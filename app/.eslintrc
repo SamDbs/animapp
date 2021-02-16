@@ -1,0 +1,35 @@
+{
+  "root": true,
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "project": "./tsconfig.json",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "settings": { "react": { "version": "detect" } },
+  "plugins": ["sort-destructure-keys", "prettier"],
+  "extends": [
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript"
+  ],
+  "rules": {
+    "prettier/prettier": "error",
+    "prefer-template": "error",
+    "object-shorthand": "error",
+    "sort-imports": ["error", { "ignoreCase": true, "ignoreDeclarationSort": true }],
+    "import/order": [
+      "error",
+      {
+        "groups": [["builtin"], ["external"], ["parent"], ["sibling", "index"]],
+        "newlines-between": "always"
+      }
+    ],
+    "import/namespace": "off",
+    "sort-destructure-keys/sort-destructure-keys": "error"
+  }
+}
