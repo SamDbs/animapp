@@ -1,0 +1,13 @@
+{
+    "name": "docker_animapp",
+    "version": "1.0.0",
+    "description": "Express.js React Postgres Docker",
+    "author": "Samantha Dubois <dbs.samantha@gmail.com>",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "express": "^4.17.1"
+    }
+}
