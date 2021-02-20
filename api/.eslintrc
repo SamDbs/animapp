@@ -1,0 +1,27 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module"
+  },
+  "extends": [
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:@typescript-eslint/recommended",
+    "prettier/@typescript-eslint",
+    "plugin:prettier/recommended"
+  ],
+  "settings": { "import/resolver": { "node": { "extensions": [".js", ".ts"] } } },
+  "plugins": ["import", "sort-destructure-keys"],
+  "rules": {
+    "sort-imports": ["error", { "ignoreCase": true, "ignoreDeclarationSort": true }],
+    "import/order": [
+      "error",
+      {
+        "groups": [["builtin"], ["external"], ["parent"], ["sibling", "index"]],
+        "newlines-between": "always"
+      }
+    ],
+    "sort-destructure-keys/sort-destructure-keys": "error"
+  }
+}
