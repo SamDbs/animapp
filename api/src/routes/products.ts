@@ -12,4 +12,6 @@ router.get('/:id/ingredients', (req, res) =>
   res.json({ name: 'test', id: req.params.id, ingredients: [1, 2, 3] }),
 )
 
+router.delete('/:id', (req, res) => res.json({ name: 'test', id: req.params.id }))
+
 export default router
