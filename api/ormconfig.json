@@ -1,0 +1,14 @@
+{
+  "type": "postgres",
+  "host": "pgsql-server",
+  "port": 5432,
+  "username": "root2",
+  "password": "root",
+  "database": "animapp_database",
+  "entities": ["./src/models/*.ts"],
+  "migrationsTableName": "typeorm_migration_table",
+  "migrations": ["./src/migrations/*.ts"],
+  "cli": {
+    "migrationsDir": "./src/migrations"
+  }
+}

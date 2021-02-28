@@ -1,8 +1,13 @@
 import { Router } from 'express'
 
+import Product from '../models/product'
+
 const router = Router()
 
-router.get('/', (req, res) => res.json({ name: 'ok' }))
+router.get('/', async (req, res) => {
+  const products = await Product.find()
+  res.json(products)
+})
 router.post('/', (req, res) => res.json({ name: 'ok' }))
 
 router.get('/:id', (req, res) => res.json({ name: 'ok', id: req.params.id }))

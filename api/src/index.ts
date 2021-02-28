@@ -8,6 +8,7 @@ import faq from './routes/faq'
 
 const PORT = 8080
 const HOST = '0.0.0.0'
+
 const app = express()
 
 app.use(express.json())
