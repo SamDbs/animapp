@@ -1,6 +1,15 @@
-import { BaseEntity, Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm'
 
 import Ingredient from './ingredient'
+import ProductDescriptionTranslation from './productDescriptionTranslation'
 
 @Entity()
 export default class Product extends BaseEntity {
@@ -12,6 +21,9 @@ export default class Product extends BaseEntity {
 
   @Column()
   name!: string
+
+  @OneToMany(() => ProductDescriptionTranslation, (description) => description.product)
+  descriptionTranslations!: ProductDescriptionTranslation[]
 
   @ManyToMany(() => Ingredient)
   @JoinTable()

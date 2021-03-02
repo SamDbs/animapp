@@ -1,0 +1,14 @@
+import Language from '../models/language'
+import Product from '../models/product'
+
+export default function viewProduct(product: Product, language: Language['id'] = 'fr') {
+  const productClient = {
+    id: product.id,
+    type: product.type,
+    name: product.name,
+    description:
+      product.descriptionTranslations.find((desc) => desc.languageId === language)?.text ??
+      'This product is not translated yet',
+  }
+  return productClient
+}

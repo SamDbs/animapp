@@ -1,6 +1,7 @@
 import { Router } from 'express'
 
 import Product from '../models/product'
+import viewProduct from '../views/product'
 
 const router = Router()
 
@@ -21,12 +22,20 @@ router.post('/', async (req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
-  const product = await Product.findOne(req.params.id)
-  if (!product) {
-    res.sendStatus(404)
-    return
+  try {
+    const product = await Product.findOne(req.params.id, { relations: ['descriptionTranslations'] })
+    if (!product) {
+      res.sendStatus(404)
+      return
+    }
+    const { language } = req.query
+    if (typeof language !== 'string') {
+      throw new Error()
+    }
+    res.json(viewProduct(product, language))
+  } catch (error) {
+    res.status(500).json({ error })
   }
-  res.json(product)
 })
 
 router.patch('/:id', (req, res) => res.json({ name: 'test', id: req.params.id }))
