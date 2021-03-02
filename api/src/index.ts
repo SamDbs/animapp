@@ -1,4 +1,5 @@
 import express from 'express'
+import { createConnection } from 'typeorm'
 
 import scan from './routes/scan'
 import products from './routes/products'
@@ -8,6 +9,7 @@ import faq from './routes/faq'
 
 const PORT = 8080
 const HOST = '0.0.0.0'
+createConnection()
 
 const app = express()
 

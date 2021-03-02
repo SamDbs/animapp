@@ -8,9 +8,26 @@ router.get('/', async (req, res) => {
   const products = await Product.find()
   res.json(products)
 })
-router.post('/', (req, res) => res.json({ name: 'ok' }))
 
-router.get('/:id', (req, res) => res.json({ name: 'ok', id: req.params.id }))
+router.post('/', async (req, res) => {
+  try {
+    const product = Product.create(req.body as Product)
+    await product.save()
+
+    res.status(201).json(product)
+  } catch {
+    res.sendStatus(400)
+  }
+})
+
+router.get('/:id', async (req, res) => {
+  const product = await Product.findOne(req.params.id)
+  if (!product) {
+    res.sendStatus(404)
+    return
+  }
+  res.json(product)
+})
 
 router.patch('/:id', (req, res) => res.json({ name: 'test', id: req.params.id }))
 router.get('/:id/ingredients', (req, res) =>
