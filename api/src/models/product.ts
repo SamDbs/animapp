@@ -25,7 +25,7 @@ export default class Product extends BaseEntity {
   @OneToMany(() => ProductTranslation, (translation) => translation.product)
   translations!: ProductTranslation[]
 
-  @ManyToMany(() => Ingredient)
+  @ManyToMany(() => Ingredient, (ingredient) => ingredient.products)
   @JoinTable()
   ingredients!: Ingredient[]
 }

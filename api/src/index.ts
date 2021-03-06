@@ -10,7 +10,7 @@ import languages from './routes/languages'
 
 const PORT = 8080
 const HOST = '0.0.0.0'
-const connection = createConnection()
+createConnection()
 const app = express()
 
 app.use(express.json())
@@ -29,8 +29,8 @@ app.use('/languages', languages)
 app.listen(PORT, HOST)
 console.log(`Running on http://${HOST}:${PORT}`)
 
-async function sync() {
-  const connec = await connection
-  connec.synchronize(true)
-}
-sync()
+// async function sync() {
+//   const connec = await connection
+//   connec.synchronize(true)
+// }
+// sync()

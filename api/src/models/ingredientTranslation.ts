@@ -9,7 +9,7 @@ export default class IngredientTranslation extends BaseEntity {
   ingredientId!: number
 
   @PrimaryColumn()
-  languageId!: number
+  languageId!: string
 
   @Column()
   name!: string
