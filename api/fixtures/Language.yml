@@ -1,0 +1,5 @@
+entity: Language
+items:
+  language{1..3}:
+    id: '{{address.countryCode}}'
+    name: '{{address.country}}'

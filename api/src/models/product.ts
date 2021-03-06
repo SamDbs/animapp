@@ -9,7 +9,7 @@ import {
 } from 'typeorm'
 
 import Ingredient from './ingredient'
-import ProductDescriptionTranslation from './productDescriptionTranslation'
+import ProductTranslation from './productTranslation'
 
 @Entity()
 export default class Product extends BaseEntity {
@@ -22,8 +22,8 @@ export default class Product extends BaseEntity {
   @Column()
   name!: string
 
-  @OneToMany(() => ProductDescriptionTranslation, (description) => description.product)
-  descriptionTranslations!: ProductDescriptionTranslation[]
+  @OneToMany(() => ProductTranslation, (translation) => translation.product)
+  translations!: ProductTranslation[]
 
   @ManyToMany(() => Ingredient)
   @JoinTable()

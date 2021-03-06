@@ -1,0 +1,14 @@
+entity: ProductTranslation
+items:
+  productTranslation1:
+    product: '@product1'
+    language: '@language1'
+    description: '{{lorem.sentence}}'
+  productTranslation2:
+    product: '@product1'
+    language: '@language2'
+    description: '{{lorem.sentence}}'
+  productTranslation3:
+    product: '@product1'
+    language: '@language3'
+    description: '{{lorem.sentence}}'

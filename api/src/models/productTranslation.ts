@@ -4,7 +4,7 @@ import Product from './product'
 import Language from './language'
 
 @Entity()
-export default class productDescriptionTranslation extends BaseEntity {
+export default class ProductTranslation extends BaseEntity {
   @PrimaryColumn()
   productId!: number
 
@@ -12,13 +12,13 @@ export default class productDescriptionTranslation extends BaseEntity {
   languageId!: string
 
   @Column()
-  text!: string
+  description!: string
 
-  @ManyToOne(() => Product, (product) => product.descriptionTranslations)
+  @ManyToOne(() => Product, (product) => product.translations)
   @JoinColumn({ name: 'productId' })
   public product!: Product
 
-  @ManyToOne(() => Language)
+  @ManyToOne(() => Language, (language) => language.productTranslations)
   @JoinColumn({ name: 'languageId' })
   public language!: Language
 }

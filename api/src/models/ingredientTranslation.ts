@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, JoinColumn, OneToMany, PrimaryColumn } from 'typeorm'
+import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm'
 
 import Ingredient from './ingredient'
 import Language from './language'
@@ -20,11 +20,11 @@ export default class IngredientTranslation extends BaseEntity {
   @Column()
   description!: string
 
-  @OneToMany(() => Ingredient, (ingredient) => ingredient.id)
+  @ManyToOne(() => Ingredient, (ingredient) => ingredient.translations)
   @JoinColumn({ name: 'ingredientId' })
   public ingredient!: Ingredient
 
-  @OneToMany(() => Language, (language) => language.id)
+  @ManyToOne(() => Language, (language) => language.ingredientTranslations)
   @JoinColumn({ name: 'languageId' })
   public language!: Language
 }

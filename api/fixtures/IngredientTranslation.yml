@@ -1,0 +1,20 @@
+entity: IngredientTranslation
+items:
+  ingredientTranslation1:
+    ingredient: '@ingredient1'
+    language: '@language1'
+    name: '{{commerce.productName}}'
+    review: '{{lorem.sentence}}'
+    description: '{{commerce.productDescription}}'
+  ingredientTranslation2:
+    ingredient: '@ingredient1'
+    language: '@language2'
+    name: '{{commerce.productName}}'
+    review: '{{lorem.sentence}}'
+    description: '{{commerce.productDescription}}'
+  ingredientTranslation3:
+    ingredient: '@ingredient1'
+    language: '@language3'
+    name: '{{commerce.productName}}'
+    review: '{{lorem.sentence}}'
+    description: '{{commerce.productDescription}}'

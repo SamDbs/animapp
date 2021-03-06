@@ -3,3 +3,7 @@ items:
   product{1..10}:
     name: '{{commerce.productName}}'
     type: '{{commerce.product}}'
+    ingredients:
+      - '@ingredient1'
+      - '@ingredient2'
+      - '@ingredient3'
