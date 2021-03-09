@@ -15,7 +15,7 @@ export const getAllProducts: RequestHandler = async (req, res) => {
 
 export const getProductById: RequestHandler = async (req, res) => {
   try {
-    const product = await Product.findOne(req.params.id, { relations: ['descriptionTranslations'] })
+    const product = await Product.findOne(req.params.id, { relations: ['translations'] })
     if (!product) {
       res.sendStatus(404)
       return
