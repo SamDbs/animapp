@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Animapp",
+      "Group": "Servers",
+      "Port": 5432,
+      "Username": "root2",
+      "Host": "db",
+      "SSLMode": "prefer",
+      "MaintenanceDB": "postgres"
+    }
+  }
+}

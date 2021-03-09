@@ -8,7 +8,7 @@ const loadFixtures = async (fixturesPath: string) => {
 
   try {
     connection = await createConnection()
-    await connection.synchronize(true)
+    // await connection.synchronize()
 
     const loader = new Loader()
     loader.load(path.resolve(fixturesPath))
