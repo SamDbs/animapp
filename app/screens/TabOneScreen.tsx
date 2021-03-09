@@ -1,32 +1,59 @@
 import * as React from 'react'
-import { StyleSheet } from 'react-native'
+import { ScrollView, StyleSheet, TouchableWithoutFeedback } from 'react-native'
+import useSWR, { mutate } from 'swr'
 
-import EditScreenInfo from '../components/EditScreenInfo'
 import { Text, View } from '../components/Themed'
 
 export default function TabOneScreen() {
+  const { data, error } = useSWR('/products')
+
+  if (error)
+    return (
+      <View>
+        <Text>{error.message}</Text>
+      </View>
+    )
+
+  if (!data)
+    return (
+      <View>
+        <Text>LOADIIING</Text>
+      </View>
+    )
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/TabOneScreen.tsx" />
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      {data.map((item: any) => (
+        <TouchableWithoutFeedback
+          key={item.id}
+          onPress={() =>
+            mutate(
+              '/products',
+              data.map((i) => {
+                if (i.id === item.id && !item.isClicked)
+                  return { ...i, name: `${i.name} clicked`, isClicked: true }
+                return i
+              }),
+              false,
+            )
+          }>
+          <View style={styles.product}>
+            <Text>{item.type}</Text>
+            <Text>{item.name}</Text>
+          </View>
+        </TouchableWithoutFeedback>
+      ))}
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  product: {
+    padding: 10,
+    borderBottomColor: 'silver',
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
 })

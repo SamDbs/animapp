@@ -21,10 +21,8 @@ export const getProductById: RequestHandler = async (req, res) => {
       return
     }
     const { language } = req.query
-    if (typeof language !== 'string') {
-      throw new Error()
-    }
-    res.json(viewProduct(product, language))
+
+    res.json(viewProduct(product, language as string))
   } catch (error) {
     res.status(500).json({ error })
   }

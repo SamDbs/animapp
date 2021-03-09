@@ -1,32 +1,63 @@
 import * as React from 'react'
-import { StyleSheet } from 'react-native'
+import { ScrollView, StyleSheet, TouchableWithoutFeedback } from 'react-native'
+import useSWR, { mutate } from 'swr'
 
-import EditScreenInfo from '../components/EditScreenInfo'
 import { Text, View } from '../components/Themed'
 
 export default function TabTwoScreen() {
+  const { data, error } = useSWR('/products/1')
+
+  if (error)
+    return (
+      <View>
+        <Text>{error.message}</Text>
+      </View>
+    )
+
+  if (!data)
+    return (
+      <View>
+        <Text>LOADIIING</Text>
+      </View>
+    )
+
+  console.log(data)
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="/screens/TabTwoScreen.tsx" />
-    </View>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text>coucou</Text>
+      <TouchableWithoutFeedback
+        key={data.id}
+        onPress={() => {
+          if (data.isClicked) return
+          mutate('/products/1', { ...data, name: `${data.name} clicked`, isClicked: true }, false)
+
+          mutate(
+            '/products',
+            async (products) =>
+              products.map((i) => {
+                if (i.id === data.id) return { ...i, name: `${i.name} clicked`, isClicked: true }
+                return i
+              }),
+            false,
+          )
+        }}>
+        <View style={styles.product}>
+          <Text>{data.type}</Text>
+          <Text>{data.name}</Text>
+        </View>
+      </TouchableWithoutFeedback>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  product: {
+    padding: 10,
+    borderBottomColor: 'silver',
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
 })
