@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   api:
@@ -7,16 +7,19 @@ services:
       - "8080:8080"
     volumes:
       - ./api/src:/usr/src/api/src
+      - ./api/fixtures:/usr/src/api/fixtures
+    links:
+      - "db:pgsql-server"
 
   db:
     image: postgres
     restart: always
-    environment:
-      POSTGRES_PASSWORD: example
     env_file:
       - database.env # configure postgres
     ports:
       - "5432:5432"
+    volumes:
+      - ./api/pg_data:/var/lib/postgresql/data
 
   pgadmin:
     image: dpage/pgadmin4
