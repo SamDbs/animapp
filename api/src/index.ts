@@ -2,6 +2,7 @@ import express from 'express'
 import { createConnection } from 'typeorm'
 
 import scan from './routes/scan'
+import search from './routes/search'
 import products from './routes/products'
 import ingredients from './routes/ingredients'
 import contact from './routes/contact'
@@ -20,6 +21,7 @@ app.get('/', (req, res) => {
 })
 
 app.use('/scan', scan)
+app.use('/search', search)
 app.use('/products', products)
 app.use('/ingredients', ingredients)
 app.use('/contact', contact)

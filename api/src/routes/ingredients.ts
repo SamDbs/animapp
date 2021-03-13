@@ -1,12 +1,13 @@
 import { Router } from 'express'
 
 import Ingredient from '../models/ingredient'
+import { viewIngredients } from '../views/ingredient'
 
 const router = Router()
 
 router.get('/', async (req, res) => {
-  const ingredients = await Ingredient.find()
-  res.json(ingredients)
+  const ingredients = await Ingredient.find({ relations: ['translations'] })
+  res.json(viewIngredients(ingredients, 'TF'))
 })
 
 router.post('/', async (req, res) => {

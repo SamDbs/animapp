@@ -1,8 +1,11 @@
 import Language from '../models/language'
 import Ingredient from '../models/ingredient'
 
-export default function viewIngredient(ingredient: Ingredient, language: Language['id'] = 'fr') {
-  const ingredientTranslation = ingredient.translations.find((desc) => desc.languageId === language)
+export default function viewIngredient(ingredient: Ingredient, language: Language['id'] = 'FR') {
+  let ingredientTranslation = ingredient.translations.find((t) => t.languageId === language)
+
+  if (!ingredientTranslation)
+    ingredientTranslation = ingredient.translations.find((t) => t.languageId === 'FR')
 
   const ingredientClient = {
     id: ingredient.id,
@@ -13,6 +16,6 @@ export default function viewIngredient(ingredient: Ingredient, language: Languag
   return ingredientClient
 }
 
-export function viewIngredients(ingredients: Ingredient[], language: Language['id'] = 'fr') {
-  return ingredients.map((ingredient) => viewIngredient(ingredient))
+export function viewIngredients(ingredients: Ingredient[], language: Language['id'] = 'FR') {
+  return ingredients.map((ingredient) => viewIngredient(ingredient, language))
 }
