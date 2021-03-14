@@ -14,7 +14,7 @@ export default class ProductTranslation extends BaseEntity {
   @Column()
   description!: string
 
-  @ManyToOne(() => Product, (product) => product.translations)
+  @ManyToOne(() => Product, (product) => product.translations, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'productId' })
   public product!: Product
 

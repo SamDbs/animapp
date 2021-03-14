@@ -60,3 +60,16 @@ export const getIngredientsByProduct: RequestHandler = async (req, res) => {
     console.log(error)
   }
 }
+
+export const deleteProduct: RequestHandler = async (req, res) => {
+  try {
+    const product = await Product.delete(req.params.id)
+    if (!product.affected) {
+      res.sendStatus(404)
+      return
+    }
+    res.sendStatus(200)
+  } catch (error) {
+    res.status(500).json({ error })
+  }
+}

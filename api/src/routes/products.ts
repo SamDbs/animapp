@@ -11,6 +11,6 @@ router.get('/:id', productController.getProductById)
 router.patch('/:id', productController.patchProduct)
 router.get('/:id/ingredients', productController.getIngredientsByProduct)
 
-router.delete('/:id', (req, res) => res.json({ name: 'test', id: req.params.id }))
+router.delete('/:id', productController.deleteProduct)
 
 export default router
