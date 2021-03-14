@@ -19,7 +19,7 @@ export default function App(): JSX.Element | null {
         <SWRConfig
           value={{
             fetcher: (resource, init) =>
-              fetch(`http://localhost:8080${resource}`, init).then((res) => res.json()),
+              fetch(`${process.env.API_URL}${resource}`, init).then((res) => res.json()),
           }}>
           <Navigation colorScheme={colorScheme} />
           <StatusBar />
