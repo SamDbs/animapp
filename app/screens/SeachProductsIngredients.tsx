@@ -1,17 +1,47 @@
 import React, { useState } from 'react'
-import { SafeAreaView, StyleSheet, TextInput, View } from 'react-native'
-import { ScrollView } from 'react-native-gesture-handler'
+import { StyleSheet, TextInput, View } from 'react-native'
+import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import useSWR from 'swr'
+import { StackNavigationProp } from '@react-navigation/stack'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { Text } from '../components/Themed'
+import { RootStackParamList } from '../types'
+
+type ProductScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Product'>
+
+type Props = {
+  navigation: ProductScreenNavigationProp
+}
 
 const SearchInputContainer = (props: any) => <View style={style.searchInputContainer} {...props} />
 
-const SearchResult = (props: any) => (
-  <View style={[style.result, props.isLast && style.noBorder].filter(Boolean)} {...props} />
+const SearchResultProduct = (props: {
+  productId: string
+  isLast: boolean
+  navigate?: Props['navigation']['push']
+  children: JSX.Element
+}) => (
+  <TouchableWithoutFeedback
+    style={[style.result, props.isLast && style.noBorder].filter(Boolean)}
+    onPress={
+      props.navigate
+        ? () => props.navigate && props.navigate('Product', { productId: props.productId })
+        : undefined
+    }>
+    {props.children}
+  </TouchableWithoutFeedback>
 )
 
-export default function SearchProductsIngredients() {
+const SearchResultIngredient = (props: { isLast: boolean; children: JSX.Element }) => (
+  <TouchableWithoutFeedback style={[style.result, props.isLast && style.noBorder].filter(Boolean)}>
+    {props.children}
+  </TouchableWithoutFeedback>
+)
+
+export default function SearchProductsIngredients({
+  navigation: { navigate },
+}: Props): JSX.Element {
   const [input, setInput] = useState('')
   const willFetch = input.length > 3
   const { data } = useSWR(willFetch ? `/search?q=${input}` : null)
@@ -31,16 +61,18 @@ export default function SearchProductsIngredients() {
         {data ? (
           <>
             {data.products.map((result: any, i: number) => (
-              <SearchResult
+              <SearchResultProduct
+                productId={result.id}
                 isLast={i === data.ingredients.length + data.products.length - 1}
-                key={result.id}>
+                key={result.id}
+                navigate={navigate}>
                 <Text>{result.name}</Text>
-              </SearchResult>
+              </SearchResultProduct>
             ))}
             {data.ingredients.map((result: any, i: number) => (
-              <SearchResult isLast={i === data.ingredients.length - 1} key={result.id}>
+              <SearchResultIngredient isLast={i === data.ingredients.length - 1} key={result.id}>
                 <Text>{result.name}</Text>
-              </SearchResult>
+              </SearchResultIngredient>
             ))}
           </>
         ) : (
