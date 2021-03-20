@@ -120,3 +120,19 @@ export const patchProductTranslation: RequestHandler = async (req, res) => {
     res.status(500).json({ error })
   }
 }
+
+export const deleteProductTranslation: RequestHandler = async (req, res) => {
+  try {
+    const productTranslation = await ProductTranslation.delete({
+      productId: parseInt(req.params.id),
+      languageId: req.params.lang,
+    })
+    if (!productTranslation.affected) {
+      res.sendStatus(404)
+      return
+    }
+    res.sendStatus(200)
+  } catch (error) {
+    res.status(500).json({ error })
+  }
+}
