@@ -5,10 +5,10 @@ import { Text } from 'react-native'
 import React from 'react'
 import useSWR from 'swr'
 
-import { RootStackParamList } from '../types'
+import { SearchStackParamList } from '../types'
 
-type ProductScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Product'>
-type ProfileScreenRouteProp = RouteProp<RootStackParamList, 'Product'>
+type ProductScreenNavigationProp = StackNavigationProp<SearchStackParamList, 'Product'>
+type ProfileScreenRouteProp = RouteProp<SearchStackParamList, 'Product'>
 
 type Props = {
   navigation: ProductScreenNavigationProp
