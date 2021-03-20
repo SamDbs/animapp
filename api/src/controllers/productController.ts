@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express'
 
-import { viewProduct, viewProductTranslations } from '../views/product'
+import { viewProduct, viewProductTranslation, viewProductTranslations } from '../views/product'
 import { viewIngredients } from '../views/ingredient'
 import Product from '../models/product'
 import ProductTranslation from '../models/productTranslation'
@@ -97,6 +97,25 @@ export const getAllProductTranslations: RequestHandler = async (req, res) => {
       return
     }
     res.json(viewProductTranslations(productTranslations))
+  } catch (error) {
+    res.status(500).json({ error })
+  }
+}
+
+export const patchProductTranslation: RequestHandler = async (req, res) => {
+  try {
+    await ProductTranslation.update(
+      { productId: parseInt(req.params.id), languageId: req.params.lang },
+      req.body,
+    )
+    const productTranslation = await ProductTranslation.findOneOrFail({
+      where: { productId: parseInt(req.params.id), languageId: req.params.lang },
+    })
+    if (!productTranslation) {
+      res.sendStatus(404)
+      return
+    }
+    res.status(200).json(viewProductTranslation(productTranslation))
   } catch (error) {
     res.status(500).json({ error })
   }

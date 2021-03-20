@@ -16,7 +16,7 @@ router.delete('/:id', productController.deleteProduct)
 // CRUD translations
 router.post('/:id/translations', productController.createProductTranslation)
 router.get('/:id/translations', productController.getAllProductTranslations)
-// router.patch('/:id/translations/:id', productController.patchProductTranslation)
+router.patch('/:id/translations/:lang', productController.patchProductTranslation)
 // router.delete('/:id/translations/:id', productController.deleteProductTranslation)
 
 export default router
