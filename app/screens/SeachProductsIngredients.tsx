@@ -1,14 +1,14 @@
-import React, { useState } from 'react'
-import { StyleSheet, TextInput, View } from 'react-native'
-import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler'
-import useSWR from 'swr'
-import { StackNavigationProp } from '@react-navigation/stack'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler'
+import { StackNavigationProp } from '@react-navigation/stack'
+import { StyleSheet, TextInput, View } from 'react-native'
+import React, { useState } from 'react'
+import useSWR from 'swr'
 
 import { Text } from '../components/Themed'
-import { RootStackParamList } from '../types'
+import { SearchStackParamList } from '../types'
 
-type ProductScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Product'>
+type ProductScreenNavigationProp = StackNavigationProp<SearchStackParamList, 'Product'>
 
 type Props = {
   navigation: ProductScreenNavigationProp
@@ -86,7 +86,7 @@ export default function SearchProductsIngredients({
 }
 
 const style = StyleSheet.create({
-  page: { backgroundColor: '#eee', flexGrow: 1 },
+  page: { flex: 1 },
   searchInputContainer: { padding: 10 },
   searchInput: {
     padding: 10,
