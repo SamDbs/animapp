@@ -1,7 +1,8 @@
 import Language from '../models/language'
 import Product from '../models/product'
+import ProductTranslation from '../models/productTranslation'
 
-export default function viewProduct(product: Product, language: Language['id'] | undefined = 'FR') {
+export function viewProduct(product: Product, language: Language['id'] | undefined = 'FR') {
   const productClient = {
     id: product.id,
     type: product.type,
@@ -15,4 +16,8 @@ export default function viewProduct(product: Product, language: Language['id'] |
 
 export function viewProducts(ingredients: Product[], language: Language['id'] = 'FR') {
   return ingredients.map((ingredient) => viewProduct(ingredient, language))
+}
+
+export function viewProductTranslations(productTranslations: ProductTranslation[]) {
+  return productTranslations
 }

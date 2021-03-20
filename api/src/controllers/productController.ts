@@ -1,8 +1,9 @@
 import { RequestHandler } from 'express'
 
-import viewProduct from '../views/product'
+import { viewProduct, viewProductTranslations } from '../views/product'
 import { viewIngredients } from '../views/ingredient'
 import Product from '../models/product'
+import ProductTranslation from '../models/productTranslation'
 
 export const getAllProducts: RequestHandler = async (req, res) => {
   try {
@@ -69,6 +70,33 @@ export const deleteProduct: RequestHandler = async (req, res) => {
       return
     }
     res.sendStatus(200)
+  } catch (error) {
+    res.status(500).json({ error })
+  }
+}
+
+export const createProductTranslation: RequestHandler = async (req, res) => {
+  try {
+    const translation = ProductTranslation.create(req.body as ProductTranslation)
+    translation.productId = parseInt(req.params.id)
+    await translation.save()
+
+    res.status(201).json(translation)
+  } catch {
+    res.sendStatus(400)
+  }
+}
+
+export const getAllProductTranslations: RequestHandler = async (req, res) => {
+  try {
+    const productTranslations = await ProductTranslation.find({
+      where: { productId: parseInt(req.params.id) },
+    })
+    if (productTranslations.length === 0) {
+      res.sendStatus(404)
+      return
+    }
+    res.json(viewProductTranslations(productTranslations))
   } catch (error) {
     res.status(500).json({ error })
   }

@@ -1,5 +1,14 @@
 entity: Language
 items:
-  language{1..3}:
-    id: '{{address.countryCode}}'
-    name: '{{address.country}}'
+  language1:
+    id: 'FR'
+    name: 'French'
+  language2:
+    id: 'EN'
+    name: 'English'
+  language3:
+    id: 'SP'
+    name: 'Spanish'
+  language4:
+    id: 'DE'
+    name: 'German'
