@@ -1,11 +1,15 @@
 export type RootStackParamList = {
   Root: undefined
-  Product: { productId: string }
   NotFound: undefined
 }
 
 export type BottomTabParamList = {
   ScanProduct: undefined
-  SearchProductsIngredients: undefined
+  SearchStackNavigator: undefined
   ProductsHistory: undefined
+}
+
+export type SearchStackParamList = {
+  Search: undefined
+  Product: { productId: string }
 }

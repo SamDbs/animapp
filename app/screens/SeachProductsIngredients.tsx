@@ -1,50 +1,64 @@
-import React, { useState } from 'react'
-import { StyleSheet, TextInput, View } from 'react-native'
-import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler'
-import useSWR from 'swr'
-import { StackNavigationProp } from '@react-navigation/stack'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler'
+import { StackNavigationProp } from '@react-navigation/stack'
+import { StyleSheet, TextInput, View } from 'react-native'
+import React, { useState } from 'react'
+import useSWR from 'swr'
 
 import { Text } from '../components/Themed'
-import { RootStackParamList } from '../types'
+import { SearchStackParamList } from '../types'
+import Loader from '../components/Loader'
 
-type ProductScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Product'>
+type ProductScreenNavigationProp = StackNavigationProp<SearchStackParamList, 'Product'>
 
 type Props = {
   navigation: ProductScreenNavigationProp
 }
 
-const SearchInputContainer = (props: any) => <View style={style.searchInputContainer} {...props} />
+function SearchInputContainer(props: any) {
+  return <View style={style.searchInputContainer} {...props} />
+}
 
-const SearchResultProduct = (props: {
+function SearchResultProduct(props: {
   productId: string
   isLast: boolean
   navigate?: Props['navigation']['push']
   children: JSX.Element
-}) => (
-  <TouchableWithoutFeedback
-    style={[style.result, props.isLast && style.noBorder].filter(Boolean)}
-    onPress={
-      props.navigate
-        ? () => props.navigate && props.navigate('Product', { productId: props.productId })
-        : undefined
-    }>
-    {props.children}
-  </TouchableWithoutFeedback>
-)
+}) {
+  return (
+    <TouchableWithoutFeedback
+      style={[style.result, props.isLast && style.noBorder].filter(Boolean)}
+      onPress={
+        props.navigate
+          ? () => props.navigate && props.navigate('Product', { productId: props.productId })
+          : undefined
+      }>
+      {props.children}
+    </TouchableWithoutFeedback>
+  )
+}
 
-const SearchResultIngredient = (props: { isLast: boolean; children: JSX.Element }) => (
-  <TouchableWithoutFeedback style={[style.result, props.isLast && style.noBorder].filter(Boolean)}>
-    {props.children}
-  </TouchableWithoutFeedback>
-)
+function SearchResultIngredient(props: { isLast: boolean; children: JSX.Element }) {
+  return (
+    <TouchableWithoutFeedback
+      style={[style.result, props.isLast && style.noBorder].filter(Boolean)}>
+      {props.children}
+    </TouchableWithoutFeedback>
+  )
+}
+
+function Center(props: { children: JSX.Element }): JSX.Element {
+  return <View style={style.center}>{props.children}</View>
+}
 
 export default function SearchProductsIngredients({
   navigation: { navigate },
 }: Props): JSX.Element {
   const [input, setInput] = useState('')
-  const willFetch = input.length > 3
-  const { data } = useSWR(willFetch ? `/search?q=${input}` : null)
+  const shouldFetch = input.length > 3
+  const { data, error } = useSWR(shouldFetch ? `/search?q=${input}` : null)
+  const loading = shouldFetch && !data && !error
+  const empty = shouldFetch && error
 
   return (
     <SafeAreaView style={style.page}>
@@ -57,8 +71,23 @@ export default function SearchProductsIngredients({
           clearButtonMode="always"
         />
       </SearchInputContainer>
+      {!shouldFetch && (
+        <Center>
+          <Text>Please type something</Text>
+        </Center>
+      )}
+      {loading && (
+        <Center>
+          <Loader />
+        </Center>
+      )}
+      {empty && (
+        <Center>
+          <Text>No result</Text>
+        </Center>
+      )}
       <ScrollView>
-        {data ? (
+        {data && (
           <>
             {data.products.map((result: any, i: number) => (
               <SearchResultProduct
@@ -75,10 +104,6 @@ export default function SearchProductsIngredients({
               </SearchResultIngredient>
             ))}
           </>
-        ) : (
-          <View style={style.noResults}>
-            <Text>No result yet</Text>
-          </View>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -86,7 +111,7 @@ export default function SearchProductsIngredients({
 }
 
 const style = StyleSheet.create({
-  page: { backgroundColor: '#eee', flexGrow: 1 },
+  page: { flex: 1 },
   searchInputContainer: { padding: 10 },
   searchInput: {
     padding: 10,
@@ -103,6 +128,10 @@ const style = StyleSheet.create({
   },
   noResults: {
     flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  center: {
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -43,10 +43,10 @@ export default function ScanProduct(): JSX.Element {
 
 const style = StyleSheet.create({
   screen: {
-    flexGrow: 1,
+    flex: 1,
   },
   viewFinder: {
-    flexGrow: 1,
+    flex: 1,
     justifyContent: 'flex-end',
   },
 })

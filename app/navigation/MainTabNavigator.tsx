@@ -3,10 +3,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import * as React from 'react'
 
 import Colors from '../constants/Colors'
+import SearchStackNavigator from '../navigation/SearchStackNavigator'
 import useColorScheme from '../hooks/useColorScheme'
 import ProductsHistory from '../screens/ProductsHistory'
 import ScanProduct from '../screens/ScanProduct'
-import SearchProductsIngredients from '../screens/SeachProductsIngredients'
 import { BottomTabParamList } from '../types'
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>()
@@ -33,8 +33,8 @@ export default function MainTabNavigator(): JSX.Element {
         }}
       />
       <BottomTab.Screen
-        name="SearchProductsIngredients"
-        component={SearchProductsIngredients}
+        name="SearchStackNavigator"
+        component={SearchStackNavigator}
         options={{
           tabBarIcon: createTabBarIcon('search'),
           title: 'Search',

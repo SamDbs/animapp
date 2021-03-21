@@ -20,6 +20,11 @@ export const searchAll: RequestHandler = async (req, res) => {
       .where('t.name ILike :q', { q: `%${q}%` })
       .getMany()
 
+    if (!products.length && !ingredients.length) {
+      res.sendStatus(404)
+      return
+    }
+
     res.json({
       ingredients: viewIngredients(
         ingredients.map((i) => i.ingredient),
