@@ -21,3 +21,7 @@ export function viewProducts(ingredients: Product[], language: Language['id'] = 
 export function viewProductTranslations(productTranslations: ProductTranslation[]) {
   return productTranslations
 }
+
+export function viewProductTranslation(productTranslation: ProductTranslation) {
+  return productTranslation
+}
