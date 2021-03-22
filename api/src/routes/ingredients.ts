@@ -8,7 +8,7 @@ router.get('/', ingredientController.getAllIngredients)
 router.post('/', ingredientController.createIngredient)
 router.get('/:id', ingredientController.getIngredientById)
 router.patch('/:id', ingredientController.patchIngredient)
-// router.delete('/:id', ingredientController.deleteIngredient)
+router.delete('/:id', ingredientController.deleteIngredient)
 
 // CRUD translations
 router.get('/:id/translations', ingredientController.getIngredientByIdWithTranslations)

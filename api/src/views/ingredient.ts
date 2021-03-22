@@ -9,6 +9,7 @@ export function viewIngredient(ingredient: Ingredient, language: Language['id'] 
 
   const ingredientClient = {
     id: ingredient.id,
+    photo: ingredient.photo ?? 'This ingredient does not have photo yet',
     name: ingredientTranslation?.name ?? 'This ingredient is not translated yet',
     review: ingredientTranslation?.review ?? 'This ingredient is not translated yet',
     description: ingredientTranslation?.description ?? 'This ingredient is not translated yet',
@@ -19,11 +20,12 @@ export function viewIngredient(ingredient: Ingredient, language: Language['id'] 
 export function viewIngredientWithTranslations(ingredient: Ingredient) {
   const ingredientTranslations = ingredient.translations
 
-  const ingredientClient = {
+  const ingredientAdmin = {
     id: ingredient.id,
+    photo: ingredient.photo,
     translations: ingredientTranslations,
   }
-  return ingredientClient
+  return ingredientAdmin
 }
 
 export function viewIngredients(ingredients: Ingredient[], language: Language['id'] = 'FR') {

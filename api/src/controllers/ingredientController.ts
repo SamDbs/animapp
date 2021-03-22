@@ -51,6 +51,19 @@ export const patchIngredient: RequestHandler = async (req, res) => {
   }
 }
 
+export const deleteIngredient: RequestHandler = async (req, res) => {
+  try {
+    const ingredient = await Ingredient.delete(req.params.id)
+    if (!ingredient.affected) {
+      res.sendStatus(404)
+      return
+    }
+    res.sendStatus(200)
+  } catch (error) {
+    res.status(500).json({ error })
+  }
+}
+
 // CRUD Translations
 export const getIngredientByIdWithTranslations: RequestHandler = async (req, res) => {
   try {
