@@ -1,5 +1,6 @@
 import Language from '../models/language'
 import Ingredient from '../models/ingredient'
+import IngredientTranslation from '../models/ingredientTranslation'
 
 export function viewIngredient(ingredient: Ingredient, language: Language['id'] = 'FR') {
   let ingredientTranslation = ingredient.translations.find((t) => t.languageId === language)
@@ -30,4 +31,8 @@ export function viewIngredientWithTranslations(ingredient: Ingredient) {
 
 export function viewIngredients(ingredients: Ingredient[], language: Language['id'] = 'FR') {
   return ingredients.map((ingredient) => viewIngredient(ingredient, language))
+}
+
+export function viewIngredientTranslation(ingredientTranslation: IngredientTranslation) {
+  return ingredientTranslation
 }

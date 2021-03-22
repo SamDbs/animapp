@@ -12,8 +12,8 @@ router.delete('/:id', ingredientController.deleteIngredient)
 
 // CRUD translations
 router.get('/:id/translations', ingredientController.getIngredientByIdWithTranslations)
-router.post('/:id', ingredientController.createIngredientTranslation)
-// router.patch('/:id', ingredientController.patchIngredientTranslation)
-// router.delete('/:id/translations/:lang', ingredientController.deleteIngredientTranslation)
+router.post('/:id/translations', ingredientController.createIngredientTranslation)
+router.patch('/:id/translations/:lang', ingredientController.patchIngredientTranslation)
+router.delete('/:id/translations/:lang', ingredientController.deleteIngredientTranslation)
 
 export default router

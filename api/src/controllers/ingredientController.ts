@@ -5,6 +5,7 @@ import IngredientTranslation from '../models/ingredientTranslation'
 import {
   viewIngredient,
   viewIngredients,
+  viewIngredientTranslation,
   viewIngredientWithTranslations,
 } from '../views/ingredient'
 
@@ -87,5 +88,40 @@ export const createIngredientTranslation: RequestHandler = async (req, res) => {
     res.status(201).json(translation)
   } catch {
     res.sendStatus(400)
+  }
+}
+
+export const patchIngredientTranslation: RequestHandler = async (req, res) => {
+  try {
+    await IngredientTranslation.update(
+      { ingredientId: parseInt(req.params.id), languageId: req.params.lang },
+      req.body,
+    )
+    const ingredientTranslation = await IngredientTranslation.findOneOrFail({
+      where: { ingredientId: parseInt(req.params.id), languageId: req.params.lang },
+    })
+    if (!ingredientTranslation) {
+      res.sendStatus(404)
+      return
+    }
+    res.status(200).json(viewIngredientTranslation(ingredientTranslation))
+  } catch (error) {
+    res.status(500).json({ error })
+  }
+}
+
+export const deleteIngredientTranslation: RequestHandler = async (req, res) => {
+  try {
+    const ingredientTranslation = await IngredientTranslation.delete({
+      ingredientId: parseInt(req.params.id),
+      languageId: req.params.lang,
+    })
+    if (!ingredientTranslation.affected) {
+      res.sendStatus(404)
+      return
+    }
+    res.sendStatus(200)
+  } catch (error) {
+    res.status(500).json({ error })
   }
 }
