@@ -22,6 +22,9 @@ export default class Product extends BaseEntity {
   @Column()
   name!: string
 
+  @Column({ nullable: true })
+  photo!: string
+
   @OneToMany(() => ProductTranslation, (translation) => translation.product)
   translations!: ProductTranslation[]
 

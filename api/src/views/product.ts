@@ -7,6 +7,7 @@ export function viewProduct(product: Product, language: Language['id'] | undefin
     id: product.id,
     type: product.type,
     name: product.name,
+    photo: product.photo,
     description:
       product.translations.find((t) => t.languageId === language)?.description ??
       'This product is not translated yet',

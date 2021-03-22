@@ -1,3 +1,5 @@
 entity: Ingredient
 items:
   ingredient{1..10}:
+    photo: '{{image.imageUrl}}'
+
