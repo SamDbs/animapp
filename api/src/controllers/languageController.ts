@@ -30,9 +30,12 @@ export const createLanguage: RequestHandler = async (req, res) => {
     const language = await Language.findByIds(req.body.id.toUpperCase())
     if (language.length > 0) {
       res.status(409).send('This language already exists')
+      return
     }
-    const newLanguage = Language.create(req.body as Language)
-    newLanguage.idToUpperCase()
+    const newLanguage = Language.create({
+      id: req.body.id.toUpperCase(),
+      name: req.body.name,
+    } as Language)
     await newLanguage.save()
     res.status(201).json(newLanguage)
   } catch {
