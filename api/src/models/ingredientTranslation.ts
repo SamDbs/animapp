@@ -20,7 +20,7 @@ export default class IngredientTranslation extends BaseEntity {
   @Column()
   description!: string
 
-  @ManyToOne(() => Ingredient, (ingredient) => ingredient.translations)
+  @ManyToOne(() => Ingredient, (ingredient) => ingredient.translations, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'ingredientId' })
   public ingredient!: Ingredient
 

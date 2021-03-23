@@ -1,28 +1,19 @@
 import { Router } from 'express'
 
-import Ingredient from '../models/ingredient'
-import { viewIngredients } from '../views/ingredient'
+import * as ingredientController from '../controllers/ingredientController'
 
 const router = Router()
 
-router.get('/', async (req, res) => {
-  const ingredients = await Ingredient.find({ relations: ['translations'] })
-  res.json(viewIngredients(ingredients, 'TF'))
-})
+router.get('/', ingredientController.getAllIngredients)
+router.post('/', ingredientController.createIngredient)
+router.get('/:id', ingredientController.getIngredientById)
+router.patch('/:id', ingredientController.patchIngredient)
+router.delete('/:id', ingredientController.deleteIngredient)
 
-router.post('/', async (req, res) => {
-  try {
-    const ingredient = Ingredient.create(req.body as Ingredient)
-    await ingredient.save()
-
-    res.status(201).json(ingredient)
-  } catch {
-    res.sendStatus(400)
-  }
-})
-router.get('/:id', (req, res) => res.json({ name: 'ok', id: req.params.id }))
-router.patch('/:id', (req, res) => res.json({ name: 'test', id: req.params.id }))
-
-router.delete('/:id', (req, res) => res.json({ name: 'test', id: req.params.id }))
+// CRUD translations
+router.get('/:id/translations', ingredientController.getIngredientByIdWithTranslations)
+router.post('/:id/translations', ingredientController.createIngredientTranslation)
+router.patch('/:id/translations/:lang', ingredientController.patchIngredientTranslation)
+router.delete('/:id/translations/:lang', ingredientController.deleteIngredientTranslation)
 
 export default router

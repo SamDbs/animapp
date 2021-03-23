@@ -3,6 +3,7 @@ items:
   product{1..10}:
     name: '{{commerce.productName}}'
     type: '{{commerce.product}}'
+    photo: '{{image.imageUrl}}'
     ingredients:
       - '@ingredient1'
       - '@ingredient2'
