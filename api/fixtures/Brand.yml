@@ -1,0 +1,4 @@
+entity: Brand
+items:
+  brand{1..3}:
+    name: '{{company.companyName}}'

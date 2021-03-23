@@ -16,4 +16,5 @@ export default class Language extends BaseEntity {
 
   @OneToMany(() => IngredientTranslation, (translation) => translation.language)
   ingredientTranslations!: IngredientTranslation[]
+
 }
