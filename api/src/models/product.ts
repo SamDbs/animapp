@@ -2,13 +2,16 @@ import {
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm'
 
 import Ingredient from './ingredient'
+import Brand from './brand'
 import ProductTranslation from './productTranslation'
 
 @Entity()
@@ -28,4 +31,8 @@ export default class Product extends BaseEntity {
   @ManyToMany(() => Ingredient, (ingredient) => ingredient.products)
   @JoinTable()
   ingredients!: Ingredient[]
+
+  @ManyToOne(() => Brand, (brand) => brand.products, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'brandID' })
+  public brand!: Brand[]
 }
