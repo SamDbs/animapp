@@ -1,4 +1,4 @@
-import { BaseEntity, Column, Entity, OneToMany, PrimaryColumn } from 'typeorm'
+import { BaseEntity, BeforeInsert, Column, Entity, OneToMany, PrimaryColumn } from 'typeorm'
 
 import ProductTranslation from './productTranslation'
 import IngredientTranslation from './ingredientTranslation'
@@ -16,4 +16,9 @@ export default class Language extends BaseEntity {
 
   @OneToMany(() => IngredientTranslation, (translation) => translation.language)
   ingredientTranslations!: IngredientTranslation[]
+
+  @BeforeInsert()
+  async idToUpperCase(): Promise<void> {
+    this.id = this.id.toUpperCase()
+  }
 }
