@@ -1,0 +1,47 @@
+entity: FaqTranslation
+items:
+  faqTranslation1:
+    language: '@language1'
+    faq: '@faq1'
+    question: '{{lorem.sentence}} ?'
+    answer: '{{lorem.sentence}}'
+  faqTranslation2:
+    language: '@language2'
+    faq: '@faq1'
+    question: '{{lorem.sentence}} ?'
+    answer: '{{lorem.sentence}}'
+  faqTranslation3:
+    language: '@language3'
+    faq: '@faq1'
+    question: '{{lorem.sentence}} ?'
+    answer: '{{lorem.sentence}}'
+  faqTranslation4:
+    language: '@language1'
+    faq: '@faq2'
+    question: '{{lorem.sentence}} ?'
+    answer: '{{lorem.sentence}}'
+  faqTranslation5:
+    language: '@language2'
+    faq: '@faq2'
+    question: '{{lorem.sentence}} ?'
+    answer: '{{lorem.sentence}}'
+  faqTranslation6:
+    language: '@language3'
+    faq: '@faq2'
+    question: '{{lorem.sentence}} ?'
+    answer: '{{lorem.sentence}}'
+  faqTranslation7:
+    language: '@language1'
+    faq: '@faq3'
+    question: '{{lorem.sentence}} ?'
+    answer: '{{lorem.sentence}}'
+  faqTranslation8:
+    language: '@language2'
+    faq: '@faq3'
+    question: '{{lorem.sentence}} ?'
+    answer: '{{lorem.sentence}}'
+  faqTranslation9:
+    language: '@language3'
+    faq: '@faq3'
+    question: '{{lorem.sentence}} ?'
+    answer: '{{lorem.sentence}}'

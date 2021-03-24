@@ -1,0 +1,3 @@
+entity: Faq
+items:
+  faq{1..3}:
