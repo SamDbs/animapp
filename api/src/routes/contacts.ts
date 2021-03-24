@@ -5,9 +5,8 @@ import * as contactController from '../controllers/contactController'
 const router = Router()
 
 router.get('/', contactController.getAllContacts)
-
-router.post('/', (req, res) => res.json({ name: 'ok' }))
-router.get('/:id', (req, res) => res.json({ name: 'ok', id: req.params.id }))
-router.delete('/:id', (req, res) => res.json({ name: 'test', id: req.params.id }))
+router.get('/:id', contactController.getContactById)
+router.post('/', contactController.createContact)
+router.delete('/:id', contactController.deleteContact)
 
 export default router
