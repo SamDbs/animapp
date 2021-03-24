@@ -5,7 +5,7 @@ import scan from './routes/scan'
 import search from './routes/search'
 import products from './routes/products'
 import ingredients from './routes/ingredients'
-import contact from './routes/contact'
+import contacts from './routes/contacts'
 import faq from './routes/faq'
 import languages from './routes/languages'
 
@@ -24,7 +24,7 @@ app.use('/scan', scan)
 app.use('/search', search)
 app.use('/products', products)
 app.use('/ingredients', ingredients)
-app.use('/contact', contact)
+app.use('/contacts', contacts)
 app.use('/faq', faq)
 app.use('/languages', languages)
 
