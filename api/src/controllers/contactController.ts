@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express'
 
 import Contact from '../models/contact'
-import { viewContacts  } from '../views/contact'
+import { viewContacts } from '../views/contact'
 
 export const getAllContacts: RequestHandler = async (req, res) => {
   try {

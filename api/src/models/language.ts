@@ -1,4 +1,13 @@
-import { BaseEntity, Column, Entity, OneToMany, PrimaryColumn } from 'typeorm'
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 
 import ProductTranslation from './productTranslation'
 import IngredientTranslation from './ingredientTranslation'
@@ -20,4 +29,13 @@ export default class Language extends BaseEntity {
 
   @OneToMany(() => FaqTranslation, (translation) => translation.language)
   faqTranslations!: FaqTranslation[]
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt!: Date
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt!: Date
+
+  @DeleteDateColumn({ name: 'deteded_at' })
+  deletedAt!: Date
 }

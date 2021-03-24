@@ -1,4 +1,13 @@
-import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 
 import Product from './product'
 
@@ -9,6 +18,15 @@ export default class Brand extends BaseEntity {
 
   @Column()
   name!: string
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt!: Date
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt!: Date
+
+  @DeleteDateColumn({ name: 'deteded_at' })
+  deletedAt!: Date
 
   @OneToMany(() => Product, (product) => product.brand)
   products!: Product[]
