@@ -27,12 +27,12 @@ export default class Ingredient extends BaseEntity {
   @ManyToMany(() => Product, (product) => product.ingredients)
   products!: Product[]
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date
 
-  @DeleteDateColumn({ name: 'deteded_at' })
+  @DeleteDateColumn()
   deletedAt!: Date
 }

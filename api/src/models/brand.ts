@@ -19,13 +19,13 @@ export default class Brand extends BaseEntity {
   @Column()
   name!: string
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date
 
-  @DeleteDateColumn({ name: 'deteded_at' })
+  @DeleteDateColumn()
   deletedAt!: Date
 
   @OneToMany(() => Product, (product) => product.brand)

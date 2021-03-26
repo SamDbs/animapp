@@ -22,12 +22,12 @@ export default class Contact extends BaseEntity {
   @Column()
   message!: string
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date
 
-  @DeleteDateColumn({ name: 'deteded_at' })
+  @DeleteDateColumn()
   deletedAt!: Date
 }

@@ -35,12 +35,12 @@ export default class FaqTranslation extends BaseEntity {
   @JoinColumn({ name: 'languageId' })
   public language!: Language
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date
 
-  @DeleteDateColumn({ name: 'deteded_at' })
+  @DeleteDateColumn()
   deletedAt!: Date
 }

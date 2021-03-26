@@ -30,12 +30,12 @@ export default class Language extends BaseEntity {
   @OneToMany(() => FaqTranslation, (translation) => translation.language)
   faqTranslations!: FaqTranslation[]
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn()
   createdAt!: Date
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn()
   updatedAt!: Date
 
-  @DeleteDateColumn({ name: 'deteded_at' })
+  @DeleteDateColumn()
   deletedAt!: Date
 }
