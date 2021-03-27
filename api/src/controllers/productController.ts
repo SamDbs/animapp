@@ -1,13 +1,42 @@
-import { RequestHandler } from 'express'
+import { FindManyOptions, QueryFailedError } from 'typeorm'
+import { Request, RequestHandler } from 'express'
 
 import { viewProduct, viewProductTranslation, viewProductTranslations } from '../views/product'
 import { viewIngredients } from '../views/ingredient'
 import Product from '../models/product'
 import ProductTranslation from '../models/productTranslation'
 
+const allowedProductFilterKeys: (keyof Product)[] = ['id', 'name' /* ,'barCode' */]
+function GetAllowedProductFilters(key: string): key is keyof Product {
+  return allowedProductFilterKeys.includes(key as keyof Product)
+}
+
+function getFilters(query: Request['query']): FindManyOptions<Product> | undefined {
+  const where: FindManyOptions<Product>['where'] = {}
+  const options: FindManyOptions<Product> = { where }
+
+  Object.entries(query).forEach(([key, value]) => {
+    if (key && GetAllowedProductFilters(key)) {
+      where[key] = value
+    } else throw new Error(`Cannot filter on ${key}.`)
+  })
+
+  if (!Object.keys(where).length) return
+
+  return options
+}
+
 export const getAllProducts: RequestHandler = async (req, res) => {
+  let filters
   try {
-    const products = await Product.find()
+    filters = getFilters(req.query)
+  } catch (error) {
+    res.status(400).json({ error: error.message })
+    return
+  }
+
+  try {
+    const products = await Product.find(filters)
     res.json(products)
   } catch (error) {
     res.status(500).json({ error })

@@ -2,6 +2,6 @@ import { Router } from 'express'
 
 const router = Router()
 
-router.post('/', (req, res) => res.json({ name: 'ok' }))
+router.get('/:code', (req, res) => res.json({ productId: 1 }))
 
 export default router

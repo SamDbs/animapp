@@ -4,9 +4,9 @@ import * as React from 'react'
 
 import Colors from '../constants/Colors'
 import SearchStackNavigator from '../navigation/SearchStackNavigator'
+import ScanProductStackNavigator from '../navigation/ScanProductScanNavigator'
 import useColorScheme from '../hooks/useColorScheme'
 import ProductsHistory from '../screens/ProductsHistory'
-import ScanProduct from '../screens/ScanProduct'
 import { BottomTabParamList } from '../types'
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>()
@@ -22,11 +22,11 @@ export default function MainTabNavigator(): JSX.Element {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="ScanProduct"
+      initialRouteName="ScanProductStackNavigator"
       tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
       <BottomTab.Screen
-        name="ScanProduct"
-        component={ScanProduct}
+        name="ScanProductStackNavigator"
+        component={ScanProductStackNavigator}
         options={{
           tabBarIcon: createTabBarIcon('scan'),
           title: 'Scan',
