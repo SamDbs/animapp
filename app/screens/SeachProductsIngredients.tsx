@@ -1,13 +1,12 @@
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { StyleSheet, TextInput, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 import useSWR from 'swr'
 
 import { Text } from '../components/Themed'
 import { SearchStackParamList } from '../types'
-import Loader from '../components/Loader'
 
 type ProductScreenNavigationProp = StackNavigationProp<SearchStackParamList, 'Product'>
 
@@ -78,7 +77,7 @@ export default function SearchProductsIngredients({
       )}
       {loading && (
         <Center>
-          <Loader />
+          <ActivityIndicator size={40} color="#ccc" />
         </Center>
       )}
       {empty && (
@@ -111,7 +110,7 @@ export default function SearchProductsIngredients({
 }
 
 const style = StyleSheet.create({
-  page: { flex: 1 },
+  page: { flex: 1, backgroundColor: '#eee' },
   searchInputContainer: { padding: 10 },
   searchInput: {
     padding: 10,
