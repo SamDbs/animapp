@@ -10,13 +10,13 @@ import {
   UpdateDateColumn,
 } from 'typeorm'
 
-import Ingredient from './ingredient'
 import Language from './language'
+import AnalyticalConstituent from './analyticalConstituent'
 
 @Entity()
-export default class IngredientTranslation extends BaseEntity {
+export default class ConstituentTranslation extends BaseEntity {
   @PrimaryColumn()
-  ingredientId!: number
+  analyticalConstituentId!: number
 
   @PrimaryColumn()
   languageId!: string
@@ -25,16 +25,17 @@ export default class IngredientTranslation extends BaseEntity {
   name!: string
 
   @Column()
-  review!: string
-
-  @Column()
   description!: string
 
-  @ManyToOne(() => Ingredient, (ingredient) => ingredient.translations, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'ingredientId' })
-  ingredient!: Ingredient
+  @ManyToOne(
+    () => AnalyticalConstituent,
+    (analyticalConstituent) => analyticalConstituent.translations,
+    { onDelete: 'CASCADE' },
+  )
+  @JoinColumn({ name: 'analyticalConstituentId' })
+  analyticalConstituent!: AnalyticalConstituent
 
-  @ManyToOne(() => Language, (language) => language.ingredientTranslations)
+  @ManyToOne(() => Language, (language) => language.constituentTranslations)
   @JoinColumn({ name: 'languageId' })
   language!: Language
 

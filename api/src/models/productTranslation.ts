@@ -26,11 +26,11 @@ export default class ProductTranslation extends BaseEntity {
 
   @ManyToOne(() => Product, (product) => product.translations, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'productId' })
-  public product!: Product
+  product!: Product
 
   @ManyToOne(() => Language, (language) => language.productTranslations)
   @JoinColumn({ name: 'languageId' })
-  public language!: Language
+  language!: Language
 
   @CreateDateColumn()
   createdAt!: Date

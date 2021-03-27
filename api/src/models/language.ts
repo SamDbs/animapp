@@ -12,6 +12,7 @@ import {
 import ProductTranslation from './productTranslation'
 import IngredientTranslation from './ingredientTranslation'
 import FaqTranslation from './faqTranslation'
+import ConstituentTranslation from './constituentTranslation'
 
 @Entity()
 export default class Language extends BaseEntity {
@@ -29,6 +30,9 @@ export default class Language extends BaseEntity {
 
   @OneToMany(() => FaqTranslation, (translation) => translation.language)
   faqTranslations!: FaqTranslation[]
+
+  @OneToMany(() => ConstituentTranslation, (translation) => translation.language)
+  constituentTranslations!: ConstituentTranslation[]
 
   @CreateDateColumn()
   createdAt!: Date

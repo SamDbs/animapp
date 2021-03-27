@@ -16,6 +16,7 @@ import {
 import Ingredient from './ingredient'
 import Brand from './brand'
 import ProductTranslation from './productTranslation'
+import ProductAnalyticalConstituent from './productAnalyticalConstituent'
 
 @Entity()
 export default class Product extends BaseEntity {
@@ -32,7 +33,16 @@ export default class Product extends BaseEntity {
   photo!: string
 
   @Column()
+  barCode!: string
+
+  @Column()
   brandId!: number
+
+  @OneToMany(
+    () => ProductAnalyticalConstituent,
+    (productAnalyticalConstituent) => productAnalyticalConstituent.product,
+  )
+  analyticalConstituents!: ProductAnalyticalConstituent[]
 
   @OneToMany(() => ProductTranslation, (translation) => translation.product)
   translations!: ProductTranslation[]
@@ -43,7 +53,7 @@ export default class Product extends BaseEntity {
 
   @ManyToOne(() => Brand, (brand) => brand.products, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'brandId' })
-  public brand!: Brand[]
+  brand!: Brand
 
   @CreateDateColumn()
   createdAt!: Date

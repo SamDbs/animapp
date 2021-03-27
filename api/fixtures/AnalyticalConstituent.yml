@@ -1,0 +1,3 @@
+entity: AnalyticalConstituent
+items:
+  analyticalConstituent{1..2}:
