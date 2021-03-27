@@ -1,6 +1,8 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   JoinTable,
@@ -8,6 +10,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
 
 import Ingredient from './ingredient'
@@ -41,4 +44,13 @@ export default class Product extends BaseEntity {
   @ManyToOne(() => Brand, (brand) => brand.products, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'brandId' })
   public brand!: Brand[]
+
+  @CreateDateColumn()
+  createdAt!: Date
+
+  @UpdateDateColumn()
+  updatedAt!: Date
+
+  @DeleteDateColumn()
+  deletedAt!: Date
 }

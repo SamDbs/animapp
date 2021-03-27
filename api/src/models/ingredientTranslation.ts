@@ -1,4 +1,14 @@
-import { BaseEntity, Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm'
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 
 import Ingredient from './ingredient'
 import Language from './language'
@@ -27,4 +37,13 @@ export default class IngredientTranslation extends BaseEntity {
   @ManyToOne(() => Language, (language) => language.ingredientTranslations)
   @JoinColumn({ name: 'languageId' })
   public language!: Language
+
+  @CreateDateColumn()
+  createdAt!: Date
+
+  @UpdateDateColumn()
+  updatedAt!: Date
+
+  @DeleteDateColumn()
+  deletedAt!: Date
 }

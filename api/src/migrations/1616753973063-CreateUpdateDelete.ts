@@ -1,0 +1,120 @@
+import {MigrationInterface, QueryRunner} from "typeorm";
+
+export class CreateUpdateDelete1616753973063 implements MigrationInterface {
+    name = 'CreateUpdateDelete1616753973063'
+
+    public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`ALTER TABLE "product_translation" DROP COLUMN "created_at"`);
+        await queryRunner.query(`ALTER TABLE "product_translation" DROP COLUMN "updated_at"`);
+        await queryRunner.query(`ALTER TABLE "product_translation" DROP COLUMN "deteded_at"`);
+        await queryRunner.query(`ALTER TABLE "faq" DROP COLUMN "created_at"`);
+        await queryRunner.query(`ALTER TABLE "faq" DROP COLUMN "updated_at"`);
+        await queryRunner.query(`ALTER TABLE "faq" DROP COLUMN "deteded_at"`);
+        await queryRunner.query(`ALTER TABLE "faq_translation" DROP COLUMN "created_at"`);
+        await queryRunner.query(`ALTER TABLE "faq_translation" DROP COLUMN "updated_at"`);
+        await queryRunner.query(`ALTER TABLE "faq_translation" DROP COLUMN "deteded_at"`);
+        await queryRunner.query(`ALTER TABLE "language" DROP COLUMN "created_at"`);
+        await queryRunner.query(`ALTER TABLE "language" DROP COLUMN "updated_at"`);
+        await queryRunner.query(`ALTER TABLE "language" DROP COLUMN "deteded_at"`);
+        await queryRunner.query(`ALTER TABLE "ingredient_translation" DROP COLUMN "created_at"`);
+        await queryRunner.query(`ALTER TABLE "ingredient_translation" DROP COLUMN "updated_at"`);
+        await queryRunner.query(`ALTER TABLE "ingredient_translation" DROP COLUMN "deteded_at"`);
+        await queryRunner.query(`ALTER TABLE "ingredient" DROP COLUMN "created_at"`);
+        await queryRunner.query(`ALTER TABLE "ingredient" DROP COLUMN "updated_at"`);
+        await queryRunner.query(`ALTER TABLE "ingredient" DROP COLUMN "deteded_at"`);
+        await queryRunner.query(`ALTER TABLE "product" DROP COLUMN "created_at"`);
+        await queryRunner.query(`ALTER TABLE "product" DROP COLUMN "updated_at"`);
+        await queryRunner.query(`ALTER TABLE "product" DROP COLUMN "deteded_at"`);
+        await queryRunner.query(`ALTER TABLE "brand" DROP COLUMN "created_at"`);
+        await queryRunner.query(`ALTER TABLE "brand" DROP COLUMN "updated_at"`);
+        await queryRunner.query(`ALTER TABLE "brand" DROP COLUMN "deteded_at"`);
+        await queryRunner.query(`ALTER TABLE "contact" DROP COLUMN "created_at"`);
+        await queryRunner.query(`ALTER TABLE "contact" DROP COLUMN "updated_at"`);
+        await queryRunner.query(`ALTER TABLE "contact" DROP COLUMN "deteded_at"`);
+        await queryRunner.query(`ALTER TABLE "product_translation" ADD "createdAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "product_translation" ADD "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "product_translation" ADD "deletedAt" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "faq" ADD "createdAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "faq" ADD "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "faq" ADD "deletedAt" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "faq_translation" ADD "createdAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "faq_translation" ADD "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "faq_translation" ADD "deletedAt" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "language" ADD "createdAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "language" ADD "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "language" ADD "deletedAt" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "ingredient_translation" ADD "createdAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "ingredient_translation" ADD "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "ingredient_translation" ADD "deletedAt" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "ingredient" ADD "createdAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "ingredient" ADD "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "ingredient" ADD "deletedAt" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "product" ADD "createdAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "product" ADD "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "product" ADD "deletedAt" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "brand" ADD "createdAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "brand" ADD "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "brand" ADD "deletedAt" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "contact" ADD "createdAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "contact" ADD "updatedAt" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "contact" ADD "deletedAt" TIMESTAMP`);
+    }
+
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`ALTER TABLE "contact" DROP COLUMN "deletedAt"`);
+        await queryRunner.query(`ALTER TABLE "contact" DROP COLUMN "updatedAt"`);
+        await queryRunner.query(`ALTER TABLE "contact" DROP COLUMN "createdAt"`);
+        await queryRunner.query(`ALTER TABLE "brand" DROP COLUMN "deletedAt"`);
+        await queryRunner.query(`ALTER TABLE "brand" DROP COLUMN "updatedAt"`);
+        await queryRunner.query(`ALTER TABLE "brand" DROP COLUMN "createdAt"`);
+        await queryRunner.query(`ALTER TABLE "product" DROP COLUMN "deletedAt"`);
+        await queryRunner.query(`ALTER TABLE "product" DROP COLUMN "updatedAt"`);
+        await queryRunner.query(`ALTER TABLE "product" DROP COLUMN "createdAt"`);
+        await queryRunner.query(`ALTER TABLE "ingredient" DROP COLUMN "deletedAt"`);
+        await queryRunner.query(`ALTER TABLE "ingredient" DROP COLUMN "updatedAt"`);
+        await queryRunner.query(`ALTER TABLE "ingredient" DROP COLUMN "createdAt"`);
+        await queryRunner.query(`ALTER TABLE "ingredient_translation" DROP COLUMN "deletedAt"`);
+        await queryRunner.query(`ALTER TABLE "ingredient_translation" DROP COLUMN "updatedAt"`);
+        await queryRunner.query(`ALTER TABLE "ingredient_translation" DROP COLUMN "createdAt"`);
+        await queryRunner.query(`ALTER TABLE "language" DROP COLUMN "deletedAt"`);
+        await queryRunner.query(`ALTER TABLE "language" DROP COLUMN "updatedAt"`);
+        await queryRunner.query(`ALTER TABLE "language" DROP COLUMN "createdAt"`);
+        await queryRunner.query(`ALTER TABLE "faq_translation" DROP COLUMN "deletedAt"`);
+        await queryRunner.query(`ALTER TABLE "faq_translation" DROP COLUMN "updatedAt"`);
+        await queryRunner.query(`ALTER TABLE "faq_translation" DROP COLUMN "createdAt"`);
+        await queryRunner.query(`ALTER TABLE "faq" DROP COLUMN "deletedAt"`);
+        await queryRunner.query(`ALTER TABLE "faq" DROP COLUMN "updatedAt"`);
+        await queryRunner.query(`ALTER TABLE "faq" DROP COLUMN "createdAt"`);
+        await queryRunner.query(`ALTER TABLE "product_translation" DROP COLUMN "deletedAt"`);
+        await queryRunner.query(`ALTER TABLE "product_translation" DROP COLUMN "updatedAt"`);
+        await queryRunner.query(`ALTER TABLE "product_translation" DROP COLUMN "createdAt"`);
+        await queryRunner.query(`ALTER TABLE "contact" ADD "deteded_at" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "contact" ADD "updated_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "contact" ADD "created_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "brand" ADD "deteded_at" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "brand" ADD "updated_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "brand" ADD "created_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "product" ADD "deteded_at" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "product" ADD "updated_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "product" ADD "created_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "ingredient" ADD "deteded_at" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "ingredient" ADD "updated_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "ingredient" ADD "created_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "ingredient_translation" ADD "deteded_at" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "ingredient_translation" ADD "updated_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "ingredient_translation" ADD "created_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "language" ADD "deteded_at" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "language" ADD "updated_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "language" ADD "created_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "faq_translation" ADD "deteded_at" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "faq_translation" ADD "updated_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "faq_translation" ADD "created_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "faq" ADD "deteded_at" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "faq" ADD "updated_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "faq" ADD "created_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "product_translation" ADD "deteded_at" TIMESTAMP`);
+        await queryRunner.query(`ALTER TABLE "product_translation" ADD "updated_at" TIMESTAMP NOT NULL DEFAULT now()`);
+        await queryRunner.query(`ALTER TABLE "product_translation" ADD "created_at" TIMESTAMP NOT NULL DEFAULT now()`);
+    }
+
+}

@@ -1,12 +1,19 @@
 import { Router } from 'express'
 
+import * as faqController from '../controllers/faqController'
+
 const router = Router()
 
-router.get('/', (req, res) => res.json({ name: 'ok' }))
-router.post('/', (req, res) => res.json({ name: 'ok' }))
+router.get('/', faqController.getAllFaq)
+router.get('/:id', faqController.getFaqById)
+router.post('/', faqController.createFaq)
+router.patch('/:id', faqController.patchFaq)
+router.delete('/:id', faqController.deleteFaq)
 
-router.get('/:id', (req, res) => res.json({ name: 'ok', id: req.params.id }))
-router.patch('/:id', (req, res) => res.json({ name: 'test', id: req.params.id }))
-router.delete('/:id', (req, res) => res.json({ name: 'test', id: req.params.id }))
+// CRUD translations
+router.get('/:id/translations', faqController.getFaqByIdWithTranslations)
+router.post('/:id/translations', faqController.createFaqTranslation)
+router.patch('/:id/translations/:lang', faqController.patchFaqTranslation)
+router.delete('/:id/translations/:lang', faqController.deleteFaqTranslation)
 
 export default router

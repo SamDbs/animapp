@@ -10,25 +10,28 @@ import {
   UpdateDateColumn,
 } from 'typeorm'
 
-import Product from './product'
+import Faq from './faq'
 import Language from './language'
 
 @Entity()
-export default class ProductTranslation extends BaseEntity {
+export default class FaqTranslation extends BaseEntity {
   @PrimaryColumn()
-  productId!: number
+  faqId!: number
 
   @PrimaryColumn()
   languageId!: string
 
   @Column()
-  description!: string
+  question!: string
 
-  @ManyToOne(() => Product, (product) => product.translations, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'productId' })
-  public product!: Product
+  @Column()
+  answer!: string
 
-  @ManyToOne(() => Language, (language) => language.productTranslations)
+  @ManyToOne(() => Faq, (faq) => faq.translations, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'faqId' })
+  public faq!: Faq
+
+  @ManyToOne(() => Language, (language) => language.faqTranslations)
   @JoinColumn({ name: 'languageId' })
   public language!: Language
 

@@ -1,4 +1,14 @@
-import { BaseEntity, Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm'
 
 import Product from './product'
 import IngredientTranslation from './ingredientTranslation'
@@ -16,4 +26,13 @@ export default class Ingredient extends BaseEntity {
 
   @ManyToMany(() => Product, (product) => product.ingredients)
   products!: Product[]
+
+  @CreateDateColumn()
+  createdAt!: Date
+
+  @UpdateDateColumn()
+  updatedAt!: Date
+
+  @DeleteDateColumn()
+  deletedAt!: Date
 }

@@ -4,20 +4,23 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
 
-import Product from './product'
-
 @Entity()
-export default class Brand extends BaseEntity {
+export default class Contact extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number
 
   @Column()
   name!: string
+
+  @Column()
+  email!: string
+
+  @Column()
+  message!: string
 
   @CreateDateColumn()
   createdAt!: Date
@@ -27,7 +30,4 @@ export default class Brand extends BaseEntity {
 
   @DeleteDateColumn()
   deletedAt!: Date
-
-  @OneToMany(() => Product, (product) => product.brand)
-  products!: Product[]
 }
