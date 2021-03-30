@@ -1,13 +1,15 @@
-import { Ionicons } from '@expo/vector-icons'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import { Ionicons } from '@expo/vector-icons'
 import * as React from 'react'
 
-import Colors from '../constants/Colors'
-import SearchStackNavigator from '../navigation/SearchStackNavigator'
-import ScanProductStackNavigator from '../navigation/ScanProductScanNavigator'
-import useColorScheme from '../hooks/useColorScheme'
-import ProductsHistory from '../screens/ProductsHistory'
-import { BottomTabParamList } from '../types'
+import { BottomTabParamList } from '../../types'
+import Colors from '../../constants/Colors'
+import useColorScheme from '../../hooks/useColorScheme'
+
+import FrequentQuestions from './FrequentQuestions'
+import ProductsHistory from './ProductsHistory'
+import ScanProductStackNavigator from './ScanProductStackNavigator'
+import SearchStackNavigator from './SearchStackNavigator'
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>()
 
@@ -46,6 +48,14 @@ export default function MainTabNavigator(): JSX.Element {
         options={{
           tabBarIcon: createTabBarIcon('time'),
           title: 'History',
+        }}
+      />
+      <BottomTab.Screen
+        name="FrequentQuestions"
+        component={FrequentQuestions}
+        options={{
+          tabBarIcon: createTabBarIcon('help'),
+          title: 'Help',
         }}
       />
     </BottomTab.Navigator>

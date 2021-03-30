@@ -6,7 +6,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import useSWR from 'swr'
 
-import { SearchStackParamList } from '../types'
+import { SearchStackParamList } from '../../../types'
 
 type ProductScreenNavigationProp = StackNavigationProp<SearchStackParamList, 'Product'>
 type ProfileScreenRouteProp = RouteProp<SearchStackParamList, 'Product'>

@@ -4,8 +4,8 @@ import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
-import { Text } from '../components/Themed'
-import { ScanProductStackParamList } from '../types'
+import { Text } from '../../components/Themed'
+import { ScanProductStackParamList } from '../../../types'
 
 export default function ScanProduct({
   navigation,

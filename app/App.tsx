@@ -5,7 +5,7 @@ import { SWRConfig, SWRConfiguration } from 'swr'
 
 import useCachedResources from './hooks/useCachedResources'
 import useColorScheme from './hooks/useColorScheme'
-import Navigation from './navigation'
+import Navigation from './views'
 
 const swrConfig: SWRConfiguration = {
   fetcher: async (resource, init) => {
