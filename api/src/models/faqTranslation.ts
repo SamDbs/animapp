@@ -29,11 +29,11 @@ export default class FaqTranslation extends BaseEntity {
 
   @ManyToOne(() => Faq, (faq) => faq.translations, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'faqId' })
-  public faq!: Faq
+  faq!: Faq
 
   @ManyToOne(() => Language, (language) => language.faqTranslations)
   @JoinColumn({ name: 'languageId' })
-  public language!: Language
+  language!: Language
 
   @CreateDateColumn()
   createdAt!: Date

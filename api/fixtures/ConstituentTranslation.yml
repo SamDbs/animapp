@@ -1,0 +1,32 @@
+entity: ConstituentTranslation
+items:
+  constituantTranslation1:
+    analyticalConstituent: '@analyticalConstituent1'
+    language: '@language1'
+    name: '{{commerce.productName}}'
+    description: '{{lorem.sentence}}'
+  constituantTranslation2:
+    analyticalConstituent: '@analyticalConstituent1'
+    language: '@language2'
+    name: '{{commerce.productName}}'
+    description: '{{lorem.sentence}}'
+  constituantTranslation3:
+    analyticalConstituent: '@analyticalConstituent1'
+    language: '@language3'
+    name: '{{commerce.productName}}'
+    description: '{{lorem.sentence}}'
+  constituantTranslation4:
+    analyticalConstituent: '@analyticalConstituent2'
+    language: '@language1'
+    name: '{{commerce.productName}}'
+    description: '{{lorem.sentence}}'
+  constituantTranslation5:
+    analyticalConstituent: '@analyticalConstituent2'
+    language: '@language2'
+    name: '{{commerce.productName}}'
+    description: '{{lorem.sentence}}'
+  constituantTranslation6:
+    analyticalConstituent: '@analyticalConstituent2'
+    language: '@language3'
+    name: '{{commerce.productName}}'
+    description: '{{lorem.sentence}}'

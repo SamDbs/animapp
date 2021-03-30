@@ -9,3 +9,5 @@ items:
       - '@ingredient2'
       - '@ingredient3'
     brand: '@brand1'
+    barCode: '{{random.number}}'
+

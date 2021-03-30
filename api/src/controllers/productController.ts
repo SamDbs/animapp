@@ -1,4 +1,4 @@
-import { FindManyOptions, QueryFailedError } from 'typeorm'
+import { FindManyOptions } from 'typeorm'
 import { Request, RequestHandler } from 'express'
 
 import { viewProduct, viewProductTranslation, viewProductTranslations } from '../views/product'
@@ -6,7 +6,7 @@ import { viewIngredients } from '../views/ingredient'
 import Product from '../models/product'
 import ProductTranslation from '../models/productTranslation'
 
-const allowedProductFilterKeys: (keyof Product)[] = ['id', 'name' /* ,'barCode' */]
+const allowedProductFilterKeys: (keyof Product)[] = ['id', 'name', 'barCode']
 function GetAllowedProductFilters(key: string): key is keyof Product {
   return allowedProductFilterKeys.includes(key as keyof Product)
 }

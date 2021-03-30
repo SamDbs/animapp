@@ -1,0 +1,11 @@
+entity: ProductAnalyticalConstituent
+items:
+  productAnalyticalConstituent1:
+    product: '@product1'
+    analyticalConstituent: '@analyticalConstituent1'
+    quantity: '20'
+  productAnalyticalConstituent2:
+    product: '@product1'
+    analyticalConstituent: '@analyticalConstituent2'
+    quantity: '10'
+
