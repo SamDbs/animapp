@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react'
-import { ActivityIndicator, Animated, Easing, View } from 'react-native'
+import { Animated, Easing, View } from 'react-native'
 
 function Circle(props: {
   color: string

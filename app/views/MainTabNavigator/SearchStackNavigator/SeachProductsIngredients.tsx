@@ -5,8 +5,8 @@ import { ActivityIndicator, StyleSheet, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 import useSWR from 'swr'
 
-import { Text } from '../components/Themed'
-import { SearchStackParamList } from '../types'
+import { Text } from '../../components/Themed'
+import { SearchStackParamList } from '../../../types'
 
 type ProductScreenNavigationProp = StackNavigationProp<SearchStackParamList, 'Product'>
 
@@ -19,7 +19,7 @@ function SearchInputContainer(props: any) {
 }
 
 function SearchResultProduct(props: {
-  productId: string
+  productId: number
   isLast: boolean
   navigate?: Props['navigation']['push']
   children: JSX.Element

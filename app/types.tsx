@@ -1,5 +1,5 @@
 export type RootStackParamList = {
-  Root: undefined
+  MainTabNavigator: undefined
   NotFound: undefined
 }
 
@@ -7,6 +7,7 @@ export type BottomTabParamList = {
   ScanProductStackNavigator: undefined
   SearchStackNavigator: undefined
   ProductsHistory: undefined
+  FrequentQuestions: undefined
 }
 
 export type SearchStackParamList = {
