@@ -19,7 +19,7 @@ function getFilters(query: Request['query']): FindManyOptions<Product> | undefin
   Object.entries(query).forEach(([key, value]) => {
     if (key && GetAllowedProductFilters(key)) {
       where[key] = value
-    } else throw new Error(`Cannot filter on ${key}.`)
+    }
   })
 
   if (!Object.keys(where).length) return
