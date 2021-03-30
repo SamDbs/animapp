@@ -5,6 +5,7 @@ import { viewProduct, viewProductTranslation, viewProductTranslations } from '..
 import { viewIngredients } from '../views/ingredient'
 import Product from '../models/product'
 import ProductTranslation from '../models/productTranslation'
+import ProductAnalyticalConstituent from '../models/productAnalyticalConstituent'
 
 const allowedProductFilterKeys: (keyof Product)[] = ['id', 'name', 'barCode']
 function GetAllowedProductFilters(key: string): key is keyof Product {
@@ -45,15 +46,24 @@ export const getAllProducts: RequestHandler = async (req, res) => {
 
 export const getProductById: RequestHandler = async (req, res) => {
   try {
-    const product = await Product.findOne(req.params.id, { relations: ['translations'] })
+    const product = await Product.createQueryBuilder('product')
+      .where('product.id = :id', { id: req.params.id })
+      .leftJoinAndSelect('product.translations', 'pt')
+      .getOneOrFail()
+
+    product.analyticalConstituents = await ProductAnalyticalConstituent.createQueryBuilder('a')
+      .where('"productId" = :id', { id: req.params.id })
+      .leftJoinAndSelect('a.analyticalConstituent', 'analyticalConstituent')
+      .leftJoinAndSelect('analyticalConstituent.translations', 'translations')
+      .getMany()
     if (!product) {
       res.sendStatus(404)
       return
     }
     const { language } = req.query
-
-    res.json(viewProduct(product, language as string))
+    res.json(viewProduct(product, language?.toString().toUpperCase()))
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error })
   }
 }
