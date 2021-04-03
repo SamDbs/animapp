@@ -37,11 +37,12 @@ export const createContact: RequestHandler = async (req, res) => {
 
 export const deleteContact: RequestHandler = async (req, res) => {
   try {
-    const contact = await Contact.delete(req.params.id)
-    if (!contact.affected) {
+    const contact = await Contact.findOneOrFail(req.params.id)
+    if (!contact) {
       res.sendStatus(404)
       return
     }
+    contact.softRemove()
     res.sendStatus(200)
   } catch (error) {
     res.status(500).json({ error })

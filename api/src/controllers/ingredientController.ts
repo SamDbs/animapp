@@ -36,7 +36,7 @@ export const getIngredientById: RequestHandler = async (req, res) => {
       return
     }
     const { language } = req.query
-    res.json(viewIngredient(ingredient, language as string))
+    res.json(viewIngredient(ingredient, language?.toString().toUpperCase()))
   } catch (error) {
     res.status(500).json({ error })
   }
@@ -54,11 +54,12 @@ export const patchIngredient: RequestHandler = async (req, res) => {
 
 export const deleteIngredient: RequestHandler = async (req, res) => {
   try {
-    const ingredient = await Ingredient.delete(req.params.id)
-    if (!ingredient.affected) {
+    const ingredient = await Ingredient.findOneOrFail(req.params.id)
+    if (!ingredient) {
       res.sendStatus(404)
       return
     }
+    ingredient.softRemove()
     res.sendStatus(200)
   } catch (error) {
     res.status(500).json({ error })
@@ -82,7 +83,12 @@ export const getIngredientByIdWithTranslations: RequestHandler = async (req, res
 
 export const createIngredientTranslation: RequestHandler = async (req, res) => {
   try {
-    const translation = IngredientTranslation.create(req.body as IngredientTranslation)
+    const translation = IngredientTranslation.create({
+      languageId: req.body.languageId.toUpperCase(),
+      name: req.body.name,
+      description: req.body.description,
+      review: req.body.review,
+    } as IngredientTranslation)
     translation.ingredientId = parseInt(req.params.id)
     await translation.save()
     res.status(201).json(translation)
@@ -94,11 +100,11 @@ export const createIngredientTranslation: RequestHandler = async (req, res) => {
 export const patchIngredientTranslation: RequestHandler = async (req, res) => {
   try {
     await IngredientTranslation.update(
-      { ingredientId: parseInt(req.params.id), languageId: req.params.lang },
+      { ingredientId: parseInt(req.params.id), languageId: req.params.lang.toUpperCase() },
       req.body,
     )
     const ingredientTranslation = await IngredientTranslation.findOneOrFail({
-      where: { ingredientId: parseInt(req.params.id), languageId: req.params.lang },
+      where: { ingredientId: parseInt(req.params.id), languageId: req.params.lang.toUpperCase() },
     })
     if (!ingredientTranslation) {
       res.sendStatus(404)
@@ -112,14 +118,15 @@ export const patchIngredientTranslation: RequestHandler = async (req, res) => {
 
 export const deleteIngredientTranslation: RequestHandler = async (req, res) => {
   try {
-    const ingredientTranslation = await IngredientTranslation.delete({
+    const ingredientTranslation = await IngredientTranslation.findOneOrFail({
       ingredientId: parseInt(req.params.id),
-      languageId: req.params.lang,
+      languageId: req.params.lang.toUpperCase(),
     })
-    if (!ingredientTranslation.affected) {
+    if (!ingredientTranslation) {
       res.sendStatus(404)
       return
     }
+    ingredientTranslation.softRemove()
     res.sendStatus(200)
   } catch (error) {
     res.status(500).json({ error })

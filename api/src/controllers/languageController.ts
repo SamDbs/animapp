@@ -55,11 +55,12 @@ export const patchLanguage: RequestHandler = async (req, res) => {
 
 export const deleteLanguage: RequestHandler = async (req, res) => {
   try {
-    const language = await Language.delete(req.params.id.toUpperCase())
-    if (!language.affected) {
+    const language = await Language.findOneOrFail(req.params.id.toUpperCase())
+    if (!language) {
       res.sendStatus(404)
       return
     }
+    language.softRemove()
     res.sendStatus(200)
   } catch (error) {
     res.status(500).json({ error })

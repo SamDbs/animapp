@@ -7,7 +7,6 @@ export function viewAnalyticalConstituent(
   analyticalConstituent: ProductAnalyticalConstituent,
   language: Language['id'] | undefined = 'FR',
 ) {
-  console.log(analyticalConstituent, language)
   const analyticalConstituentClient = {
     id: analyticalConstituent.analyticalConstituentId,
     quantity: analyticalConstituent.quantity,
@@ -41,7 +40,9 @@ export function viewProduct(product: Product, language: Language['id'] | undefin
     description:
       product.translations.find((t) => t.languageId === language)?.description ??
       'This product is not translated yet',
-    analyticalConstituents: viewAnalyticalConstituents(product.analyticalConstituents, language),
+    analyticalConstituents: product.analyticalConstituents
+      ? viewAnalyticalConstituents(product.analyticalConstituents, language)
+      : undefined,
   }
   return productClient
 }
