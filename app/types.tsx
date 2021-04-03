@@ -6,7 +6,7 @@ export type RootStackParamList = {
 export type BottomTabParamList = {
   ScanProductStackNavigator: undefined
   SearchStackNavigator: undefined
-  ProductsHistory: undefined
+  ProductsHistoryStackNavigator: undefined
   FrequentQuestions: undefined
 }
 
@@ -17,5 +17,10 @@ export type SearchStackParamList = {
 
 export type ScanProductStackParamList = {
   ScanProduct: undefined
+  Product: { productId: number }
+}
+
+export type ProductsHistoryStackParamList = {
+  ProductsHistory: undefined
   Product: { productId: number }
 }

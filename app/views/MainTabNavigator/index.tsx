@@ -7,7 +7,7 @@ import Colors from '../../constants/Colors'
 import useColorScheme from '../../hooks/useColorScheme'
 
 import FrequentQuestions from './FrequentQuestions'
-import ProductsHistory from './ProductsHistory'
+import ProductsHistory from './ProductHistoryStackNavigator/ProductHistory'
 import ScanProductStackNavigator from './ScanProductStackNavigator'
 import SearchStackNavigator from './SearchStackNavigator'
 
