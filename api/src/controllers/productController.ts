@@ -103,11 +103,12 @@ export const getIngredientsByProduct: RequestHandler = async (req, res) => {
 
 export const deleteProduct: RequestHandler = async (req, res) => {
   try {
-    const product = await Product.delete(req.params.id)
-    if (!product.affected) {
+    const product = await Product.findOneOrFail(req.params.id)
+    if (!product) {
       res.sendStatus(404)
       return
     }
+    product.softRemove()
     res.sendStatus(200)
   } catch (error) {
     res.status(500).json({ error })
@@ -116,7 +117,10 @@ export const deleteProduct: RequestHandler = async (req, res) => {
 
 export const createProductTranslation: RequestHandler = async (req, res) => {
   try {
-    const translation = ProductTranslation.create(req.body as ProductTranslation)
+    const translation = ProductTranslation.create({
+      languageId: req.body.languageId.toUpperCase(),
+      description: req.body.description,
+    } as ProductTranslation)
     translation.productId = parseInt(req.params.id)
     await translation.save()
 
@@ -144,11 +148,11 @@ export const getAllProductTranslations: RequestHandler = async (req, res) => {
 export const patchProductTranslation: RequestHandler = async (req, res) => {
   try {
     await ProductTranslation.update(
-      { productId: parseInt(req.params.id), languageId: req.params.lang },
+      { productId: parseInt(req.params.id), languageId: req.params.lang.toUpperCase() },
       req.body,
     )
     const productTranslation = await ProductTranslation.findOneOrFail({
-      where: { productId: parseInt(req.params.id), languageId: req.params.lang },
+      where: { productId: parseInt(req.params.id), languageId: req.params.lang.toUpperCase() },
     })
     if (!productTranslation) {
       res.sendStatus(404)
@@ -162,14 +166,15 @@ export const patchProductTranslation: RequestHandler = async (req, res) => {
 
 export const deleteProductTranslation: RequestHandler = async (req, res) => {
   try {
-    const productTranslation = await ProductTranslation.delete({
+    const productTranslation = await ProductTranslation.findOneOrFail({
       productId: parseInt(req.params.id),
-      languageId: req.params.lang,
+      languageId: req.params.lang.toUpperCase(),
     })
-    if (!productTranslation.affected) {
+    if (!productTranslation) {
       res.sendStatus(404)
       return
     }
+    productTranslation.softRemove()
     res.sendStatus(200)
   } catch (error) {
     res.status(500).json({ error })

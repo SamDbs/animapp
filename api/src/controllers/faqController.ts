@@ -51,11 +51,12 @@ export const patchFaq: RequestHandler = async (req, res) => {
 
 export const deleteFaq: RequestHandler = async (req, res) => {
   try {
-    const faq = await Faq.delete(req.params.id)
-    if (!faq.affected) {
+    const faq = await Faq.findOneOrFail(req.params.id)
+    if (!faq) {
       res.sendStatus(404)
       return
     }
+    faq.softRemove()
     res.sendStatus(200)
   } catch (error) {
     res.status(500).json({ error })
@@ -113,14 +114,15 @@ export const patchFaqTranslation: RequestHandler = async (req, res) => {
 
 export const deleteFaqTranslation: RequestHandler = async (req, res) => {
   try {
-    const faqTranslation = await FaqTranslation.delete({
+    const faqTranslation = await FaqTranslation.findOneOrFail({
       faqId: parseInt(req.params.id),
       languageId: req.params.lang.toUpperCase(),
     })
-    if (!faqTranslation.affected) {
+    if (!faqTranslation) {
       res.sendStatus(404)
       return
     }
+    faqTranslation.softRemove()
     res.sendStatus(200)
   } catch (error) {
     res.status(500).json({ error })

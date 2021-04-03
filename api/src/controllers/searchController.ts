@@ -28,9 +28,9 @@ export const searchAll: RequestHandler = async (req, res) => {
     res.json({
       ingredients: viewIngredients(
         ingredients.map((i) => i.ingredient),
-        language as string,
+        language?.toString().toUpperCase(),
       ),
-      products: viewProducts(products, language as string),
+      products: viewProducts(products, language?.toString().toUpperCase()),
     })
   } catch (error) {
     res.status(500).json({ error })
