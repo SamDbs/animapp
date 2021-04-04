@@ -1,12 +1,12 @@
 import { RequestHandler } from 'express'
 
 import Language from '../models/language'
-import { viewLanguage } from '../views/language'
+import { viewLanguage, viewLanguages } from '../views/language'
 
 export const getAllLanguages: RequestHandler = async (req, res) => {
   try {
     const languages = await Language.find()
-    res.json(languages)
+    res.json(viewLanguages(languages))
   } catch (error) {
     res.status(500).json({ error })
   }
@@ -37,7 +37,7 @@ export const createLanguage: RequestHandler = async (req, res) => {
       name: req.body.name,
     } as Language)
     await newLanguage.save()
-    res.status(201).json(newLanguage)
+    res.status(201).json(viewLanguage(newLanguage))
   } catch {
     res.sendStatus(400)
   }
@@ -47,7 +47,7 @@ export const patchLanguage: RequestHandler = async (req, res) => {
   try {
     await Language.update(req.params.id.toUpperCase(), req.body)
     const language = await Language.findOneOrFail(req.params.id.toUpperCase())
-    res.status(200).json(language)
+    res.status(200).json(viewLanguage(language))
   } catch {
     res.sendStatus(400)
   }

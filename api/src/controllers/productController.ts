@@ -1,11 +1,19 @@
 import { FindManyOptions } from 'typeorm'
 import { Request, RequestHandler } from 'express'
 
-import { viewProduct, viewProductTranslation, viewProductTranslations } from '../views/product'
+import {
+  viewAnalyticalConstituent,
+  viewAnalyticalConstituents,
+  viewProduct,
+  viewProductTranslation,
+  viewProductTranslations,
+} from '../views/product'
 import { viewIngredients } from '../views/ingredient'
 import Product from '../models/product'
 import ProductTranslation from '../models/productTranslation'
 import ProductAnalyticalConstituent from '../models/productAnalyticalConstituent'
+import AnalyticalConstituent from '../models/analyticalConstituent'
+import { viewError } from '../views/error'
 
 const allowedProductFilterKeys: (keyof Product)[] = ['id', 'name', 'barCode']
 function GetAllowedProductFilters(key: string): key is keyof Product {
@@ -63,7 +71,6 @@ export const getProductById: RequestHandler = async (req, res) => {
     const { language } = req.query
     res.json(viewProduct(product, language?.toString().toUpperCase()))
   } catch (error) {
-    console.log(error)
     res.status(500).json({ error })
   }
 }
@@ -115,6 +122,80 @@ export const deleteProduct: RequestHandler = async (req, res) => {
   }
 }
 
+// Create relation between product and AC + add quantity
+export const createProductACQuantity: RequestHandler = async (req, res) => {
+  try {
+    const product = await Product.findOneOrFail(req.params.id)
+    const aC = await AnalyticalConstituent.findOneOrFail(req.params.idAC)
+    const relation = ProductAnalyticalConstituent.create({
+      productId: product.id,
+      analyticalConstituentId: aC.id,
+      quantity: req.body.quantity,
+    } as ProductAnalyticalConstituent)
+    await relation.save()
+
+    res.status(201).json(relation)
+  } catch {
+    res.sendStatus(400)
+  }
+}
+
+// View that returns product's analytical constituents
+export const getACByProduct: RequestHandler = async (req, res) => {
+  try {
+    const analyticalConstituents = await ProductAnalyticalConstituent.createQueryBuilder('a')
+      .where('"productId" = :id', { id: req.params.id })
+      .leftJoinAndSelect('a.analyticalConstituent', 'analyticalConstituent')
+      .leftJoinAndSelect('analyticalConstituent.translations', 'translations')
+      .getMany()
+    if (!analyticalConstituents) {
+      res.sendStatus(404)
+      return
+    }
+    const { language } = req.query
+    res.json(viewAnalyticalConstituents(analyticalConstituents, language?.toString().toUpperCase()))
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ error })
+  }
+}
+
+export const patchACByProduct: RequestHandler = async (req, res) => {
+  try {
+    await ProductAnalyticalConstituent.update(
+      { productId: parseInt(req.params.id), analyticalConstituentId: parseInt(req.params.idAC) },
+      req.body,
+    )
+    const relation = await ProductAnalyticalConstituent.createQueryBuilder('a')
+      .where('"productId" = :id', { id: req.params.id })
+      .andWhere('a."analyticalConstituentId" = :idAC', { idAC: req.params.idAC })
+      .leftJoinAndSelect('a.analyticalConstituent', 'analyticalConstituent')
+      .leftJoinAndSelect('analyticalConstituent.translations', 'translations')
+      .getOneOrFail()
+    if (!relation) {
+      res.sendStatus(404)
+      return
+    }
+    res.status(200).json(viewAnalyticalConstituent(relation))
+  } catch (error) {
+    res.status(500).json({ error })
+  }
+}
+
+export const deleteProductACQuantity: RequestHandler = async (req, res) => {
+  try {
+    const relation = await ProductAnalyticalConstituent.findOneOrFail({
+      productId: parseInt(req.params.id),
+      analyticalConstituentId: parseInt(req.params.idAC),
+    })
+    relation.softRemove()
+    res.sendStatus(200)
+  } catch {
+    res.sendStatus(400)
+  }
+}
+
+// CRUD Translations
 export const createProductTranslation: RequestHandler = async (req, res) => {
   try {
     const translation = ProductTranslation.create({
@@ -160,7 +241,7 @@ export const patchProductTranslation: RequestHandler = async (req, res) => {
     }
     res.status(200).json(viewProductTranslation(productTranslation))
   } catch (error) {
-    res.status(500).json({ error })
+    viewError(error, res)
   }
 }
 

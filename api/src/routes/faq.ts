@@ -11,7 +11,7 @@ router.patch('/:id', faqController.patchFaq)
 router.delete('/:id', faqController.deleteFaq)
 
 // CRUD translations
-router.get('/:id/translations', faqController.getFaqByIdWithTranslations)
+router.get('/:id/translations', faqController.getAllFaqTranslations)
 router.post('/:id/translations', faqController.createFaqTranslation)
 router.patch('/:id/translations/:lang', faqController.patchFaqTranslation)
 router.delete('/:id/translations/:lang', faqController.deleteFaqTranslation)

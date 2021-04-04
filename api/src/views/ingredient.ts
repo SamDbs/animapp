@@ -18,15 +18,8 @@ export function viewIngredient(ingredient: Ingredient, language: Language['id'] 
   return ingredientClient
 }
 
-export function viewIngredientWithTranslations(ingredient: Ingredient) {
-  const ingredientTranslations = ingredient.translations
-
-  const ingredientAdmin = {
-    id: ingredient.id,
-    photo: ingredient.photo,
-    translations: ingredientTranslations,
-  }
-  return ingredientAdmin
+export function viewIngredientTranslations(ingredientTranslations: IngredientTranslation[]) {
+  return ingredientTranslations
 }
 
 export function viewIngredients(ingredients: Ingredient[], language: Language['id'] = 'FR') {

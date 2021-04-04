@@ -4,20 +4,21 @@ import ProductAnalyticalConstituent from '../models/productAnalyticalConstituent
 import ProductTranslation from '../models/productTranslation'
 
 export function viewAnalyticalConstituent(
-  analyticalConstituent: ProductAnalyticalConstituent,
+  productAC: ProductAnalyticalConstituent,
   language: Language['id'] | undefined = 'FR',
 ) {
+  let translation = productAC.analyticalConstituent.translations.find(
+    (t) => t.languageId === language,
+  )
+
+  if (!translation)
+    translation = productAC.analyticalConstituent.translations.find((t) => t.languageId === 'FR')
+
   const analyticalConstituentClient = {
-    id: analyticalConstituent.analyticalConstituentId,
-    quantity: analyticalConstituent.quantity,
-    name:
-      analyticalConstituent.analyticalConstituent.translations.find(
-        (t) => t.languageId === language,
-      )?.name ?? 'This product is not translated yet',
-    description:
-      analyticalConstituent.analyticalConstituent.translations.find(
-        (t) => t.languageId === language,
-      )?.description ?? 'This product is not translated yet',
+    id: productAC.analyticalConstituentId,
+    quantity: productAC.quantity,
+    name: translation?.name ?? 'This product is not translated yet',
+    description: translation?.description ?? 'This product is not translated yet',
   }
   return analyticalConstituentClient
 }
@@ -32,17 +33,16 @@ export function viewAnalyticalConstituents(
 }
 
 export function viewProduct(product: Product, language: Language['id'] | undefined = 'FR') {
+  let translation = product.translations.find((t) => t.languageId === language)
+
+  if (!translation) translation = product.translations.find((t) => t.languageId === 'FR')
+
   const productClient = {
     id: product.id,
     type: product.type,
     name: product.name,
     photo: product.photo,
-    description:
-      product.translations.find((t) => t.languageId === language)?.description ??
-      'This product is not translated yet',
-    analyticalConstituents: product.analyticalConstituents
-      ? viewAnalyticalConstituents(product.analyticalConstituents, language)
-      : undefined,
+    description: translation?.description ?? 'This product is not translated yet',
   }
   return productClient
 }

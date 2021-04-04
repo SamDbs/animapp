@@ -14,7 +14,7 @@ export const getAllContacts: RequestHandler = async (req, res) => {
 
 export const getContactById: RequestHandler = async (req, res) => {
   try {
-    const contact = await Contact.findOne(req.params.id)
+    const contact = await Contact.findOneOrFail(req.params.id)
     if (!contact) {
       res.sendStatus(404)
       return

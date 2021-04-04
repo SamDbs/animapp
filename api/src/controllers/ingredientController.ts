@@ -6,7 +6,7 @@ import {
   viewIngredient,
   viewIngredients,
   viewIngredientTranslation,
-  viewIngredientWithTranslations,
+  viewIngredientTranslations,
 } from '../views/ingredient'
 
 export const getAllIngredients: RequestHandler = async (req, res) => {
@@ -67,15 +67,17 @@ export const deleteIngredient: RequestHandler = async (req, res) => {
 }
 
 // CRUD Translations
-export const getIngredientByIdWithTranslations: RequestHandler = async (req, res) => {
+export const getAllIngredientTranslations: RequestHandler = async (req, res) => {
   try {
-    const ingredient = await Ingredient.findOne(req.params.id, { relations: ['translations'] })
-    if (!ingredient) {
+    const ingredientTranslations = await IngredientTranslation.find({
+      where: { ingredientId: parseInt(req.params.id) },
+    })
+    if (!ingredientTranslations) {
       res.sendStatus(404)
       return
     }
 
-    res.json(viewIngredientWithTranslations(ingredient))
+    res.json(viewIngredientTranslations(ingredientTranslations))
   } catch (error) {
     res.status(500).json({ error })
   }

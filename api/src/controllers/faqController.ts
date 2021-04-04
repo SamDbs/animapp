@@ -2,7 +2,6 @@ import { RequestHandler } from 'express'
 
 import Faq from '../models/faq'
 import FaqTranslation from '../models/faqTranslation'
-// import faqTranslation from '../models/faqTranslation'
 import { viewFaq, viewFaqs, viewFaqTranslation, viewFaqWithTranslations } from '../views/faq'
 
 export const getAllFaq: RequestHandler = async (req, res) => {
@@ -64,15 +63,17 @@ export const deleteFaq: RequestHandler = async (req, res) => {
 }
 
 // CRUD Translations
-export const getFaqByIdWithTranslations: RequestHandler = async (req, res) => {
+export const getAllFaqTranslations: RequestHandler = async (req, res) => {
   try {
-    const faq = await Faq.findOne(req.params.id, { relations: ['translations'] })
-    if (!faq) {
+    const faqTranslations = await FaqTranslation.find({
+      where: { faqId: parseInt(req.params.id) },
+    })
+    if (!faqTranslations) {
       res.sendStatus(404)
       return
     }
 
-    res.json(viewFaqWithTranslations(faq))
+    res.json(viewFaqWithTranslations(faqTranslations))
   } catch (error) {
     res.status(500).json({ error })
   }
