@@ -1,10 +1,12 @@
 import { StatusBar } from 'expo-status-bar'
-import React from 'react'
+import React, { useState } from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { SWRConfig, SWRConfiguration } from 'swr'
 
+import ProductHistoryContext from './hooks/ProductHistoryContext'
 import useCachedResources from './hooks/useCachedResources'
 import useColorScheme from './hooks/useColorScheme'
+import useProductHistoryContextValue from './hooks/useProductsHistory'
 import Navigation from './views'
 
 const swrConfig: SWRConfiguration = {
@@ -26,6 +28,7 @@ const swrConfig: SWRConfiguration = {
 export default function App(): JSX.Element | null {
   const isLoadingComplete = useCachedResources()
   const colorScheme = useColorScheme()
+  const historyContextValue = useProductHistoryContextValue()
 
   if (!isLoadingComplete) {
     return null
@@ -33,7 +36,9 @@ export default function App(): JSX.Element | null {
     return (
       <SafeAreaProvider>
         <SWRConfig value={swrConfig}>
-          <Navigation colorScheme={colorScheme} />
+          <ProductHistoryContext.Provider value={historyContextValue}>
+            <Navigation colorScheme={colorScheme} />
+          </ProductHistoryContext.Provider>
           <StatusBar />
         </SWRConfig>
       </SafeAreaProvider>

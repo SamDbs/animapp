@@ -3,10 +3,11 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native-gesture-handler'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import React, { useContext, useEffect } from 'react'
 import useSWR from 'swr'
 
 import { SearchStackParamList } from '../../../types'
+import ProductHistoryContext from '../../../hooks/ProductHistoryContext'
 
 type ProductScreenNavigationProp = StackNavigationProp<SearchStackParamList, 'Product'>
 type ProfileScreenRouteProp = RouteProp<SearchStackParamList, 'Product'>
@@ -65,6 +66,11 @@ function Ingredient({ ingredient }: { ingredient: any }) {
 export default function Product(props: Props): JSX.Element {
   const { data: product } = useSWR(`/products/${props.route.params.productId}`)
   const { data: ingredients } = useSWR(`/products/${props.route.params.productId}/ingredients`)
+  const { viewProduct } = useContext(ProductHistoryContext)
+
+  useEffect(() => {
+    if (product && product.id) viewProduct(product.id)
+  }, [product, viewProduct])
 
   if (!product || !ingredients) return <Text>Loading...</Text>
 
