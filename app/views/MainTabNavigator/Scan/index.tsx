@@ -5,11 +5,11 @@ import React, { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
 import { Text } from '../../components/Themed'
-import { ScanProductStackParamList } from '../../../types'
+import { SearchStackParamList } from '../../../types'
 
 export default function ScanProduct({
   navigation,
-}: StackScreenProps<ScanProductStackParamList, 'ScanProduct'>): JSX.Element {
+}: StackScreenProps<SearchStackParamList, 'SearchProduct'>): JSX.Element {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
   const [code, setCode] = useState('')
 
@@ -38,7 +38,7 @@ export default function ScanProduct({
   useEffect(() => {
     if (code && data && !error) {
       setCode('')
-      navigation.push('Product', { productId: data.productId })
+      navigation.push('SearchProduct', { productId: data.productId })
     } else if (error) {
       alert('Bar code not working.')
       setCode('')

@@ -3,24 +3,17 @@ export type RootStackParamList = {
   NotFound: undefined
 }
 
-export type BottomTabParamList = {
-  ScanProductStackNavigator: undefined
-  SearchStackNavigator: undefined
-  ProductsHistoryStackNavigator: undefined
+export type MainTabParamList = {
+  Scan: undefined
+  SearchStackNavigator: {
+    screen?: 'SearchProduct'
+    params?: SearchStackParamList['SearchProduct']
+  }
+  History: undefined
   FrequentQuestions: undefined
 }
 
 export type SearchStackParamList = {
   Search: undefined
-  Product: { productId: number }
-}
-
-export type ScanProductStackParamList = {
-  ScanProduct: undefined
-  Product: { productId: number }
-}
-
-export type ProductsHistoryStackParamList = {
-  ProductsHistory: undefined
-  Product: { productId: number }
+  SearchProduct: { productId: number }
 }

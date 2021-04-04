@@ -2,16 +2,16 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { Ionicons } from '@expo/vector-icons'
 import * as React from 'react'
 
-import { BottomTabParamList } from '../../types'
+import { MainTabParamList } from '../../types'
 import Colors from '../../constants/Colors'
 import useColorScheme from '../../hooks/useColorScheme'
 
 import FrequentQuestions from './FrequentQuestions'
-import ProductsHistory from './ProductHistoryStackNavigator/ProductHistory'
-import ScanProductStackNavigator from './ScanProductStackNavigator'
+import History from './History'
+import Scan from './Scan'
 import SearchStackNavigator from './SearchStackNavigator'
 
-const BottomTab = createBottomTabNavigator<BottomTabParamList>()
+const BottomTab = createBottomTabNavigator<MainTabParamList>()
 
 function createTabBarIcon(icon: React.ComponentProps<typeof Ionicons>['name']) {
   return function TabBarIcon({ color }: { color: string }) {
@@ -24,11 +24,11 @@ export default function MainTabNavigator(): JSX.Element {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="ScanProductStackNavigator"
+      initialRouteName="Scan"
       tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
       <BottomTab.Screen
-        name="ScanProductStackNavigator"
-        component={ScanProductStackNavigator}
+        name="Scan"
+        component={Scan}
         options={{
           tabBarIcon: createTabBarIcon('scan'),
           title: 'Scan',
@@ -43,8 +43,8 @@ export default function MainTabNavigator(): JSX.Element {
         }}
       />
       <BottomTab.Screen
-        name="ProductsHistory"
-        component={ProductsHistory}
+        name="History"
+        component={History}
         options={{
           tabBarIcon: createTabBarIcon('time'),
           title: 'History',

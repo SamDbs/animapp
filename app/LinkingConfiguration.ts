@@ -8,17 +8,22 @@ export default {
         screens: {
           ScanProductStackNavigator: {
             screens: {
-              ScanProduct: 'scan',
-              Product: 'product',
+              Scan: 'scan',
+              ScanProduct: 'scan-product',
             },
           },
           SearchStackNavigator: {
             screens: {
               Search: 'search',
-              Product: 'scan',
+              SearchProduct: 'search-product',
             },
           },
-          ProductsHistory: 'history',
+          HistoryStackNavigator: {
+            screens: {
+              History: 'history',
+              HistoryProduct: 'history-product',
+            },
+          },
           FrequentQuestions: 'faq',
         },
       },
