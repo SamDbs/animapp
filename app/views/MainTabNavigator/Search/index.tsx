@@ -1,18 +1,14 @@
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { ActivityIndicator, StyleSheet, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 import useSWR from 'swr'
 
 import { Text } from '../../components/Themed'
-import { SearchStackParamList } from '../../../types'
+import { RootStackParamList } from '../../../types'
 
-type ProductScreenNavigationProp = StackNavigationProp<SearchStackParamList, 'Product'>
-
-type Props = {
-  navigation: ProductScreenNavigationProp
-}
+type Props = BottomTabScreenProps<RootStackParamList, 'Product'>
 
 function SearchInputContainer(props: any) {
   return <View style={style.searchInputContainer} {...props} />
@@ -21,7 +17,7 @@ function SearchInputContainer(props: any) {
 function SearchResultProduct(props: {
   productId: number
   isLast: boolean
-  navigate?: Props['navigation']['push']
+  navigate?: Props['navigation']['navigate']
   children: JSX.Element
 }) {
   return (
@@ -29,7 +25,7 @@ function SearchResultProduct(props: {
       style={[style.result, props.isLast && style.noBorder].filter(Boolean)}
       onPress={
         props.navigate
-          ? () => props.navigate && props.navigate('SearchProduct', { productId: props.productId })
+          ? () => props.navigate && props.navigate('Product', { productId: props.productId })
           : undefined
       }>
       {props.children}

@@ -1,19 +1,16 @@
 export type RootStackParamList = {
   MainTabNavigator: undefined
+  Product: { productId: number }
   NotFound: undefined
 }
 
 export type MainTabParamList = {
   Scan: undefined
-  SearchStackNavigator: {
-    screen?: 'SearchProduct'
-    params?: SearchStackParamList['SearchProduct']
-  }
+  Search: undefined
   History: undefined
   FrequentQuestions: undefined
 }
 
 export type SearchStackParamList = {
   Search: undefined
-  SearchProduct: { productId: number }
 }

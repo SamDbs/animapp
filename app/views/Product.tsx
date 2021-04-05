@@ -6,15 +6,12 @@ import { StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect } from 'react'
 import useSWR from 'swr'
 
-import { SearchStackParamList } from '../../../types'
-import ProductHistoryContext from '../../../hooks/ProductHistoryContext'
-
-type ProductScreenNavigationProp = StackNavigationProp<SearchStackParamList, 'Product'>
-type ProfileScreenRouteProp = RouteProp<SearchStackParamList, 'Product'>
+import { RootStackParamList } from '../types'
+import ProductHistoryContext from '../hooks/ProductHistoryContext'
 
 type Props = {
-  navigation: ProductScreenNavigationProp
-  route: ProfileScreenRouteProp
+  navigation: StackNavigationProp<RootStackParamList, 'Product'>
+  route: RouteProp<RootStackParamList, 'Product'>
 }
 
 type AnalyticalConstituent = {
@@ -117,19 +114,19 @@ function AnalyticalConstituants({ ACs }: { ACs: AnalyticalConstituent[] }) {
 export default function Product(props: Props): JSX.Element {
   const { data: product } = useSWR(`/products/${props.route.params.productId}`)
   const { data: ingredients } = useSWR(`/products/${props.route.params.productId}/ingredients`)
-  // const { data: AC } = useSWR(`/products/${props.route.params.productId}/analyticalConstituants`)
+  const { data: AC } = useSWR(`/products/${props.route.params.productId}/analyticalConstituents`)
   const { viewProduct } = useContext(ProductHistoryContext)
 
   useEffect(() => {
     if (product && product.id) viewProduct(product.id)
   }, [product, viewProduct])
 
-  if (!product || !ingredients) return <Text>Loading...</Text>
+  if (!product || !ingredients || !AC) return <Text>Loading...</Text>
 
   return (
     <SafeAreaView style={style.page}>
       <ProductHeader product={product} />
-      <AnalyticalConstituants ACs={product.analyticalConstituents} />
+      <AnalyticalConstituants ACs={AC} />
       <Ingredients ingredients={ingredients} />
     </SafeAreaView>
   )

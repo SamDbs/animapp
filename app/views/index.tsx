@@ -8,6 +8,7 @@ import LinkingConfiguration from '../LinkingConfiguration'
 
 import MainTabNavigator from './MainTabNavigator'
 import NotFoundScreen from './NotFoundScreen'
+import Product from './Product'
 
 // If you are not familiar with React Navigation, we recommend going through the
 // "Fundamentals" guide: https://reactnavigation.org/docs/getting-started
@@ -29,6 +30,11 @@ function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="MainTabNavigator" component={MainTabNavigator} />
+      <Stack.Screen
+        name="Product"
+        component={Product}
+        options={{ headerShown: true, headerBackTitle: '' }}
+      />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
     </Stack.Navigator>
   )
