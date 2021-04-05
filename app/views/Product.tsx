@@ -1,7 +1,6 @@
-import { RouteProp } from '@react-navigation/native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native-gesture-handler'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { StackScreenProps } from '@react-navigation/stack'
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect } from 'react'
 import useSWR from 'swr'
@@ -9,10 +8,7 @@ import useSWR from 'swr'
 import { RootStackParamList } from '../types'
 import ProductHistoryContext from '../hooks/ProductHistoryContext'
 
-type Props = {
-  navigation: StackNavigationProp<RootStackParamList, 'Product'>
-  route: RouteProp<RootStackParamList, 'Product'>
-}
+type Props = StackScreenProps<RootStackParamList, 'Product'>
 
 type AnalyticalConstituent = {
   id: number
