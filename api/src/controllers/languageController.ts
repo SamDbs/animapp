@@ -4,65 +4,37 @@ import Language from '../models/language'
 import { viewLanguage, viewLanguages } from '../views/language'
 
 export const getAllLanguages: RequestHandler = async (req, res) => {
-  try {
-    const languages = await Language.find()
-    res.json(viewLanguages(languages))
-  } catch (error) {
-    res.status(500).json({ error })
-  }
+  const languages = await Language.find()
+  res.json(viewLanguages(languages))
 }
 
 export const getLanguageById: RequestHandler = async (req, res) => {
-  try {
-    const language = await Language.findOneOrFail(req.params.id.toUpperCase())
-    if (!language) {
-      res.sendStatus(404)
-      return
-    }
-    res.json(viewLanguage(language))
-  } catch (error) {
-    res.status(500).json({ error })
-  }
+  const language = await Language.findOneOrFail(req.params.id.toUpperCase())
+  res.json(viewLanguage(language))
 }
 
 export const createLanguage: RequestHandler = async (req, res) => {
-  try {
-    const language = await Language.findByIds(req.body.id.toUpperCase())
-    if (language.length > 0) {
-      res.status(409).send('This language already exists')
-      return
-    }
-    const newLanguage = Language.create({
-      id: req.body.id.toUpperCase(),
-      name: req.body.name,
-    } as Language)
-    await newLanguage.save()
-    res.status(201).json(viewLanguage(newLanguage))
-  } catch {
-    res.sendStatus(400)
+  const language = await Language.findByIds(req.body.id.toUpperCase())
+  if (language.length > 0) {
+    res.status(409).send('This language already exists')
+    return
   }
+  const newLanguage = Language.create({
+    id: req.body.id.toUpperCase(),
+    name: req.body.name,
+  } as Language)
+  await newLanguage.save()
+  res.status(201).json(viewLanguage(newLanguage))
 }
 
 export const patchLanguage: RequestHandler = async (req, res) => {
-  try {
-    await Language.update(req.params.id.toUpperCase(), req.body)
-    const language = await Language.findOneOrFail(req.params.id.toUpperCase())
-    res.status(200).json(viewLanguage(language))
-  } catch {
-    res.sendStatus(400)
-  }
+  await Language.update(req.params.id.toUpperCase(), req.body)
+  const language = await Language.findOneOrFail(req.params.id.toUpperCase())
+  res.status(200).json(viewLanguage(language))
 }
 
 export const deleteLanguage: RequestHandler = async (req, res) => {
-  try {
-    const language = await Language.findOneOrFail(req.params.id.toUpperCase())
-    if (!language) {
-      res.sendStatus(404)
-      return
-    }
-    language.softRemove()
-    res.sendStatus(200)
-  } catch (error) {
-    res.status(500).json({ error })
-  }
+  const language = await Language.findOneOrFail(req.params.id.toUpperCase())
+  language.softRemove()
+  res.sendStatus(200)
 }
