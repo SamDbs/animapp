@@ -29,7 +29,7 @@ function SearchResultProduct(props: {
       style={[style.result, props.isLast && style.noBorder].filter(Boolean)}
       onPress={
         props.navigate
-          ? () => props.navigate && props.navigate('Product', { productId: props.productId })
+          ? () => props.navigate && props.navigate('SearchProduct', { productId: props.productId })
           : undefined
       }>
       {props.children}

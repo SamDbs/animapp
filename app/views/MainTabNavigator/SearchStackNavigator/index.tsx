@@ -5,7 +5,7 @@ import React from 'react'
 import { SearchStackParamList } from '../../../types'
 
 import Product from './Product'
-import SearchProductsIngredients from './SeachProductsIngredients'
+import SearchProductsIngredients from './Search'
 
 const Stack = createStackNavigator<SearchStackParamList>()
 
@@ -14,7 +14,7 @@ export default function SearchStackNavigator(): JSX.Element {
     <SafeAreaProvider>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen component={SearchProductsIngredients} name="Search" />
-        <Stack.Screen component={Product} name="Product" />
+        <Stack.Screen component={Product} name="SearchProduct" />
       </Stack.Navigator>
     </SafeAreaProvider>
   )

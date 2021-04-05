@@ -1,32 +1,38 @@
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { ScrollView } from 'react-native-gesture-handler'
+import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import { StackScreenProps } from '@react-navigation/stack'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet } from 'react-native'
 import React, { useContext } from 'react'
 import useSWR from 'swr'
 
-import { ProductsHistoryStackParamList } from '../../../types'
+import { MainTabParamList } from '../../../types'
 import ProductHistoryContext from '../../../hooks/ProductHistoryContext'
 import { Text } from '../../components/Themed'
 
-function ProductHistory({ id }: { id: number }) {
+type Props = StackScreenProps<MainTabParamList, 'History'>
+
+function ProductHistory({ id, navigation }: { id: number; navigation: Props['navigation'] }) {
   const { data: product, error } = useSWR(`/products/${id}`)
 
   if (error) return null
   if (!product) return <Text>Loading</Text>
 
   return (
-    <View>
+    <TouchableWithoutFeedback
+      onPress={() =>
+        navigation.navigate('SearchStackNavigator', {
+          screen: 'SearchProduct',
+          params: { productId: id },
+        })
+      }>
       <Text>
         {product.id} - {product.name}
       </Text>
-    </View>
+    </TouchableWithoutFeedback>
   )
 }
 
-export default function ProductsHistory({
-  navigation,
-}: StackScreenProps<ProductsHistoryStackParamList, 'ProductsHistory'>): JSX.Element {
+export default function History({ navigation }: Props): JSX.Element {
   const { historyProductsIds } = useContext(ProductHistoryContext)
 
   return (
@@ -34,7 +40,7 @@ export default function ProductsHistory({
       <Text>History</Text>
       <ScrollView style={style.scrollView}>
         {historyProductsIds.map((id) => (
-          <ProductHistory key={id} id={id} />
+          <ProductHistory key={id} id={id} navigation={navigation} />
         ))}
       </ScrollView>
     </SafeAreaView>
