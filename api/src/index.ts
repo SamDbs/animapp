@@ -1,6 +1,7 @@
 import express from 'express'
 import { createConnection } from 'typeorm'
 
+import 'express-async-errors'
 import search from './routes/search'
 import products from './routes/products'
 import ingredients from './routes/ingredients'
@@ -8,6 +9,7 @@ import contacts from './routes/contacts'
 import faq from './routes/faq'
 import languages from './routes/languages'
 import analyticalConstituents from './routes/analyticalConstituents'
+import { errorHandler } from './controllers/errorHandler'
 
 const PORT = 8080
 const HOST = '0.0.0.0'
@@ -34,6 +36,7 @@ app.use('/faq', faq)
 app.use('/languages', languages)
 app.use('/analyticalConstituents', analyticalConstituents)
 
+app.use(errorHandler)
 app.use((req, res) => {
   res.status(404).json({ error: true, status: 404 })
 })

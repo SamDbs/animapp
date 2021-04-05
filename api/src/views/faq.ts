@@ -19,14 +19,8 @@ export function viewFaq(faq: Faq, language: Language['id'] = 'FR') {
   return faqClient
 }
 
-export function viewFaqWithTranslations(faq: Faq) {
-  const faqTranslations = faq.translations
-
-  const faqAdmin = {
-    id: faq.id,
-    translations: faqTranslations,
-  }
-  return faqAdmin
+export function viewFaqWithTranslations(faqTranslations: FaqTranslation[]) {
+  return faqTranslations
 }
 
 export function viewFaqTranslation(faqTranslation: FaqTranslation) {

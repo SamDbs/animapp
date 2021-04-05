@@ -6,14 +6,15 @@ export function viewAnalyticalConstituentClient(
   analyticalConstituent: AnalyticalConstituent,
   language: Language['id'] | undefined = 'FR',
 ) {
+  let translation = analyticalConstituent.translations.find((t) => t.languageId === language)
+
+  if (!translation)
+    translation = analyticalConstituent.translations.find((t) => t.languageId === 'FR')
+
   const analyticalConstituentClient = {
     id: analyticalConstituent.id,
-    name:
-      analyticalConstituent.translations.find((t) => t.languageId === language)?.name ??
-      'This analytical is not translated yet',
-    description:
-      analyticalConstituent.translations.find((t) => t.languageId === language)?.description ??
-      'This analytical constituent is not translated yet',
+    name: translation?.name ?? 'This analytical is not translated yet',
+    description: translation?.description ?? 'This analytical constituent is not translated yet',
   }
   return analyticalConstituentClient
 }

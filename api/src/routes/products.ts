@@ -10,8 +10,13 @@ router.get('/:id', productController.getProductById)
 
 router.patch('/:id', productController.patchProduct)
 router.get('/:id/ingredients', productController.getIngredientsByProduct)
-
 router.delete('/:id', productController.deleteProduct)
+
+// CRUD AC
+router.post('/:id/analyticalconstituents/:idAC', productController.createProductACQuantity)
+router.get('/:id/analyticalconstituents', productController.getACByProduct)
+router.patch('/:id/analyticalconstituents/:idAC', productController.patchACByProduct)
+router.delete('/:id/analyticalconstituents/:idAC', productController.deleteProductACQuantity)
 
 // CRUD translations
 router.post('/:id/translations', productController.createProductTranslation)

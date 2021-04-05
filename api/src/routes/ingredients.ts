@@ -11,7 +11,7 @@ router.patch('/:id', ingredientController.patchIngredient)
 router.delete('/:id', ingredientController.deleteIngredient)
 
 // CRUD translations
-router.get('/:id/translations', ingredientController.getIngredientByIdWithTranslations)
+router.get('/:id/translations', ingredientController.getAllIngredientTranslations)
 router.post('/:id/translations', ingredientController.createIngredientTranslation)
 router.patch('/:id/translations/:lang', ingredientController.patchIngredientTranslation)
 router.delete('/:id/translations/:lang', ingredientController.deleteIngredientTranslation)
