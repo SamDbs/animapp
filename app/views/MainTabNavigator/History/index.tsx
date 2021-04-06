@@ -1,6 +1,6 @@
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler'
-import { StackScreenProps } from '@react-navigation/stack'
 import { StyleSheet } from 'react-native'
 import React, { useContext } from 'react'
 import useSWR from 'swr'
@@ -9,7 +9,7 @@ import { MainTabParamList } from '../../../types'
 import ProductHistoryContext from '../../../hooks/ProductHistoryContext'
 import { Text } from '../../components/Themed'
 
-type Props = StackScreenProps<MainTabParamList, 'History'>
+type Props = BottomTabScreenProps<MainTabParamList, 'History'>
 
 function ProductHistory({ id, navigation }: { id: number; navigation: Props['navigation'] }) {
   const { data: product, error } = useSWR(`/products/${id}`)
@@ -19,12 +19,7 @@ function ProductHistory({ id, navigation }: { id: number; navigation: Props['nav
 
   return (
     <TouchableWithoutFeedback
-      onPress={() =>
-        navigation.navigate('SearchStackNavigator', {
-          screen: 'SearchProduct',
-          params: { productId: id },
-        })
-      }>
+      onPress={() => navigation.navigate('Product' as any, { productId: id })}>
       <Text>
         {product.id} - {product.name}
       </Text>

@@ -1,21 +1,14 @@
-import { RouteProp } from '@react-navigation/native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native-gesture-handler'
-import { StackNavigationProp } from '@react-navigation/stack'
+import { StackScreenProps } from '@react-navigation/stack'
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useContext, useEffect } from 'react'
 import useSWR from 'swr'
 
-import { SearchStackParamList } from '../../../types'
-import ProductHistoryContext from '../../../hooks/ProductHistoryContext'
+import { RootStackParamList } from '../types'
+import ProductHistoryContext from '../hooks/ProductHistoryContext'
 
-type ProductScreenNavigationProp = StackNavigationProp<SearchStackParamList, 'Product'>
-type ProfileScreenRouteProp = RouteProp<SearchStackParamList, 'Product'>
-
-type Props = {
-  navigation: ProductScreenNavigationProp
-  route: ProfileScreenRouteProp
-}
+type Props = StackScreenProps<RootStackParamList, 'Product'>
 
 type AnalyticalConstituent = {
   id: number
@@ -117,19 +110,19 @@ function AnalyticalConstituants({ ACs }: { ACs: AnalyticalConstituent[] }) {
 export default function Product(props: Props): JSX.Element {
   const { data: product } = useSWR(`/products/${props.route.params.productId}`)
   const { data: ingredients } = useSWR(`/products/${props.route.params.productId}/ingredients`)
-  // const { data: AC } = useSWR(`/products/${props.route.params.productId}/analyticalConstituants`)
+  const { data: AC } = useSWR(`/products/${props.route.params.productId}/analyticalConstituents`)
   const { viewProduct } = useContext(ProductHistoryContext)
 
   useEffect(() => {
     if (product && product.id) viewProduct(product.id)
   }, [product, viewProduct])
 
-  if (!product || !ingredients) return <Text>Loading...</Text>
+  if (!product || !ingredients || !AC) return <Text>Loading...</Text>
 
   return (
     <SafeAreaView style={style.page}>
       <ProductHeader product={product} />
-      <AnalyticalConstituants ACs={product.analyticalConstituents} />
+      <AnalyticalConstituants ACs={AC} />
       <Ingredients ingredients={ingredients} />
     </SafeAreaView>
   )

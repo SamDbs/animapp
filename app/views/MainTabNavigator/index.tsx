@@ -9,7 +9,7 @@ import useColorScheme from '../../hooks/useColorScheme'
 import FrequentQuestions from './FrequentQuestions'
 import History from './History'
 import Scan from './Scan'
-import SearchStackNavigator from './SearchStackNavigator'
+import Search from './Search'
 
 const BottomTab = createBottomTabNavigator<MainTabParamList>()
 
@@ -35,8 +35,8 @@ export default function MainTabNavigator(): JSX.Element {
         }}
       />
       <BottomTab.Screen
-        name="SearchStackNavigator"
-        component={SearchStackNavigator}
+        name="Search"
+        component={Search}
         options={{
           tabBarIcon: createTabBarIcon('search'),
           title: 'Search',

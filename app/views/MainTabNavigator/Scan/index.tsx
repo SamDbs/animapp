@@ -1,15 +1,15 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { BarCodeEvent, BarCodeScanner } from 'expo-barcode-scanner'
-import { StackScreenProps } from '@react-navigation/stack'
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import React, { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
 import { Text } from '../../components/Themed'
-import { SearchStackParamList } from '../../../types'
+import { MainTabParamList } from '../../../types'
 
-export default function ScanProduct({
-  navigation,
-}: StackScreenProps<SearchStackParamList, 'SearchProduct'>): JSX.Element {
+type Props = BottomTabScreenProps<MainTabParamList, 'Scan'>
+
+export default function ScanProduct({ navigation }: Props): JSX.Element {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
   const [code, setCode] = useState('')
 
@@ -38,7 +38,7 @@ export default function ScanProduct({
   useEffect(() => {
     if (code && data && !error) {
       setCode('')
-      navigation.push('SearchProduct', { productId: data.productId })
+      navigation.navigate('Product' as any, { productId: data.productId })
     } else if (error) {
       alert('Bar code not working.')
       setCode('')
