@@ -1,5 +1,7 @@
 import express from 'express'
 import { createConnection } from 'typeorm'
+import { config } from 'dotenv'
+config()
 
 import 'express-async-errors'
 import search from './routes/search'
@@ -9,6 +11,8 @@ import contacts from './routes/contacts'
 import faq from './routes/faq'
 import languages from './routes/languages'
 import analyticalConstituents from './routes/analyticalConstituents'
+import authentication from './routes/authentication'
+import admin from './routes/admin'
 import { errorHandler } from './controllers/errorHandler'
 
 const PORT = 8080
@@ -35,6 +39,8 @@ app.use('/contacts', contacts)
 app.use('/faq', faq)
 app.use('/languages', languages)
 app.use('/analyticalConstituents', analyticalConstituents)
+app.use('/auth', authentication)
+app.use('/admin', admin)
 
 app.use(errorHandler)
 app.use((req, res) => {
