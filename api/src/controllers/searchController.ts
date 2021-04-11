@@ -5,7 +5,7 @@ import { viewProducts } from '../views/product'
 import Product from '../models/product'
 import { NotFoundError } from '../middleware/errorHandler'
 import Brand from '../models/brand'
-import IngredientTranslation from '../models/ingredientTranslation'
+// import IngredientTranslation from '../models/ingredientTranslation'
 
 export const searchAll: RequestHandler = async (req, res) => {
   const { language, q } = req.query
@@ -30,15 +30,15 @@ export const searchAll: RequestHandler = async (req, res) => {
   })
 }
 export const searchByIngredients: RequestHandler = async (req, res) => {
-  const { language, q } = req.query
-  const queryDeleteParenthesis = req.query.q?.toString().replace(/\(.*\)/Ugms, '')
-  const queryWord = queryDeleteParenthesis?.split(',').map((item) => item.trim())
-  const queryWord2 = queryDeleteParenthesis?.split(';').map((item) => item.trim())
-  const queryWord3 = queryDeleteParenthesis?.split('\n').map((item) => item.trim())
-
-  const ingredients = await IngredientTranslation.createQueryBuilder('t')
-    .innerJoinAndSelect('t.ingredient', 'ingredient')
-    .leftJoinAndSelect('ingredient.translations', 'ts')
-    .where('t.name ILike :q', { q: `%${q}%` })
-    .getMany()
+  const { q } = req.query
+  const queryDeleteParenthesis = q?.toString().replace(/\(.*\)/gms, '')
+  const formatQuery = queryDeleteParenthesis?.replace('\n', ',')
+  // const tableauMots = []
+  const matches = formatQuery?.matchAll(/([a-zA-Z\s]+),?/gms)
+  console.log(matches)
+  // const ingredients = await IngredientTranslation.createQueryBuilder('t')
+  //   .innerJoinAndSelect('t.ingredient', 'ingredient')
+  //   .leftJoinAndSelect('ingredient.translations', 'ts')
+  //   .where('t.name ILike :q', { q: `%${q}%` })
+  //   .getMany()
 }
