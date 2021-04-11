@@ -13,7 +13,7 @@ import languages from './routes/languages'
 import analyticalConstituents from './routes/analyticalConstituents'
 import authentication from './routes/authentication'
 import admin from './routes/admin'
-import { errorHandler } from './controllers/errorHandler'
+import { errorHandler } from './middleware/errorHandler'
 
 const PORT = 8080
 const HOST = '0.0.0.0'

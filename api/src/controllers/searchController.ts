@@ -5,8 +5,7 @@ import { viewProducts } from '../views/product'
 import { viewIngredients } from '../views/ingredient'
 import Product from '../models/product'
 import IngredientTranslation from '../models/ingredientTranslation'
-
-import { NotFoundError } from './errorHandler'
+import { NotFoundError } from '../middleware/errorHandler'
 
 export const searchAll: RequestHandler = async (req, res) => {
   const { language, q } = req.query

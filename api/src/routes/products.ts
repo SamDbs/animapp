@@ -1,20 +1,22 @@
 import { Router } from 'express'
 
 import * as productController from '../controllers/productController'
+import { authAdmin } from '../middleware/admin'
 
 const router = Router()
 
+router.get('/:id', productController.getProductById)
+router.get('/:id/ingredients', productController.getIngredientsByProduct)
+router.get('/:id/analyticalconstituents', productController.getACByProduct)
+
+router.use(authAdmin)
 router.get('/', productController.getAllProducts)
 router.post('/', productController.createProduct)
-router.get('/:id', productController.getProductById)
-
 router.patch('/:id', productController.patchProduct)
-router.get('/:id/ingredients', productController.getIngredientsByProduct)
 router.delete('/:id', productController.deleteProduct)
 
 // CRUD AC
 router.post('/:id/analyticalconstituents/:idAC', productController.createProductACQuantity)
-router.get('/:id/analyticalconstituents', productController.getACByProduct)
 router.patch('/:id/analyticalconstituents/:idAC', productController.patchACByProduct)
 router.delete('/:id/analyticalconstituents/:idAC', productController.deleteProductACQuantity)
 

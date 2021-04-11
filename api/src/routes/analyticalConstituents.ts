@@ -1,13 +1,14 @@
 import { Router } from 'express'
 
 import * as analyticalConstituentController from '../controllers/analyticalConstituentController'
+import { authAdmin } from '../middleware/admin'
 
 const router = Router()
 
+router.use(authAdmin)
 router.get('/', analyticalConstituentController.getAllAnalyticalConstituents)
 router.post('/', analyticalConstituentController.createAnalyticalConstituent)
 router.get('/:id', analyticalConstituentController.getAnalyticalConstituentById)
-// router.patch('/:id', analyticalConstituentController.patchAnalyticalConstituent)
 router.delete('/:id', analyticalConstituentController.deleteAnalyticalConstituent)
 
 // CRUD translations

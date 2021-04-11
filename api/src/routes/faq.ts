@@ -1,10 +1,13 @@
 import { Router } from 'express'
 
 import * as faqController from '../controllers/faqController'
+import { authAdmin } from '../middleware/admin'
 
 const router = Router()
 
 router.get('/', faqController.getAllFaq)
+
+router.use(authAdmin)
 router.get('/:id', faqController.getFaqById)
 router.post('/', faqController.createFaq)
 router.patch('/:id', faqController.patchFaq)

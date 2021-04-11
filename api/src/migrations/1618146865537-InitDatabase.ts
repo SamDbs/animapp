@@ -1,9 +1,10 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class InitDatabase1617725509617 implements MigrationInterface {
-    name = 'InitDatabase1617725509617'
+export class InitDatabase1618146865537 implements MigrationInterface {
+    name = 'InitDatabase1618146865537'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`CREATE TABLE "admin" ("id" SERIAL NOT NULL, "login" character varying NOT NULL, "password" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "UQ_4e22b047986b40e5018b04a71c7" UNIQUE ("login"), CONSTRAINT "PK_e032310bcef831fb83101899b10" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "product_translation" ("productId" integer NOT NULL, "languageId" character varying NOT NULL, "description" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "PK_393ea5a38a9bc79815ba34e085b" PRIMARY KEY ("productId", "languageId"))`);
         await queryRunner.query(`CREATE TABLE "faq" ("id" SERIAL NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "PK_d6f5a52b1a96dd8d0591f9fbc47" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "faq_translation" ("faqId" integer NOT NULL, "languageId" character varying NOT NULL, "question" character varying NOT NULL, "answer" character varying NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), "deletedAt" TIMESTAMP, CONSTRAINT "PK_40b1e067e6044e46976ea00d80a" PRIMARY KEY ("faqId", "languageId"))`);
@@ -63,6 +64,7 @@ export class InitDatabase1617725509617 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "faq_translation"`);
         await queryRunner.query(`DROP TABLE "faq"`);
         await queryRunner.query(`DROP TABLE "product_translation"`);
+        await queryRunner.query(`DROP TABLE "admin"`);
     }
 
 }

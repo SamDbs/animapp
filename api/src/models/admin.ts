@@ -2,10 +2,10 @@ import {
   BaseEntity,
   Column,
   CreateDateColumn,
-  UpdateDateColumn,
   DeleteDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm'
 
 @Entity()
@@ -13,7 +13,7 @@ export default class Admin extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number
 
-  @Column()
+  @Column({ unique: true })
   login!: string
 
   @Column()

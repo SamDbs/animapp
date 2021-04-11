@@ -1,8 +1,11 @@
 import { Router } from 'express'
 
 import * as ingredientController from '../controllers/ingredientController'
+import { authAdmin } from '../middleware/admin'
 
 const router = Router()
+
+router.use(authAdmin)
 
 router.get('/', ingredientController.getAllIngredients)
 router.post('/', ingredientController.createIngredient)
