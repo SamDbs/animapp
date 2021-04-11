@@ -8,6 +8,8 @@ services:
     volumes:
       - ./api/src:/usr/src/api/src
       - ./api/fixtures:/usr/src/api/fixtures
+    env_file:
+      - ./api/.env
 
   db:
     image: postgres
