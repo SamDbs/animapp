@@ -9,6 +9,11 @@ jobs:
       wd: ./api
     steps:
     - uses: actions/checkout@v2
+    - name: Cache node modules
+      uses: actions/cache@v2
+      with:
+        path: "api/node_modules"
+        key: ${{ runner.os }}-modules-${{ hashFiles('api/yarn.lock') }}
     - name: Install dependencies
       run: yarn install --frozen-lockfile
       working-directory: ${{env.wd}}
