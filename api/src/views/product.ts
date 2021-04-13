@@ -39,6 +39,7 @@ export function viewProduct(product: Product, language: Language['id'] | undefin
 
   const productClient = {
     id: product.id,
+    brand: product.brand?.name,
     type: product.type,
     name: product.name,
     photo: product.photo,
