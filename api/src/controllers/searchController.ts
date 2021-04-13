@@ -32,16 +32,10 @@ export const searchAll: RequestHandler = async (req, res) => {
 }
 export const searchByIngredients: RequestHandler = async (req, res) => {
   const { q } = req.query
-  const queryDeleteParenthesis = q?.toString().replace(/\([^\)]*\)/gms, '')
-  const formatQuery = queryDeleteParenthesis?.replace('\n', ',')
-  const tableauMots = []
-  const matches = formatQuery?.matchAll(/([a-zA-Z\s]+),?/gms)
-  if (!matches) {
-    return
+  if (typeof q !== 'string') {
+    throw new NotFoundError()
   }
-  for (const match of matches) {
-    tableauMots.push(match[1].trim())
-  }
+  const tableauMots = parseQueryToWordArray(q)
   const searchResult = await Promise.all(
     tableauMots.map(async (mot) => {
       const ingredient = await IngredientTranslation.createQueryBuilder('t')
@@ -56,4 +50,18 @@ export const searchByIngredients: RequestHandler = async (req, res) => {
     }),
   )
   res.json(searchResult)
+}
+
+export const parseQueryToWordArray = (q: string): string[] => {
+  const queryDeleteParenthesis = q?.replace(/\([^\)]*\)/gms, '')
+  const formatQuery = queryDeleteParenthesis?.replace('\n', ',')
+  const tableauMots = []
+  const matches = formatQuery?.matchAll(/([a-zA-Z\s]+),?/gms)
+  if (!matches) {
+    return []
+  }
+  for (const match of matches) {
+    tableauMots.push(match[1].trim())
+  }
+  return tableauMots
 }
