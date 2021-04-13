@@ -1,0 +1,23 @@
+name: Lint, Build and Test
+
+on: [push]
+
+jobs:
+  check-api:
+    runs-on: ubuntu-latest
+    env:
+      wd: ./api
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+      working-directory: ${{env.wd}}
+    - name: Lint ./src
+      run: yarn run lint
+      working-directory: ${{env.wd}}
+    - name: Check typescript
+      run: yarn run build
+      working-directory: ${{env.wd}}
+    - name: Unit test
+      run: yarn run test
+      working-directory: ${{env.wd}}
