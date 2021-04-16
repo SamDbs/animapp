@@ -1,0 +1,7 @@
+entity: Admin
+items:
+  admin1:
+    login: 'test'
+    __call:
+      setPassword:
+        - test

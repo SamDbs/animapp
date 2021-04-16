@@ -1,3 +1,4 @@
+import { genSalt, hash } from 'bcryptjs'
 import {
   BaseEntity,
   Column,
@@ -27,4 +28,10 @@ export default class Admin extends BaseEntity {
 
   @DeleteDateColumn()
   deletedAt!: Date
+
+  async setPassword(password: string): Promise<void> {
+    const salt = await genSalt()
+    this.password = await hash(password, salt)
+    await this.save()
+  }
 }
