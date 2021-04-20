@@ -20,18 +20,15 @@ export const searchAll: RequestHandler = async (req, res) => {
     relations: ['products', 'products.translations', 'products.brand'],
   })
 
-  if (!products.length && !brands.length) {
-    throw new NotFoundError()
-  }
   res.json({
     products: viewProducts(
-      [...products, ...brands.map((brand) => brand.products).flat()],
+      [...brands.map((brand) => brand.products).flat(), ...products],
       language?.toString().toUpperCase(),
     ),
   })
 }
 export const searchByIngredients: RequestHandler = async (req, res) => {
-  const { q } = req.query
+  const { language, q } = req.query
   if (typeof q !== 'string') {
     throw new NotFoundError()
   }
@@ -45,7 +42,9 @@ export const searchByIngredients: RequestHandler = async (req, res) => {
         .getOne()
       return {
         ingredientSearched: mot,
-        ingredientFound: ingredient ? viewIngredient(ingredient.ingredient) : null,
+        ingredientFound: ingredient
+          ? viewIngredient(ingredient.ingredient, language?.toString())
+          : null,
       }
     }),
   )

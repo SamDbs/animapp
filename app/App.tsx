@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar'
-import React, { useState } from 'react'
+import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { SWRConfig, SWRConfiguration } from 'swr'
 

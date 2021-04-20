@@ -1,12 +1,12 @@
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native-gesture-handler'
 import { StackScreenProps } from '@react-navigation/stack'
-import { StyleSheet, Text, View } from 'react-native'
+import { Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View } from 'react-native'
 import React, { useContext, useEffect } from 'react'
 import useSWR from 'swr'
 
 import { RootStackParamList } from '../types'
 import ProductHistoryContext from '../hooks/ProductHistoryContext'
+import globalStyle from './components/style'
 
 type Props = StackScreenProps<RootStackParamList, 'Product'>
 
@@ -17,12 +17,44 @@ type AnalyticalConstituent = {
   description: string
 }
 
+const IMG_MARGIN = 20
+
 function ProductHeader({ product }: { product: any }) {
+  const dimensions = useWindowDimensions()
+  const { width } = dimensions
   return (
-    <View style={{ backgroundColor: '#fff', flex: 1, padding: 10 }}>
-      <Text style={{ fontSize: 24 }}>{product.name}</Text>
-      <Text style={{ fontSize: 12 }}>{product.type}</Text>
-      <Text style={{ marginTop: 20 }}>{product.description}</Text>
+    <View
+      style={{
+        ...globalStyle.card,
+        flexDirection: 'row',
+        height: width * 0.4,
+      }}>
+      <View
+        style={{
+          height: width * 0.4,
+          width: width * 0.4,
+          alignItems: 'center',
+        }}>
+        <Image
+          source={{
+            uri: product.photo,
+          }}
+          style={{
+            height: width * 0.4 - IMG_MARGIN,
+            width: width * 0.4 - IMG_MARGIN,
+            margin: IMG_MARGIN / 2,
+            borderRadius: 5,
+            overflow: 'hidden',
+            resizeMode: 'contain',
+            backgroundColor: 'red',
+          }}
+        />
+      </View>
+      <View style={{ width: width * 0.6 - 20, padding: 10 }}>
+        <Text style={{ fontSize: 24 }}>{product.name}</Text>
+        <Text style={{ fontSize: 12 }}>{product.type}</Text>
+        <Text style={{ marginTop: 20 }}>{product.description}</Text>
+      </View>
     </View>
   )
 }
@@ -33,7 +65,7 @@ function Separator() {
 
 function Ingredients({ ingredients }: { ingredients: any[] }) {
   return (
-    <View style={{ backgroundColor: '#fff', flex: 1 }}>
+    <View style={{ ...globalStyle.card, marginTop: 0, backgroundColor: '#fff', flex: 1 }}>
       <Text style={{ fontSize: 24, paddingLeft: 10 }}>Ingredients</Text>
       <ScrollView style={{ flex: 1 }}>
         {ingredients.map((ingredient: any, i: number) => (

@@ -1,43 +1,75 @@
+import { ActivityIndicator, Image, StyleSheet, TextInput, View } from 'react-native'
+import { AntDesign } from '@expo/vector-icons'
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler'
-import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import { ActivityIndicator, StyleSheet, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 import useSWR from 'swr'
 
 import { Text } from '../../components/Themed'
 import { RootStackParamList } from '../../../types'
+import globalStyle from '../../components/style'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Product'>
 
-function SearchInputContainer(props: any) {
-  return <View style={style.searchInputContainer} {...props} />
-}
-
-function SearchResultProduct(props: {
-  productId: number
-  isLast: boolean
-  navigate?: Props['navigation']['navigate']
-  children: JSX.Element
+function SearchInput(props: {
+  input: string
+  setInput: React.Dispatch<React.SetStateAction<string>>
 }) {
   return (
-    <TouchableWithoutFeedback
-      style={[style.result, props.isLast && style.noBorder].filter(Boolean)}
-      onPress={
-        props.navigate
-          ? () => props.navigate && props.navigate('Product', { productId: props.productId })
-          : undefined
-      }>
-      {props.children}
-    </TouchableWithoutFeedback>
+    <View style={style.searchInputContainer}>
+      <TextInput
+        style={style.searchInput}
+        onChangeText={(event) => props.setInput(event)}
+        value={props.input}
+        returnKeyType="search"
+        clearButtonMode="always"
+      />
+    </View>
   )
 }
 
-function SearchResultIngredient(props: { isLast: boolean; children: JSX.Element }) {
+const CARD_SIZE = 80
+
+function SearchResult(props: {
+  product: { id: number; name: string; brand: string; photo: string }
+  navigate?: Props['navigation']['navigate']
+}) {
   return (
     <TouchableWithoutFeedback
-      style={[style.result, props.isLast && style.noBorder].filter(Boolean)}>
-      {props.children}
+      style={style.result}
+      onPress={
+        props.navigate
+          ? () => props.navigate && props.navigate('Product', { productId: props.product.id })
+          : undefined
+      }>
+      <View style={{ flexDirection: 'row' }}>
+        <View>
+          <Image
+            source={{ uri: props.product.photo }}
+            style={{
+              height: CARD_SIZE,
+              width: CARD_SIZE,
+              borderTopLeftRadius: 5,
+              borderBottomLeftRadius: 5,
+              overflow: 'hidden',
+            }}
+          />
+        </View>
+        <View style={{ padding: 10 }}>
+          <Text>{props.product.name}</Text>
+          <Text style={{ fontSize: 12, color: '#444' }}>{props.product.brand}</Text>
+        </View>
+      </View>
+      <View
+        style={{
+          height: CARD_SIZE,
+          width: CARD_SIZE,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <AntDesign name="smileo" size={24} color="black" />
+      </View>
     </TouchableWithoutFeedback>
   )
 }
@@ -46,9 +78,7 @@ function Center(props: { children: JSX.Element }): JSX.Element {
   return <View style={style.center}>{props.children}</View>
 }
 
-export default function SearchProductsIngredients({
-  navigation: { navigate },
-}: Props): JSX.Element {
+export default function SearchProducts({ navigation: { navigate } }: Props): JSX.Element {
   const [input, setInput] = useState('')
   const shouldFetch = input.length > 3
   const { data, error } = useSWR(shouldFetch ? `/search?q=${input}` : null)
@@ -57,15 +87,7 @@ export default function SearchProductsIngredients({
 
   return (
     <SafeAreaView style={style.page}>
-      <SearchInputContainer>
-        <TextInput
-          style={style.searchInput}
-          onChangeText={(event) => setInput(event)}
-          value={input}
-          returnKeyType="search"
-          clearButtonMode="always"
-        />
-      </SearchInputContainer>
+      <SearchInput input={input} setInput={setInput} />
       {!shouldFetch && (
         <Center>
           <Text>Please type something</Text>
@@ -85,18 +107,7 @@ export default function SearchProductsIngredients({
         {data && (
           <>
             {data.products.map((result: any, i: number) => (
-              <SearchResultProduct
-                productId={result.id}
-                isLast={i === data.ingredients.length + data.products.length - 1}
-                key={result.id}
-                navigate={navigate}>
-                <Text>{result.name}</Text>
-              </SearchResultProduct>
-            ))}
-            {data.ingredients.map((result: any, i: number) => (
-              <SearchResultIngredient isLast={i === data.ingredients.length - 1} key={result.id}>
-                <Text>{result.name}</Text>
-              </SearchResultIngredient>
+              <SearchResult product={result} key={result.id} navigate={navigate} />
             ))}
           </>
         )}
@@ -109,25 +120,23 @@ const style = StyleSheet.create({
   page: { flex: 1, backgroundColor: '#eee' },
   searchInputContainer: { padding: 10 },
   searchInput: {
-    padding: 10,
-    borderRadius: 15,
     backgroundColor: '#ddd',
+    borderRadius: 15,
+    padding: 10,
   },
   result: {
-    padding: 10,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'silver',
-  },
-  noBorder: {
-    borderBottomWidth: 0,
+    ...globalStyle.card,
+    flexDirection: 'row',
+    height: 80,
+    marginVertical: 5,
   },
   noResults: {
+    alignItems: 'center',
     flexGrow: 1,
     justifyContent: 'center',
-    alignItems: 'center',
   },
   center: {
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
 })
