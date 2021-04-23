@@ -3,9 +3,11 @@ import { StackScreenProps } from '@react-navigation/stack'
 import { Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View } from 'react-native'
 import React, { useContext, useEffect } from 'react'
 import useSWR from 'swr'
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 
-import { RootStackParamList } from '../types'
 import ProductHistoryContext from '../hooks/ProductHistoryContext'
+import { RootStackParamList } from '../types'
+
 import globalStyle from './components/style'
 
 type Props = StackScreenProps<RootStackParamList, 'Product'>
@@ -23,12 +25,7 @@ function ProductHeader({ product }: { product: any }) {
   const dimensions = useWindowDimensions()
   const { width } = dimensions
   return (
-    <View
-      style={{
-        ...globalStyle.card,
-        flexDirection: 'row',
-        height: width * 0.4,
-      }}>
+    <View style={{ ...globalStyle.card, flexDirection: 'row', height: width * 0.4 }}>
       <View
         style={{
           height: width * 0.4,
@@ -46,7 +43,6 @@ function ProductHeader({ product }: { product: any }) {
             borderRadius: 5,
             overflow: 'hidden',
             resizeMode: 'contain',
-            backgroundColor: 'red',
           }}
         />
       </View>
@@ -63,10 +59,15 @@ function Separator() {
   return <View style={{ borderColor: 'silver', borderWidth: StyleSheet.hairlineWidth }} />
 }
 
-function Ingredients({ ingredients }: { ingredients: any[] }) {
+function Ingredients({
+  route: {
+    params: { ingredients },
+  },
+}: {
+  route: { params: { ingredients: any[] } }
+}) {
   return (
-    <View style={{ ...globalStyle.card, marginTop: 0, backgroundColor: '#fff', flex: 1 }}>
-      <Text style={{ fontSize: 24, paddingLeft: 10 }}>Ingredients</Text>
+    <View style={{ marginTop: 0, backgroundColor: '#fff', flex: 1 }}>
       <ScrollView style={{ flex: 1 }}>
         {ingredients.map((ingredient: any, i: number) => (
           <React.Fragment key={ingredient.id}>
@@ -121,7 +122,13 @@ function Row(props: JSX.Element['props']) {
   )
 }
 
-function AnalyticalConstituants({ ACs }: { ACs: AnalyticalConstituent[] }) {
+function AnalyticalConstituents({
+  route: {
+    params: { ACs },
+  },
+}: {
+  route: { params: { ACs: AnalyticalConstituent[] } }
+}) {
   if (ACs.length === 0) return null
   return (
     <Table>
@@ -139,23 +146,49 @@ function AnalyticalConstituants({ ACs }: { ACs: AnalyticalConstituent[] }) {
   )
 }
 
+const DetailsTabNavigator = createMaterialTopTabNavigator()
+
+function ProductDetails({
+  ACs,
+  ingredients,
+}: {
+  ACs: AnalyticalConstituent[]
+  ingredients: any[]
+}) {
+  return (
+    <DetailsTabNavigator.Navigator
+      initialRouteName="Ingredients"
+      style={{ ...globalStyle.card, marginTop: 0 }}>
+      <DetailsTabNavigator.Screen
+        component={Ingredients}
+        name="Ingredients"
+        initialParams={{ ingredients }}
+      />
+      <DetailsTabNavigator.Screen
+        component={AnalyticalConstituents}
+        name="Constituents"
+        initialParams={{ ACs }}
+      />
+    </DetailsTabNavigator.Navigator>
+  )
+}
+
 export default function Product(props: Props): JSX.Element {
   const { data: product } = useSWR(`/products/${props.route.params.productId}`)
   const { data: ingredients } = useSWR(`/products/${props.route.params.productId}/ingredients`)
-  const { data: AC } = useSWR(`/products/${props.route.params.productId}/analyticalConstituents`)
+  const { data: ACs } = useSWR(`/products/${props.route.params.productId}/analyticalConstituents`)
   const { viewProduct } = useContext(ProductHistoryContext)
 
   useEffect(() => {
     if (product && product.id) viewProduct(product.id)
   }, [product, viewProduct])
 
-  if (!product || !ingredients || !AC) return <Text>Loading...</Text>
+  if (!product || !ingredients || !ACs) return <Text>Loading...</Text>
 
   return (
     <SafeAreaView style={style.page}>
       <ProductHeader product={product} />
-      <AnalyticalConstituants ACs={AC} />
-      <Ingredients ingredients={ingredients} />
+      <ProductDetails ACs={ACs} ingredients={ingredients} />
     </SafeAreaView>
   )
 }
