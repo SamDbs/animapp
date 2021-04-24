@@ -1,7 +1,6 @@
 export type RootStackParamList = {
   MainTabNavigator: undefined
   Product: { productId: number }
-  Ingredient: { ingredientId: number }
   NotFound: undefined
 }
 

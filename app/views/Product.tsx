@@ -1,7 +1,16 @@
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
+import { ScrollView } from 'react-native-gesture-handler'
 import { StackScreenProps } from '@react-navigation/stack'
-import { Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View } from 'react-native'
-import React, { useContext, useEffect } from 'react'
+import {
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  useWindowDimensions,
+  View,
+} from 'react-native'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 
@@ -9,6 +18,9 @@ import ProductHistoryContext from '../hooks/ProductHistoryContext'
 import { RootStackParamList } from '../types'
 
 import globalStyle from './components/style'
+import { Title } from './MainTabNavigator/FrequentQuestions'
+
+const CARD_SIZE = 80
 
 type Props = StackScreenProps<RootStackParamList, 'Product'>
 
@@ -20,6 +32,11 @@ type AnalyticalConstituent = {
 }
 
 const IMG_MARGIN = 20
+
+const IngredientModalContext = createContext<{ ingredientId: number | null; open: any }>({
+  ingredientId: null,
+  open: (id: number) => null,
+})
 
 function ProductHeader({ product }: { product: any }) {
   const dimensions = useWindowDimensions()
@@ -60,10 +77,10 @@ function Separator() {
 }
 
 function Ingredients({
+  navigation,
   route: {
     params: { ingredients },
   },
-  navigation,
 }: {
   route: { params: { ingredients: any[] } }
   navigation: any
@@ -73,7 +90,7 @@ function Ingredients({
       <ScrollView style={{ flex: 1 }}>
         {ingredients.map((ingredient: any, i: number) => (
           <React.Fragment key={ingredient.id}>
-            <Ingredient ingredient={ingredient} navigation={navigation} />
+            <Ingredient ingredient={ingredient} />
             {i !== ingredients.length - 1 && <Separator />}
           </React.Fragment>
         ))}
@@ -82,16 +99,11 @@ function Ingredients({
   )
 }
 
-function Ingredient({
-  ingredient,
-  navigation,
-}: {
-  ingredient: any
-  navigation: Props['navigation']
-}) {
+function Ingredient({ ingredient }: { ingredient: any }) {
+  const modal = useContext(IngredientModalContext)
+
   return (
-    <TouchableOpacity
-      onPress={() => navigation.navigate('Ingredient', { ingredientId: ingredient.id })}>
+    <TouchableOpacity onPress={() => modal.open(ingredient.id)}>
       <View key={ingredient.id} style={{ padding: 10, flex: 1 }}>
         <View>
           <Text>{ingredient.name}</Text>
@@ -178,11 +190,54 @@ function ProductDetails({
   )
 }
 
-export default function Product(props: Props): JSX.Element {
+function ModalIngredient({ ingredient }: { ingredient: any }) {
+  const modal = useContext(IngredientModalContext)
+
+  return (
+    <TouchableOpacity
+      style={{
+        backgroundColor: 'rgba(0,0,0,0.2)',
+        position: 'absolute',
+        height: '100%',
+        width: '100%',
+        justifyContent: 'center',
+        elevation: 1,
+      }}
+      onPress={() => modal.open(null)}>
+      <TouchableWithoutFeedback>
+        <View
+          style={{
+            ...globalStyle.card,
+            elevation: 10,
+            backgroundColor: '#fff',
+            padding: 10,
+            margin: 20,
+          }}>
+          <Title>{ingredient.name}</Title>
+          <Text>{ingredient.description}</Text>
+          <Text>{ingredient.review}</Text>
+          <Image
+            source={{ uri: ingredient.photo }}
+            style={{
+              height: CARD_SIZE,
+              width: CARD_SIZE,
+              borderTopLeftRadius: 5,
+              borderBottomLeftRadius: 5,
+              overflow: 'hidden',
+            }}
+          />
+        </View>
+      </TouchableWithoutFeedback>
+    </TouchableOpacity>
+  )
+}
+
+function ProductView(props: Props): JSX.Element {
   const { data: product } = useSWR(`/products/${props.route.params.productId}`)
   const { data: ingredients } = useSWR(`/products/${props.route.params.productId}/ingredients`)
   const { data: ACs } = useSWR(`/products/${props.route.params.productId}/analyticalConstituents`)
   const { viewProduct } = useContext(ProductHistoryContext)
+  const modal = useContext(IngredientModalContext)
 
   useEffect(() => {
     if (product && product.id) {
@@ -197,7 +252,22 @@ export default function Product(props: Props): JSX.Element {
     <SafeAreaView style={style.page}>
       <ProductHeader product={product} />
       <ProductDetails ACs={ACs} ingredients={ingredients} />
+      {modal.ingredientId && (
+        <ModalIngredient
+          ingredient={ingredients.find(({ id }: any) => id === modal.ingredientId)}
+        />
+      )}
     </SafeAreaView>
+  )
+}
+
+export default function Product(props: Props): JSX.Element {
+  const [ingredientId, open] = useState<null | number>(null)
+
+  return (
+    <IngredientModalContext.Provider value={{ ingredientId, open }}>
+      <ProductView {...props} />
+    </IngredientModalContext.Provider>
   )
 }
 
