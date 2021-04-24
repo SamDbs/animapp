@@ -5,11 +5,12 @@ import { authAdmin } from '../middleware/admin'
 
 const router = Router()
 
+router.get('/:id', ingredientController.getIngredientById)
+
 router.use(authAdmin)
 
 router.get('/', ingredientController.getAllIngredients)
 router.post('/', ingredientController.createIngredient)
-router.get('/:id', ingredientController.getIngredientById)
 router.patch('/:id', ingredientController.patchIngredient)
 router.delete('/:id', ingredientController.deleteIngredient)
 

@@ -1,29 +1,34 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler'
+import { StackNavigationProp } from '@react-navigation/stack'
 import { StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { ScrollView } from 'react-native-gesture-handler'
 import React, { useContext } from 'react'
 import useSWR from 'swr'
 
-import { MainTabParamList } from '../../../types'
+import { MainTabParamList, RootStackParamList } from '../../../types'
 import ProductHistoryContext from '../../../hooks/ProductHistoryContext'
 import { Text } from '../../components/Themed'
-
+import ProductCard from '../Search/components/ProductCard'
+import { Title } from '../FrequentQuestions'
 type Props = BottomTabScreenProps<MainTabParamList, 'History'>
 
-function ProductHistory({ id, navigation }: { id: number; navigation: Props['navigation'] }) {
-  const { data: product, error } = useSWR(`/products/${id}`)
+function Product(props: {
+  productId: number
+  navigate?: StackNavigationProp<RootStackParamList, 'Product'>['navigate']
+}) {
+  const { data: product, error } = useSWR(`/products/${props.productId}`)
 
   if (error) return null
   if (!product) return <Text>Loading</Text>
 
   return (
-    <TouchableWithoutFeedback
-      onPress={() => navigation.navigate('Product' as any, { productId: id })}>
-      <Text>
-        {product.id} - {product.name}
-      </Text>
-    </TouchableWithoutFeedback>
+    <ProductCard
+      product={product}
+      onPress={() => {
+        if (props.navigate) props.navigate('Product', { productId: props.productId })
+      }}
+    />
   )
 }
 
@@ -32,10 +37,16 @@ export default function History({ navigation }: Props): JSX.Element {
 
   return (
     <SafeAreaView style={style.page}>
-      <Text>History</Text>
+      <Title>History</Title>
       <ScrollView style={style.scrollView}>
         {historyProductsIds.map((id) => (
-          <ProductHistory key={id} id={id} navigation={navigation} />
+          <Product
+            key={id}
+            productId={id}
+            navigate={
+              navigation.navigate as StackNavigationProp<RootStackParamList, 'Product'>['navigate']
+            }
+          />
         ))}
       </ScrollView>
     </SafeAreaView>

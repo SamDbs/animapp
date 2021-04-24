@@ -1,4 +1,4 @@
-import { ScrollView } from 'react-native-gesture-handler'
+import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import { StackScreenProps } from '@react-navigation/stack'
 import { Image, SafeAreaView, StyleSheet, Text, useWindowDimensions, View } from 'react-native'
 import React, { useContext, useEffect } from 'react'
@@ -63,15 +63,17 @@ function Ingredients({
   route: {
     params: { ingredients },
   },
+  navigation,
 }: {
   route: { params: { ingredients: any[] } }
+  navigation: any
 }) {
   return (
     <View style={{ marginTop: 0, backgroundColor: '#fff', flex: 1 }}>
       <ScrollView style={{ flex: 1 }}>
         {ingredients.map((ingredient: any, i: number) => (
           <React.Fragment key={ingredient.id}>
-            <Ingredient ingredient={ingredient} />
+            <Ingredient ingredient={ingredient} navigation={navigation} />
             {i !== ingredients.length - 1 && <Separator />}
           </React.Fragment>
         ))}
@@ -80,25 +82,28 @@ function Ingredients({
   )
 }
 
-function Ingredient({ ingredient }: { ingredient: any }) {
+function Ingredient({
+  ingredient,
+  navigation,
+}: {
+  ingredient: any
+  navigation: Props['navigation']
+}) {
   return (
-    <View key={ingredient.id} style={{ padding: 10, flex: 1 }}>
-      <View>
-        <Text>{ingredient.name}</Text>
+    <TouchableOpacity
+      onPress={() => navigation.navigate('Ingredient', { ingredientId: ingredient.id })}>
+      <View key={ingredient.id} style={{ padding: 10, flex: 1 }}>
+        <View>
+          <Text>{ingredient.name}</Text>
+        </View>
       </View>
-      <View>
-        <Text>{ingredient.review}</Text>
-      </View>
-      <View>
-        <Text>{ingredient.description}</Text>
-      </View>
-    </View>
+    </TouchableOpacity>
   )
 }
 
 function Table(props: JSX.Element['props']) {
   return (
-    <View style={{ paddingHorizontal: 10, backgroundColor: '#fff' }}>
+    <View style={{ paddingHorizontal: 10, backgroundColor: '#fff', flex: 1 }}>
       <View style={{ borderWidth: StyleSheet.hairlineWidth, borderRadius: 10 }}>
         {props.children}
       </View>
@@ -156,20 +161,20 @@ function ProductDetails({
   ingredients: any[]
 }) {
   return (
-    <DetailsTabNavigator.Navigator
-      initialRouteName="Ingredients"
-      style={{ ...globalStyle.card, marginTop: 0 }}>
-      <DetailsTabNavigator.Screen
-        component={Ingredients}
-        name="Ingredients"
-        initialParams={{ ingredients }}
-      />
-      <DetailsTabNavigator.Screen
-        component={AnalyticalConstituents}
-        name="Constituents"
-        initialParams={{ ACs }}
-      />
-    </DetailsTabNavigator.Navigator>
+    <View style={{ ...globalStyle.card, marginTop: 0, flex: 1 }}>
+      <DetailsTabNavigator.Navigator initialRouteName="Ingredients" style={{ borderRadius: 10 }}>
+        <DetailsTabNavigator.Screen
+          component={Ingredients}
+          name="Ingredients"
+          initialParams={{ ingredients }}
+        />
+        <DetailsTabNavigator.Screen
+          component={AnalyticalConstituents}
+          name="Constituents"
+          initialParams={{ ACs }}
+        />
+      </DetailsTabNavigator.Navigator>
+    </View>
   )
 }
 
@@ -180,8 +185,11 @@ export default function Product(props: Props): JSX.Element {
   const { viewProduct } = useContext(ProductHistoryContext)
 
   useEffect(() => {
-    if (product && product.id) viewProduct(product.id)
-  }, [product, viewProduct])
+    if (product && product.id) {
+      props.navigation.setOptions({ title: product.name })
+      viewProduct(product.id)
+    }
+  }, [product, viewProduct, props.navigation])
 
   if (!product || !ingredients || !ACs) return <Text>Loading...</Text>
 
