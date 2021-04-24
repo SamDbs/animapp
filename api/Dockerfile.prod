@@ -1,0 +1,15 @@
+FROM node:lts-alpine as build
+WORKDIR /usr/src/api
+COPY src tsconfig.json package.json yarn.lock ormconfig.json ./
+RUN yarn
+RUN yarn build
+
+FROM node:lts-alpine as prod
+ENV NODE_ENV production 
+WORKDIR /usr/bin/api
+COPY --from=build /usr/src/api/build ./build
+COPY --from=build /usr/src/api/package.json /usr/src/api/yarn.lock /usr/src/api/ormconfig.json ./
+
+RUN yarn
+CMD yarn start
+EXPOSE 80
