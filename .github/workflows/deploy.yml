@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Login to Heroku Container registry
-      provider:
+      env: 
         api_key: ${{ secrets.HEROKU_API_KEY }}
         email: ${{ secrets.HEROKU_EMAIL }}
       run: heroku container:login 
