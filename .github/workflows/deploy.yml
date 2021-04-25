@@ -16,11 +16,11 @@ jobs:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
       run: heroku container:login 
-    - run: heroku container:push --recursive -a animapp-v1 prod
+    - run: heroku container:push --recursive -a animapp-v1 web
       env: 
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
           HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
-    - run: heroku container:release -a animapp-v1 prod 
+    - run: heroku container:release -a animapp-v1 web 
       env: 
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
