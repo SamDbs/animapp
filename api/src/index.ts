@@ -18,7 +18,12 @@ import { errorHandler } from './middleware/errorHandler'
 
 const PORT = ((process.env.PORT as unknown) as number) || 8080
 const HOST = '0.0.0.0'
-createConnection()
+if (process.env.DATABASE_URL) {
+  createConnection({ url: process.env.DATABASE_URL, type: 'postgres' })
+} else {
+  createConnection()
+}
+
 const app = express()
 
 app.use(express.json())
