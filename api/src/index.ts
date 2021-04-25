@@ -16,7 +16,7 @@ import authentication from './routes/authentication'
 import admin from './routes/admin'
 import { errorHandler } from './middleware/errorHandler'
 
-const PORT = 8080
+const PORT = process.env.PORT
 const HOST = '0.0.0.0'
 createConnection()
 const app = express()
