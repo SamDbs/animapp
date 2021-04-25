@@ -12,9 +12,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Login to Heroku Container registry
-      env: 
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
+      provider:
+        api_key: ${{ secrets.HEROKU_API_KEY }}
+        email: ${{ secrets.HEROKU_EMAIL }}
       run: heroku container:login 
     - run: heroku container:push -a animapp-v1 prod
     - run: heroku container:release -a animapp-v1 prod  
