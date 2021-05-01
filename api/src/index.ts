@@ -24,6 +24,7 @@ if (process.env.DATABASE_URL) {
     url: process.env.DATABASE_URL,
     type: 'postgres',
     logging: true,
+    ssl: true,
   })
     .then(() => console.log('dbconnectedProd'))
     .catch((error) => console.log('error prod', error))
