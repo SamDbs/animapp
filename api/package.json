@@ -10,7 +10,8 @@
     "dev": "ts-node-dev src/index.ts --respawn --transpileOnly",
     "typeorm": "node --require ts-node/register ./node_modules/typeorm/cli.js",
     "fixtures": "node --require ts-node/register ./fixtures/loadFixtures.ts",
-    "test": "jest"
+    "test": "jest",
+    "postinstall": "yarn build"
   },
   "engines": {
     "node": "14.x"
