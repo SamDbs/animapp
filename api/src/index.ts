@@ -24,7 +24,7 @@ if (process.env.DATABASE_URL) {
     type: 'postgres',
     ssl: true,
     extra: { ssl: { rejectUnauthorized: false } },
-  })
+  }).catch((error) => console.log(error))
 } else {
   createConnection()
 }
