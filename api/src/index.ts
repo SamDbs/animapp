@@ -25,7 +25,7 @@ if (process.env.DATABASE_URL) {
     type: 'postgres',
     ssl: true,
     extra: { ssl: { rejectUnauthorized: false } },
-    logging: true,
+    entities: ['./build/src/models/*.js'],
   })
     .then(() => console.log('dbconnectedProd'))
     .catch((error) => console.log('error prod', error))
