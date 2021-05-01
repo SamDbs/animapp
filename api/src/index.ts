@@ -23,8 +23,9 @@ if (process.env.DATABASE_URL) {
   createConnection({
     url: process.env.DATABASE_URL,
     type: 'postgres',
-    logging: true,
     ssl: true,
+    extra: { ssl: { rejectUnauthorized: false } },
+    logging: true,
   })
     .then(() => console.log('dbconnectedProd'))
     .catch((error) => console.log('error prod', error))
