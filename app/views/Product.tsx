@@ -2,9 +2,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { StackScreenProps } from '@react-navigation/stack'
 import {
   Image,
-  SafeAreaView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   useWindowDimensions,
@@ -17,8 +15,7 @@ import { createMaterialTopTabNavigator } from '@react-navigation/material-top-ta
 import ProductHistoryContext from '../hooks/ProductHistoryContext'
 import { RootStackParamList } from '../types'
 
-import globalStyle from './components/style'
-import { Title } from './MainTabNavigator/FrequentQuestions'
+import { Card, ContentView, SafeAreaPage, Text, Title } from './components/Themed'
 
 const CARD_SIZE = 80
 
@@ -42,7 +39,7 @@ function ProductHeader({ product }: { product: any }) {
   const dimensions = useWindowDimensions()
   const { width } = dimensions
   return (
-    <View style={{ ...globalStyle.card, flexDirection: 'row', height: width * 0.4 }}>
+    <Card style={{ flexDirection: 'row', height: width * 0.4 }}>
       <View
         style={{
           height: width * 0.4,
@@ -68,16 +65,11 @@ function ProductHeader({ product }: { product: any }) {
         <Text style={{ fontSize: 12 }}>{product.type}</Text>
         <Text style={{ marginTop: 20 }}>{product.description}</Text>
       </View>
-    </View>
+    </Card>
   )
 }
 
-function Separator() {
-  return <View style={{ borderColor: 'silver', borderWidth: StyleSheet.hairlineWidth }} />
-}
-
 function Ingredients({
-  navigation,
   route: {
     params: { ingredients },
   },
@@ -86,16 +78,15 @@ function Ingredients({
   navigation: any
 }) {
   return (
-    <View style={{ marginTop: 0, backgroundColor: '#fff', flex: 1 }}>
+    <ContentView style={{ flex: 1 }}>
       <ScrollView style={{ flex: 1 }}>
         {ingredients.map((ingredient: any, i: number) => (
           <React.Fragment key={ingredient.id}>
             <Ingredient ingredient={ingredient} />
-            {i !== ingredients.length - 1 && <Separator />}
           </React.Fragment>
         ))}
       </ScrollView>
-    </View>
+    </ContentView>
   )
 }
 
@@ -113,21 +104,10 @@ function Ingredient({ ingredient }: { ingredient: any }) {
   )
 }
 
-function Table(props: JSX.Element['props']) {
-  return (
-    <View style={{ paddingHorizontal: 10, backgroundColor: '#fff', flex: 1 }}>
-      <View style={{ borderWidth: StyleSheet.hairlineWidth, borderRadius: 10 }}>
-        {props.children}
-      </View>
-    </View>
-  )
-}
-
 function Row(props: JSX.Element['props']) {
   return (
     <View
       style={{
-        borderBottomWidth: props.last ? 0 : StyleSheet.hairlineWidth,
         height: 40,
         flexDirection: 'row',
         alignItems: 'center',
@@ -146,9 +126,10 @@ function AnalyticalConstituents({
 }: {
   route: { params: { ACs: AnalyticalConstituent[] } }
 }) {
-  if (ACs.length === 0) return null
+  if (ACs.length === 0) return <ContentView style={{ paddingHorizontal: 10, flex: 1 }} />
+
   return (
-    <Table>
+    <ContentView style={{ paddingHorizontal: 10, flex: 1 }}>
       <Row>
         <Text style={{ fontWeight: 'bold' }}>Element</Text>
         <Text style={{ fontWeight: 'bold' }}>Nutrition value</Text>
@@ -159,7 +140,7 @@ function AnalyticalConstituents({
           <Text>{AC.quantity ? AC.quantity : '-'}%</Text>
         </Row>
       ))}
-    </Table>
+    </ContentView>
   )
 }
 
@@ -173,7 +154,7 @@ function ProductDetails({
   ingredients: any[]
 }) {
   return (
-    <View style={{ ...globalStyle.card, marginTop: 0, flex: 1 }}>
+    <Card style={{ marginTop: 0, flex: 1 }}>
       <DetailsTabNavigator.Navigator initialRouteName="Ingredients" style={{ borderRadius: 10 }}>
         <DetailsTabNavigator.Screen
           component={Ingredients}
@@ -186,7 +167,7 @@ function ProductDetails({
           initialParams={{ ACs }}
         />
       </DetailsTabNavigator.Navigator>
-    </View>
+    </Card>
   )
 }
 
@@ -205,11 +186,9 @@ function ModalIngredient({ ingredient }: { ingredient: any }) {
       }}
       onPress={() => modal.open(null)}>
       <TouchableWithoutFeedback>
-        <View
+        <Card
           style={{
-            ...globalStyle.card,
             elevation: 10,
-            backgroundColor: '#fff',
             padding: 10,
             margin: 20,
           }}>
@@ -226,7 +205,7 @@ function ModalIngredient({ ingredient }: { ingredient: any }) {
               overflow: 'hidden',
             }}
           />
-        </View>
+        </Card>
       </TouchableWithoutFeedback>
     </TouchableOpacity>
   )
@@ -249,7 +228,7 @@ function ProductView(props: Props): JSX.Element {
   if (!product || !ingredients || !ACs) return <Text>Loading...</Text>
 
   return (
-    <SafeAreaView style={style.page}>
+    <SafeAreaPage noContext>
       <ProductHeader product={product} />
       <ProductDetails ACs={ACs} ingredients={ingredients} />
       {modal.ingredientId && (
@@ -257,7 +236,7 @@ function ProductView(props: Props): JSX.Element {
           ingredient={ingredients.find(({ id }: any) => id === modal.ingredientId)}
         />
       )}
-    </SafeAreaView>
+    </SafeAreaPage>
   )
 }
 
@@ -270,7 +249,3 @@ export default function Product(props: Props): JSX.Element {
     </IngredientModalContext.Provider>
   )
 }
-
-const style = StyleSheet.create({
-  page: { flex: 1 },
-})

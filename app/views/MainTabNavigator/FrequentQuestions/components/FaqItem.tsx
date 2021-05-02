@@ -1,6 +1,8 @@
 import React from 'react'
-import { LayoutAnimation, Platform, StyleSheet, Text, UIManager, View } from 'react-native'
+import { LayoutAnimation, Platform, StyleSheet, UIManager, View } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
+
+import { Card, Text } from '../../../components/Themed'
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true)
@@ -15,7 +17,7 @@ function Title(props: JSX.Element['props']) {
 }
 export default function FaqItem(props: Props): JSX.Element {
   return (
-    <View style={style.component}>
+    <Card style={style.component}>
       <TouchableWithoutFeedback
         onPressIn={() => {
           LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
@@ -28,7 +30,7 @@ export default function FaqItem(props: Props): JSX.Element {
           <Text>{props.item.answer}</Text>
         </View>
       )}
-    </View>
+    </Card>
   )
 }
 
