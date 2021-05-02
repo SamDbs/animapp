@@ -1,18 +1,14 @@
 {
   "compilerOptions": {
-    "outDir": "./build",
-    "allowJs": true,
-    "module": "CommonJS",
-    "target": "ES2020",
-    "allowSyntheticDefaultImports": true,
+    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "strict": true,
     "noUnusedLocals": true,
     "noImplicitReturns": true,
-    "noImplicitAny": true,
-    "resolveJsonModule": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "experimentalDecorators": true,
+    "module": "CommonJS",
+    "outDir": "./build",
+    "target": "ESNext",
   },
   "exclude": ["tests/**/*"]
 }

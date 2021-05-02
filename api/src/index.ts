@@ -16,9 +16,26 @@ import authentication from './routes/authentication'
 import admin from './routes/admin'
 import { errorHandler } from './middleware/errorHandler'
 
-const PORT = 8080
+const PORT = ((process.env.PORT as unknown) as number) || 8080
 const HOST = '0.0.0.0'
-createConnection()
+if (process.env.DATABASE_URL) {
+  console.log('Cest la prod')
+  createConnection({
+    url: process.env.DATABASE_URL,
+    type: 'postgres',
+    ssl: true,
+    extra: { ssl: { rejectUnauthorized: false } },
+    entities: ['./build/src/models/*.js'],
+  })
+    .then(() => console.log('dbconnectedProd'))
+    .catch((error) => console.log('error prod', error))
+} else {
+  console.log('Cest local')
+  createConnection()
+    .then(() => console.log('dbconnectedlocal'))
+    .catch((error) => console.log('error local', error))
+}
+
 const app = express()
 
 app.use(express.json())
