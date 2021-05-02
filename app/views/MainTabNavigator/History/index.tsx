@@ -1,16 +1,15 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { StackNavigationProp } from '@react-navigation/stack'
 import { StyleSheet } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native-gesture-handler'
 import React, { useContext } from 'react'
 import useSWR from 'swr'
 
 import { MainTabParamList, RootStackParamList } from '../../../types'
 import ProductHistoryContext from '../../../hooks/ProductHistoryContext'
-import { Text } from '../../components/Themed'
+import { SafeAreaPage, Text, Title } from '../../components/Themed'
 import ProductCard from '../Search/components/ProductCard'
-import { Title } from '../FrequentQuestions'
+
 type Props = BottomTabScreenProps<MainTabParamList, 'History'>
 
 function Product(props: {
@@ -21,6 +20,8 @@ function Product(props: {
 
   if (error) return null
   if (!product) return <Text>Loading</Text>
+
+  console.log('product', product)
 
   return (
     <ProductCard
@@ -36,7 +37,7 @@ export default function History({ navigation }: Props): JSX.Element {
   const { historyProductsIds } = useContext(ProductHistoryContext)
 
   return (
-    <SafeAreaView style={style.page}>
+    <SafeAreaPage>
       <Title>History</Title>
       <ScrollView style={style.scrollView}>
         {historyProductsIds.map((id) => (
@@ -49,11 +50,10 @@ export default function History({ navigation }: Props): JSX.Element {
           />
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </SafeAreaPage>
   )
 }
 
 const style = StyleSheet.create({
-  page: { flex: 1 },
   scrollView: { flexGrow: 1 },
 })

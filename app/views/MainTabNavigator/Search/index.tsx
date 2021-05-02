@@ -1,12 +1,13 @@
-import { ActivityIndicator, Image, StyleSheet, TextInput, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, TextInput, View } from 'react-native'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native-gesture-handler'
 import React, { useState } from 'react'
 import useSWR from 'swr'
 
-import { Text } from '../../components/Themed'
+import { SafeAreaPage, Text } from '../../components/Themed'
 import { RootStackParamList } from '../../../types'
+import useColorScheme from '../../../hooks/useColorScheme'
 
 import ProductCard from './components/ProductCard'
 
@@ -33,17 +34,16 @@ function Center(props: { children: JSX.Element }): JSX.Element {
   return <View style={style.center}>{props.children}</View>
 }
 
-export default function SearchProducts({
-  navigation: { navigate, setOptions },
-}: Props): JSX.Element {
+export default function SearchProducts({ navigation: { navigate } }: Props): JSX.Element {
   const [input, setInput] = useState('')
+
   const shouldFetch = input.length > 3
   const { data, error } = useSWR(shouldFetch ? `/search?q=${input}` : null)
   const loading = shouldFetch && !data && !error
   const empty = shouldFetch && data && !data.products.length
 
   return (
-    <SafeAreaView style={style.page}>
+    <SafeAreaPage>
       <SearchInput input={input} setInput={setInput} />
       {!shouldFetch && (
         <Center>
@@ -74,12 +74,11 @@ export default function SearchProducts({
           ))}
         </ScrollView>
       )}
-    </SafeAreaView>
+    </SafeAreaPage>
   )
 }
 
 const style = StyleSheet.create({
-  page: { flex: 1, backgroundColor: '#eee' },
   searchInputContainer: { padding: 10 },
   searchInput: {
     backgroundColor: '#ddd',
