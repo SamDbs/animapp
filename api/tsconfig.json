@@ -2,6 +2,9 @@
   "compilerOptions": {
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noImplicitReturns": true,
     "experimentalDecorators": true,
     "module": "CommonJS",
     "outDir": "./build",
