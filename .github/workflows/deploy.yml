@@ -11,18 +11,11 @@ jobs:
         working-directory: api
     steps:
     - uses: actions/checkout@v2
-    - name: Login to Heroku Container registry
+    - name: Login to Heroku
       env: 
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
-      run: heroku container:login 
-    - run: heroku container:push --recursive -a animapp-v1 web
-      env: 
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
-    - run: heroku container:release -a animapp-v1 web 
-      env: 
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
-
+      run: heroku login
+    - name: Pushing to Heroku
+      run: git subtree push --prefix api heroku master
     
