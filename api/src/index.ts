@@ -1,6 +1,7 @@
 import 'reflect-metadata'
 import express from 'express'
 import { createConnection } from 'typeorm'
+import cors from 'cors'
 import { config } from 'dotenv'
 config()
 
@@ -38,6 +39,7 @@ if (process.env.DATABASE_URL) {
 
 const app = express()
 
+app.use(cors())
 app.use(express.json())
 
 app.use((req, res, next) => {
