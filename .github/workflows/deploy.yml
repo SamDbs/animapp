@@ -11,11 +11,9 @@ jobs:
         working-directory: api
     steps:
     - uses: actions/checkout@v2
-    - name: Login to Heroku
-      env: 
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
-      run: heroku login
-    - name: Pushing to Heroku
-      run: git subtree push --prefix api heroku master
-    
+    - name: Deploy to Heroku
+      with:
+        heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+        heroku_app_name: "animapp-v2"
+        heroku_email: ${{secrets.HEROKU_EMAIL}}
+        appdir: "api" 
