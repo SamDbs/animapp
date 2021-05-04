@@ -1,11 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
+
 import { login } from './actions'
 
 export const authSlice = createSlice({
   name: 'auth',
   initialState: {
     isLoading: false,
-    jwt: null,
+    jwt: '',
   },
   reducers: {},
   extraReducers: {
@@ -18,7 +19,7 @@ export const authSlice = createSlice({
     },
     [login.rejected.type]: (state, { payload }) => {
       state.isLoading = false
-      state.jwt = null
+      state.jwt = ''
     },
   },
 })

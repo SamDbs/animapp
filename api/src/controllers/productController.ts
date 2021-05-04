@@ -1,4 +1,4 @@
-import { FindManyOptions } from 'typeorm'
+import { FindManyOptions, FindOperator } from 'typeorm'
 import { Request, RequestHandler } from 'express'
 
 import {
@@ -25,7 +25,8 @@ function getFilters(query: Request['query']): FindManyOptions<Product> | undefin
 
   Object.entries(query).forEach(([key, value]) => {
     if (key && GetAllowedProductFilters(key)) {
-      where[key] = value
+      if (key === 'name') where[key] = new FindOperator('ilike', `%${value}%`)
+      else where[key] = value
     }
   })
 

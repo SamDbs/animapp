@@ -12,7 +12,6 @@ export default function Login() {
 
   return (
     <View>
-      <Text>Coucou</Text>
       <TextInput
         autoCompleteType="username"
         onChangeText={(text) => setState((oldState) => ({ ...oldState, login: text }))}

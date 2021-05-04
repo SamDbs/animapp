@@ -5,18 +5,9 @@ export default {
   config: {
     screens: {
       Auth: { screens: { Login: 'login' } },
-      Root: {
+      Main: {
         screens: {
-          TabOne: {
-            screens: {
-              TabOneScreen: 'one',
-            },
-          },
-          TabTwo: {
-            screens: {
-              TabTwoScreen: 'two',
-            },
-          },
+          Products: 'products',
         },
       },
       NotFound: '*',
