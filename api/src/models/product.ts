@@ -9,14 +9,16 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
 
-import Ingredient from './ingredient'
 import Brand from './brand'
-import ProductTranslation from './productTranslation'
+import Image from './image'
+import Ingredient from './ingredient'
 import ProductAnalyticalConstituent from './productAnalyticalConstituent'
+import ProductTranslation from './productTranslation'
 
 @Entity()
 export default class Product extends BaseEntity {
@@ -29,8 +31,8 @@ export default class Product extends BaseEntity {
   @Column()
   name!: string
 
-  @Column({ nullable: true })
-  photo!: string
+  @OneToOne(() => Image, (image) => image.product)
+  image?: Image
 
   @Column()
   barCode!: string

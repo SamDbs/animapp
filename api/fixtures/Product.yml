@@ -3,11 +3,9 @@ items:
   product{1..5}:
     name: '{{commerce.productName}}'
     type: '{{commerce.product}}'
-    photo: '{{image.imageUrl}}'
     ingredients:
       - '@ingredient1'
       - '@ingredient2'
       - '@ingredient3'
     brand: '@brand1'
     barCode: '{{random.number}}'
-

@@ -10,7 +10,7 @@ export function viewIngredient(ingredient: Ingredient, language: Language['id'] 
 
   const ingredientClient = {
     id: ingredient.id,
-    photo: ingredient.photo ?? 'This ingredient does not have photo yet',
+    image: ingredient.image ?? 'This ingredient does not have a picture yet',
     name: ingredientTranslation?.name ?? 'This ingredient is not translated yet',
     review: ingredientTranslation?.review ?? 'This ingredient is not translated yet',
     description: ingredientTranslation?.description ?? 'This ingredient is not translated yet',

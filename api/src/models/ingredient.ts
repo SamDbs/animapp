@@ -1,25 +1,26 @@
 import {
   BaseEntity,
-  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
   ManyToMany,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm'
 
-import Product from './product'
+import Image from './image'
 import IngredientTranslation from './ingredientTranslation'
+import Product from './product'
 
 @Entity()
 export default class Ingredient extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number
 
-  @Column({ nullable: true })
-  photo!: string
+  @OneToOne(() => Image, (image) => image.ingredient)
+  image!: Image
 
   @OneToMany(() => IngredientTranslation, (translation) => translation.ingredient)
   translations!: IngredientTranslation[]
