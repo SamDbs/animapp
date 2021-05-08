@@ -42,7 +42,7 @@ export function viewProduct(product: Product, language: Language['id'] | undefin
     brand: product.brand?.name,
     type: product.type,
     name: product.name,
-    photo: product.photo,
+    image: product?.image?.url,
     description: translation?.description ?? 'This product is not translated yet',
   }
   return productClient

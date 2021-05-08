@@ -1,5 +1,6 @@
 import { RequestHandler } from 'express'
 
+import Image from '../models/image'
 import Ingredient from '../models/ingredient'
 import IngredientTranslation from '../models/ingredientTranslation'
 import {
@@ -30,6 +31,26 @@ export const patchIngredient: RequestHandler = async (req, res) => {
   await Ingredient.update(req.params.id, req.body)
   const ingredient = await Ingredient.findOneOrFail(req.params.id)
   res.status(200).json(ingredient)
+}
+
+export const setIngredientImage: RequestHandler = async (req, res) => {
+  const ingredient = await Ingredient.findOneOrFail(req.params.id)
+  const existingImage = await Image.findOne({ where: { ingredientId: ingredient.id } })
+
+  const img = existingImage || Image.create({ ingredientId: ingredient.id })
+
+  img.image = req.file.buffer
+  img.url = `${process.env.HOST_URL}/ingredients/${ingredient.id}/image`
+  img.type = req.file.mimetype
+
+  await img.save()
+  res.status(200).json(img)
+}
+
+export const getIngredientImage: RequestHandler = async (req, res) => {
+  const ingredient = await Ingredient.findOneOrFail(req.params.id)
+  const img = await Image.findOneOrFail({ where: { ingredientId: ingredient.id } })
+  res.status(200).set('Content-Type', img.type).send(img.image)
 }
 
 export const deleteIngredient: RequestHandler = async (req, res) => {

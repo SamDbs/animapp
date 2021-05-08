@@ -13,6 +13,7 @@ import Product from '../models/product'
 import ProductTranslation from '../models/productTranslation'
 import ProductAnalyticalConstituent from '../models/productAnalyticalConstituent'
 import AnalyticalConstituent from '../models/analyticalConstituent'
+import Image from '../models/image'
 
 const allowedProductFilterKeys: (keyof Product)[] = ['id', 'name', 'barCode']
 function GetAllowedProductFilters(key: string): key is keyof Product {
@@ -46,6 +47,7 @@ export const getProductById: RequestHandler = async (req, res) => {
     .where('product.id = :id', { id: req.params.id })
     .leftJoinAndSelect('product.translations', 'pt')
     .leftJoinAndSelect('product.brand', 'bd')
+    .leftJoinAndSelect('product.image', 'img')
     .getOneOrFail()
 
   product.analyticalConstituents = await ProductAnalyticalConstituent.createQueryBuilder('a')
@@ -53,6 +55,7 @@ export const getProductById: RequestHandler = async (req, res) => {
     .leftJoinAndSelect('a.analyticalConstituent', 'analyticalConstituent')
     .leftJoinAndSelect('analyticalConstituent.translations', 'translations')
     .getMany()
+
   const { language } = req.query
   res.json(viewProduct(product, language?.toString().toUpperCase()))
 }
@@ -67,6 +70,26 @@ export const patchProduct: RequestHandler = async (req, res) => {
   await Product.update(req.params.id, req.body)
   const product = await Product.findOneOrFail(req.params.id)
   res.status(200).json(product)
+}
+
+export const setProductImage: RequestHandler = async (req, res) => {
+  const product = await Product.findOneOrFail(req.params.id)
+  const existingImage = await Image.findOne({ where: { productId: product.id } })
+
+  const img = existingImage || Image.create({ productId: product.id })
+
+  img.image = req.file.buffer
+  img.url = `${process.env.HOST_URL}/products/${product.id}/image`
+  img.type = req.file.mimetype
+
+  await img.save()
+  res.status(200).json(img)
+}
+
+export const getProductImage: RequestHandler = async (req, res) => {
+  const product = await Product.findOneOrFail(req.params.id)
+  const img = await Image.findOneOrFail({ where: { productId: product.id } })
+  res.status(200).set('Content-Type', img.type).send(img.image)
 }
 
 export const getIngredientsByProduct: RequestHandler = async (req, res) => {
