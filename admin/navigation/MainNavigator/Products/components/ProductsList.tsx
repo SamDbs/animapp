@@ -1,17 +1,27 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
-import { useProductsStore, Product } from '@hooks/stores'
+import { useProductsStore } from '@hooks/stores'
 import Card from '@components/Card'
 import debounce from '@utils/debounce'
 
 export default function ProductList({ isLoading, style }: any) {
-  const [ids, setProductIds] = useState<Product['id'][]>([])
+  const [ids, setProductIds] = useState<string[]>([])
+  const [registerIds, unregisterIds, getProducts, searchProducts] = useProductsStore((state) => [
+    state.registerIds,
+    state.unregisterIds,
+    state.getProducts,
+    state.searchProducts,
+  ])
+
+  useEffect(() => {
+    registerIds(ids)
+    return () => unregisterIds(ids)
+  }, [ids])
+
   const products = useProductsStore(
     useCallback((state) => ids.map((id) => state.products[id]), [ids]),
   )
-  const getProducts = useProductsStore((state) => state.getProducts)
-  const searchProducts = useProductsStore((state) => state.searchProducts)
 
   const searchDebounced = useCallback(
     debounce(async (text: string) => {
@@ -68,7 +78,7 @@ export default function ProductList({ isLoading, style }: any) {
             <Text>No result.</Text>
           </View>
         )}
-        {products.map((product: any, i: number) => {
+        {products.filter(Boolean).map((product: any, i: number) => {
           return (
             <View
               key={product.id}

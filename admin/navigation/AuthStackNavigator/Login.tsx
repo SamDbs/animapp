@@ -1,8 +1,8 @@
-import { Button, TextInput } from 'react-native'
+import { Button, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 
-import { Text, View } from '@components/Themed'
 import { useAuthStore } from '@hooks/stores'
+import Card from '@components/Card'
 
 export default function Login() {
   const loginAction = useAuthStore((state) => state.login)
@@ -19,20 +19,26 @@ export default function Login() {
   }
 
   return (
-    <View>
-      <TextInput
-        autoCompleteType="username"
-        onChangeText={(text) => setState((oldState) => ({ ...oldState, login: text }))}
-        value={login}
-      />
-      <TextInput
-        autoCompleteType="password"
-        onChangeText={(text) => setState((oldState) => ({ ...oldState, password: text }))}
-        secureTextEntry
-        value={password}
-      />
-      <Button title="Log in" onPress={loginAsync} disabled={isLoading} />
-      {isLoading && <Text>Loading...</Text>}
+    <View style={{ flex: 1, justifyContent: 'center' }}>
+      <Card style={{ margin: 32 }}>
+        <TextInput
+          style={{ padding: 8, marginBottom: 8 }}
+          autoCompleteType="username"
+          onChangeText={(text) => setState((oldState) => ({ ...oldState, login: text }))}
+          value={login}
+          placeholder="Login"
+        />
+        <TextInput
+          style={{ padding: 8, marginBottom: 8 }}
+          autoCompleteType="password"
+          onChangeText={(text) => setState((oldState) => ({ ...oldState, password: text }))}
+          secureTextEntry
+          value={password}
+          placeholder="Password"
+        />
+        <Button title="Log in" onPress={loginAsync} disabled={isLoading} />
+        {isLoading && <Text>Loading...</Text>}
+      </Card>
     </View>
   )
 }

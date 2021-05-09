@@ -5,6 +5,7 @@ import { useAsyncStorage } from '@react-native-async-storage/async-storage'
 import React, { useEffect } from 'react'
 
 import { useAuthStore } from '@hooks/stores'
+import useColorScheme from '@hooks/useColorScheme'
 
 import { RootStackParamList } from '../types'
 import AuthStackNavigator from './AuthStackNavigator'
@@ -14,7 +15,8 @@ import NotFoundScreen from './NotFoundScreen'
 
 const Stack = createStackNavigator<RootStackParamList>()
 
-export default function RootNavigator({ colorScheme }: { colorScheme: ColorSchemeName }) {
+export default function RootNavigator() {
+  const colorScheme = useColorScheme()
   const { getItem } = useAsyncStorage('jwt')
   const jwt = useAuthStore((state) => state.jwt)
   const setJwt = useAuthStore((state) => state.setJwt)
