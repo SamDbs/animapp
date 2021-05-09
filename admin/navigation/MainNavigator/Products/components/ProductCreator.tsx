@@ -35,7 +35,6 @@ export default function ProductCreator({ style }: any) {
   const create = async () => {
     setLoading(true)
     setError('')
-    await new Promise((res) => setTimeout(res, 1000))
     try {
       await createProduct(product)
       setProduct({ ...initialState })
