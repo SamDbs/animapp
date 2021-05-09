@@ -3,31 +3,30 @@ import axios from 'axios'
 
 import type { AppState } from '../../stores'
 
-export const getProducts = createAsyncThunk<
+export const getIngredients = createAsyncThunk<
   any[],
   void,
   {
     state: AppState
   }
->('products', async (_, { getState }) => {
+>('ingredients', async (_, { getState }) => {
   const { jwt } = getState().auth
-  console.log('hello')
-  const { data } = await axios.get(`${process.env.API_URL}/products`, {
+  const { data } = await axios.get(`${process.env.API_URL}/ingredients`, {
     headers: { Authorization: jwt },
   })
 
   return data
 })
 
-export const searchProducts = createAsyncThunk<
+export const searchIngredients = createAsyncThunk<
   any[],
   Record<string, string>,
   {
     state: AppState
   }
->('products', async (params, { getState }) => {
+>('ingredients', async (params, { getState }) => {
   const { jwt } = getState().auth
-  const { data } = await axios.get(`${process.env.API_URL}/products`, {
+  const { data } = await axios.get(`${process.env.API_URL}/ingredients`, {
     headers: { Authorization: jwt },
     params,
   })

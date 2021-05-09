@@ -9,6 +9,8 @@ import useColorScheme from '../../hooks/useColorScheme'
 import { MainTabParamList } from '../../types'
 import Menu from './components/Menu'
 import Products from './Products'
+import Ingredients from './Ingredients'
+
 
 const BottomTab = createBottomTabNavigator<MainTabParamList>()
 
@@ -23,6 +25,7 @@ export default function TabNavigator() {
         tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}
         tabBar={() => null}>
         <BottomTab.Screen name="Products" component={Products} />
+        <BottomTab.Screen name="Ingredients" component={Ingredients} />
       </BottomTab.Navigator>
     </View>
   )

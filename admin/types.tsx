@@ -15,7 +15,9 @@ export type AuthStackParamList = {
 
 export type MainTabParamList = {
   Products: undefined
+  Ingredients: undefined
 }
+
 
 export type TabOneParamList = {
   TabOneScreen: undefined

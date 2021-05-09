@@ -8,6 +8,7 @@ export default {
       Main: {
         screens: {
           Products: 'products',
+          Ingredients: 'ingredients',
         },
       },
       NotFound: '*',
