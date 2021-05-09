@@ -28,7 +28,7 @@ export const useProductsStore = create(
     },
     async getProducts() {
       const { jwt } = useAuthStore.getState()
-      const { data } = await axios.get(`${process.env.API_URL}/products`, {
+      const { data } = await axios.get<Product[]>(`${process.env.API_URL}/products`, {
         headers: { Authorization: jwt },
       })
       const ids = data.map((product: any) => product.id) as any[]
@@ -38,11 +38,11 @@ export const useProductsStore = create(
     },
     async searchProducts(params: Record<string, any>) {
       const { jwt } = useAuthStore.getState()
-      const { data } = await axios.get(`${process.env.API_URL}/products`, {
+      const { data } = await axios.get<Product[]>(`${process.env.API_URL}/products`, {
         headers: { Authorization: jwt },
         params,
       })
-      const ids = data.map((product: any) => product.id) as any[]
+      const ids = data.map((product) => product.id) as any[]
       const entities = data.reduce((r: any, x: any) => ({ ...r, [x['id']]: x }), {})
       set((state) => ({ products: { ...state.products, ...entities } }))
       return { ids }

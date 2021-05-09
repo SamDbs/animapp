@@ -7,8 +7,10 @@ import debounce from '../../../../utils/debounce'
 import { useProductsStore, Product } from '../../../../stores'
 
 export default function ProductList({ isLoading, style }: any) {
-  const [productIds, setProductIds] = useState<Product['id'][]>([])
-  const productEntities = useProductsStore((state) => state.products)
+  const [ids, setProductIds] = useState<Product['id'][]>([])
+  const products = useProductsStore(
+    useCallback((state) => ids.map((id) => state.products[id]), [ids]),
+  )
   const getProducts = useProductsStore((state) => state.getProducts)
   const searchProducts = useProductsStore((state) => state.searchProducts)
 
@@ -28,7 +30,6 @@ export default function ProductList({ isLoading, style }: any) {
     fn()
   }, [])
 
-  const products = productIds.map((id) => productEntities[id])
   const noResult = !products.length
 
   return (
@@ -64,8 +65,8 @@ export default function ProductList({ isLoading, style }: any) {
         }}>
         {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
         {noResult && (
-          <View>
-            <Text>no result sorry</Text>
+          <View style={{ padding: 8 }}>
+            <Text>No result.</Text>
           </View>
         )}
         {products.map((product: any, i: number) => {
