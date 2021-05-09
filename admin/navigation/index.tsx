@@ -4,7 +4,8 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { useAsyncStorage } from '@react-native-async-storage/async-storage'
 import React, { useEffect } from 'react'
 
-import { useAuthStore } from '../stores'
+import { useAuthStore } from '@hooks/stores'
+
 import { RootStackParamList } from '../types'
 import AuthStackNavigator from './AuthStackNavigator'
 import LinkingConfiguration from './LinkingConfiguration'

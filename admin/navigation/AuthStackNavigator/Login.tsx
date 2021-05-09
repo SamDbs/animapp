@@ -1,8 +1,8 @@
-import React, { useCallback, useState } from 'react'
 import { Button, TextInput } from 'react-native'
-import { useAuthStore } from '../../stores'
+import React, { useState } from 'react'
 
-import { Text, View } from '../../components/Themed'
+import { Text, View } from '@components/Themed'
+import { useAuthStore } from '@hooks/stores'
 
 export default function Login() {
   const loginAction = useAuthStore((state) => state.login)

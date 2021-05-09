@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
+import { useProductsStore, Product } from '@hooks/stores'
 import Card from '@components/Card'
-
-import debounce from '../../../../utils/debounce'
-import { useProductsStore, Product } from '../../../../stores'
+import debounce from '@utils/debounce'
 
 export default function ProductList({ isLoading, style }: any) {
   const [ids, setProductIds] = useState<Product['id'][]>([])

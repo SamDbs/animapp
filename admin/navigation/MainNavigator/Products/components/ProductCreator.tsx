@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
 import { Button, Text, TextInput, View } from 'react-native'
+import React, { useState } from 'react'
 
+import { useProductsStore } from '@hooks/stores'
 import Card from '@components/Card'
-import { useProductsStore } from '../../../../stores'
 
 function Row({
   label,
