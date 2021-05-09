@@ -61,6 +61,8 @@ export const getProductById: RequestHandler = async (req, res) => {
 }
 
 export const createProduct: RequestHandler = async (req, res) => {
+  if (!req.body.name) throw new Error('A product needs a name')
+
   const product = Product.create(req.body as Product)
   await product.save()
   res.status(201).json(product)

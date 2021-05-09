@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from '../hooks/redux'
 import AuthStackNavigator from './AuthStackNavigator'
 import LinkingConfiguration from './LinkingConfiguration'
 import MainNavigator from './MainNavigator'
-import NotFoundScreen from '../screens/NotFoundScreen'
+import NotFoundScreen from './NotFoundScreen'
 
 const Stack = createStackNavigator<RootStackParamList>()
 

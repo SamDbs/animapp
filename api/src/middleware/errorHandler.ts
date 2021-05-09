@@ -7,9 +7,9 @@ export class NotFoundError extends Error {}
 export class NotAuthorizedError extends Error {}
 
 export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
+  res.status(500).json({ message: error.message })
+  return
   if (res.locals.admin) {
-    res.status(500).json(error)
-    return
   }
   if (error instanceof EntityColumnNotFound) {
     res.status(500).json({ message: 'Bad request' })

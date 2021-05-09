@@ -9,7 +9,7 @@ export const getProducts = createAsyncThunk<
   {
     state: AppState
   }
->('products', async (_, { getState }) => {
+>('products/getList', async (_, { getState }) => {
   const { jwt } = getState().auth
   const { data } = await axios.get(`${process.env.API_URL}/products`, {
     headers: { Authorization: jwt },
@@ -24,7 +24,7 @@ export const searchProducts = createAsyncThunk<
   {
     state: AppState
   }
->('products', async (params, { getState }) => {
+>('products/search', async (params, { getState }) => {
   const { jwt } = getState().auth
   const { data } = await axios.get(`${process.env.API_URL}/products`, {
     headers: { Authorization: jwt },
@@ -32,4 +32,18 @@ export const searchProducts = createAsyncThunk<
   })
 
   return data
+})
+
+export const createProduct = createAsyncThunk<
+  void,
+  { barCode: string; name: string; type: string },
+  {
+    state: AppState
+  }
+>('products/create', async (params, { getState }) => {
+  const { jwt } = getState().auth
+  const { data } = await axios.post(`${process.env.API_URL}/products`, params, {
+    headers: { Authorization: jwt },
+  })
+  return
 })
