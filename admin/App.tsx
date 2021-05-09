@@ -1,12 +1,10 @@
 import { StatusBar } from 'expo-status-bar'
 import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { Provider } from 'react-redux'
 
 import useCachedResources from './hooks/useCachedResources'
 import useColorScheme from './hooks/useColorScheme'
 import RootNavigator from './navigation'
-import store from './stores'
 
 export default function App() {
   const isLoadingComplete = useCachedResources()
@@ -17,10 +15,8 @@ export default function App() {
   } else {
     return (
       <SafeAreaProvider>
-        <Provider store={store}>
-          <RootNavigator colorScheme={colorScheme} />
-          <StatusBar />
-        </Provider>
+        <RootNavigator colorScheme={colorScheme} />
+        <StatusBar />
       </SafeAreaProvider>
     )
   }

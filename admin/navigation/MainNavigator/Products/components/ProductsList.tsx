@@ -1,19 +1,35 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
 import Card from '@components/Card'
 
-import { searchProducts } from '../../../../features/products/actions'
-import { useDispatch } from '../../../../hooks/redux'
 import debounce from '../../../../utils/debounce'
+import { useProductsStore, Product } from '../../../../stores'
 
-export default function ProductList({ isLoading, products, style }: any) {
-  const dispatch = useDispatch()
-  const noResult = !products.length
+export default function ProductList({ isLoading, style }: any) {
+  const [productIds, setProductIds] = useState<Product['id'][]>([])
+  const productEntities = useProductsStore((state) => state.products)
+  const getProducts = useProductsStore((state) => state.getProducts)
+  const searchProducts = useProductsStore((state) => state.searchProducts)
+
   const searchDebounced = useCallback(
-    debounce((text: string) => dispatch(searchProducts({ name: text })), 500),
+    debounce(async (text: string) => {
+      const { ids } = await searchProducts({ name: text })
+      setProductIds(ids)
+    }, 500),
     [],
   )
+
+  useEffect(() => {
+    async function fn() {
+      const { ids } = await getProducts()
+      setProductIds(ids)
+    }
+    fn()
+  }, [])
+
+  const products = productIds.map((id) => productEntities[id])
+  const noResult = !products.length
 
   return (
     <Card style={style}>

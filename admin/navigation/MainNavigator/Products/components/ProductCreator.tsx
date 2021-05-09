@@ -2,9 +2,7 @@ import React, { useState } from 'react'
 import { Button, Text, TextInput, View } from 'react-native'
 
 import Card from '@components/Card'
-
-import { createProduct } from '../../../../features/products/actions'
-import { useDispatch, useSelector } from '../../../../hooks/redux'
+import { useProductsStore } from '../../../../stores'
 
 function Row({
   label,
@@ -28,40 +26,48 @@ function Row({
 }
 
 const initialState = { type: '', name: '', barCode: '', brandId: 3 }
+
 export default function ProductCreator({ style }: any) {
-  const dispatch = useDispatch()
-  const [state, setState] = useState({ ...initialState })
-  const isError = useSelector((state) => state.products.isCreationError)
-  const errorMsg = useSelector((state) => state.products.creationErrorMsg)
+  const [product, setProduct] = useState({ ...initialState })
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const createProduct = useProductsStore((state) => state.createProduct)
+  const create = async () => {
+    setLoading(true)
+    setError('')
+    await new Promise((res) => setTimeout(res, 1000))
+    try {
+      await createProduct(product)
+      setProduct({ ...initialState })
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <Card style={style}>
       <Text style={{ fontSize: 18, marginBottom: 16 }}>Create a product</Text>
       <Row
         label="Type"
-        value={state.type}
-        onChangeValue={(val: string) => setState((current) => ({ ...current, type: val }))}
+        value={product.type}
+        onChangeValue={(val: string) => setProduct((current) => ({ ...current, type: val }))}
       />
       <Row
         label="Name"
-        value={state.name}
-        onChangeValue={(val: string) => setState((current) => ({ ...current, name: val }))}
+        value={product.name}
+        onChangeValue={(val: string) => setProduct((current) => ({ ...current, name: val }))}
       />
       <Row
         label="Bar code"
-        value={state.barCode}
-        onChangeValue={(val: string) => setState((current) => ({ ...current, barCode: val }))}
+        value={product.barCode}
+        onChangeValue={(val: string) => setProduct((current) => ({ ...current, barCode: val }))}
       />
-      {isError && (
-        <Text style={{ backgroundColor: '#f55', padding: 8, marginBottom: 16 }}>{errorMsg}</Text>
+      {!!error && (
+        <Text style={{ backgroundColor: '#f55', padding: 8, marginBottom: 16 }}>{error}</Text>
       )}
-      <Button
-        title="Create"
-        onPress={async () => {
-          const res = await dispatch(createProduct(state))
-          if (res.meta.requestStatus === 'fulfilled') setState({ ...initialState })
-        }}
-      />
+      <Button title={loading ? 'Loading...' : 'Create'} onPress={create} disabled={loading} />
     </Card>
   )
 }
