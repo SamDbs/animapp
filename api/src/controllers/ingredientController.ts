@@ -1,4 +1,5 @@
-import { RequestHandler } from 'express'
+import { FindManyOptions, FindOperator } from 'typeorm'
+import { Request, RequestHandler } from 'express'
 
 import Image from '../models/image'
 import Ingredient from '../models/ingredient'
@@ -10,7 +11,29 @@ import {
   viewIngredientTranslations,
 } from '../views/ingredient'
 
+const allowedIngredientFilterKeys: (keyof IngredientTranslation)[] = ['name']
+function GetAllowedIngredientFilters(key: string): key is keyof IngredientTranslation {
+  return allowedIngredientFilterKeys.includes(key as keyof IngredientTranslation)
+}
+
+function getFilters(query: Request['query']): FindManyOptions<IngredientTranslation> | undefined {
+  const where: FindManyOptions<IngredientTranslation>['where'] = {}
+  const options: FindManyOptions<IngredientTranslation> = { where }
+
+  Object.entries(query).forEach(([key, value]) => {
+    if (key && GetAllowedIngredientFilters(key)) {
+      if (key === 'name') where[key] = new FindOperator('ilike', `%${value}%`)
+      else where[key] = value
+    }
+  })
+
+  if (!Object.keys(where).length) return
+
+  return options
+}
+
 export const getAllIngredients: RequestHandler = async (req, res) => {
+  const filters = getFilters(req.query)
   const ingredients = await Ingredient.find({ relations: ['translations'], order: { id: 'ASC' } })
   res.json(viewIngredients(ingredients, req.params.lang))
 }
