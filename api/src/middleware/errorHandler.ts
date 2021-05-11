@@ -5,12 +5,9 @@ import { EntityColumnNotFound } from 'typeorm/error/EntityColumnNotFound'
 
 export class NotFoundError extends Error {}
 export class NotAuthorizedError extends Error {}
+export class ConflictError extends Error {}
 
 export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
-  res.status(500).json({ message: error.message })
-  return
-  if (res.locals.admin) {
-  }
   if (error instanceof EntityColumnNotFound) {
     res.status(500).json({ message: 'Bad request' })
     return
@@ -23,6 +20,10 @@ export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
     res.status(400).json({ message: 'Bad request' })
     return
   }
+  if (error instanceof ConflictError) {
+    res.status(409).json({ message: 'Conflict with entities' })
+    return
+  }
   if (
     error instanceof NotAuthorizedError ||
     error instanceof JsonWebTokenError ||
@@ -32,5 +33,5 @@ export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
     return
   }
 
-  res.status(500).json(error)
+  res.status(500).json({ error: error.message })
 }
