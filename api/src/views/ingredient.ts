@@ -2,11 +2,11 @@ import Language from '../models/language'
 import Ingredient from '../models/ingredient'
 import IngredientTranslation from '../models/ingredientTranslation'
 
-export function viewIngredient(ingredient: Ingredient, language: Language['id'] = 'FR') {
+export function viewIngredient(ingredient: Ingredient, language: Language['id'] = 'EN') {
   let ingredientTranslation = ingredient.translations.find((t) => t.languageId === language)
 
   if (!ingredientTranslation)
-    ingredientTranslation = ingredient.translations.find((t) => t.languageId === 'FR')
+    ingredientTranslation = ingredient.translations.find((t) => t.languageId === 'EN')
 
   const ingredientClient = {
     id: ingredient.id,
@@ -22,7 +22,7 @@ export function viewIngredientTranslations(ingredientTranslations: IngredientTra
   return ingredientTranslations
 }
 
-export function viewIngredients(ingredients: Ingredient[], language: Language['id'] = 'FR') {
+export function viewIngredients(ingredients: Ingredient[], language: Language['id'] = 'EN') {
   return ingredients.map((ingredient) => viewIngredient(ingredient, language))
 }
 

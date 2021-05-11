@@ -13,6 +13,7 @@ export const getIngredients = createAsyncThunk<
   const { jwt } = getState().auth
   const { data } = await axios.get(`${process.env.API_URL}/ingredients`, {
     headers: { Authorization: jwt },
+    params: { lang: 'EN'}
   })
 
   return data

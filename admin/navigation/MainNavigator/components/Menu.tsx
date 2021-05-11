@@ -11,7 +11,7 @@ export default function Menu() {
       <MenuItem title="Ingredients" />
       <MenuItem title="Languages" />
       <MenuItem title="FAQ" />
-      <MenuItem title="Contact" />
+      <MenuItem title="Contacts" />
     </View>
   )
 }

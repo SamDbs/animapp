@@ -1,4 +1,4 @@
-import { FindManyOptions, FindOperator } from 'typeorm'
+import { FindManyOptions, FindOperator, In } from 'typeorm'
 import { Request, RequestHandler } from 'express'
 
 import Image from '../models/image'
@@ -16,9 +16,10 @@ function GetAllowedIngredientFilters(key: string): key is keyof IngredientTransl
   return allowedIngredientFilterKeys.includes(key as keyof IngredientTranslation)
 }
 
-function getFilters(query: Request['query']): FindManyOptions<IngredientTranslation> | undefined {
+async function getFilters(
+  query: Request['query'],
+): Promise<FindManyOptions<Ingredient>['where'] | undefined> {
   const where: FindManyOptions<IngredientTranslation>['where'] = {}
-  const options: FindManyOptions<IngredientTranslation> = { where }
 
   Object.entries(query).forEach(([key, value]) => {
     if (key && GetAllowedIngredientFilters(key)) {
@@ -28,14 +29,20 @@ function getFilters(query: Request['query']): FindManyOptions<IngredientTranslat
   })
 
   if (!Object.keys(where).length) return
-
-  return options
+  const translations = await IngredientTranslation.find({ where })
+  const ingredientIds = translations.map((translation) => translation.ingredientId)
+  const whereIngredient: FindManyOptions<Ingredient>['where'] = { id: In(ingredientIds) }
+  return whereIngredient
 }
 
 export const getAllIngredients: RequestHandler = async (req, res) => {
-  const filters = getFilters(req.query)
-  const ingredients = await Ingredient.find({ relations: ['translations'], order: { id: 'ASC' } })
-  res.json(viewIngredients(ingredients, req.params.lang))
+  const where = await getFilters(req.query)
+  const ingredients = await Ingredient.find({
+    relations: ['translations'],
+    order: { id: 'ASC' },
+    where,
+  })
+  res.json(viewIngredients(ingredients, req.query.lang?.toString()))
 }
 
 export const createIngredient: RequestHandler = async (req, res) => {
