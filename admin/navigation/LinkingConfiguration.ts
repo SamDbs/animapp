@@ -7,7 +7,12 @@ export default {
       Auth: { screens: { Login: 'login' } },
       Main: {
         screens: {
-          Products: 'products',
+          ProductStack: {
+            screens: {
+              Products: 'products',
+              Product: 'products/:id',
+            },
+          },
         },
       },
       NotFound: '*',

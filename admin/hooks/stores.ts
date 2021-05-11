@@ -22,6 +22,7 @@ export const useAuthStore = create(
 
 export type Product = {
   id: string
+  name: string
 }
 
 export const useProductsStore = create(
@@ -71,6 +72,16 @@ export const useProductsStore = create(
             const newState = { ...state, usedProductIds: { ...state.usedProductIds, ...update } }
             return newState
           })
+        },
+        async getProductById(id: string) {
+          const { jwt } = useAuthStore.getState()
+          const { data } = await axios.get<Product>(`${process.env.API_URL}/products/${id}`, {
+            headers: { Authorization: jwt },
+          })
+          const product = { ...data, id: data.id.toString() }
+
+          set((state) => ({ products: { ...state.products, [product.id]: product } }))
+          return { id }
         },
         async getProducts() {
           const { jwt } = useAuthStore.getState()

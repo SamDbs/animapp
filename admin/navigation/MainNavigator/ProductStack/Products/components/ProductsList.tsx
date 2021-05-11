@@ -1,18 +1,21 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Text, TextInput, View, ActivityIndicator } from 'react-native'
+import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
 
 import { useProductsStore } from '@hooks/stores'
 import Card from '@components/Card'
 import debounce from '@utils/debounce'
+import { useNavigation } from '@react-navigation/native'
 
-export default function ProductList({ isLoading, style }: any) {
+export default function ProductList({ style }: { style: View['props']['style'] }) {
   const [ids, setProductIds] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const [registerIds, unregisterIds, getProducts, searchProducts] = useProductsStore((state) => [
     state.registerIds,
     state.unregisterIds,
     state.getProducts,
     state.searchProducts,
   ])
+  const navigation = useNavigation()
 
   useEffect(() => {
     registerIds(ids)
@@ -25,16 +28,20 @@ export default function ProductList({ isLoading, style }: any) {
 
   const searchDebounced = useCallback(
     debounce(async (text: string) => {
+      setIsLoading(true)
       const { ids } = await searchProducts({ name: text })
       setProductIds(ids)
+      setIsLoading(false)
     }, 500),
     [],
   )
 
   useEffect(() => {
     async function fn() {
+      setIsLoading(true)
       const { ids } = await getProducts()
       setProductIds(ids)
+      setIsLoading(false)
     }
     fn()
   }, [])
@@ -87,8 +94,13 @@ export default function ProductList({ isLoading, style }: any) {
                 borderBottomColor: '#ccc',
                 borderBottomWidth: i === products.length - 1 ? 0 : 1,
                 backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
               }}>
               <Text>{product.name}</Text>
+              <Pressable onPress={() => navigation.navigate(`Product`, { id: product.id })}>
+                <Text style={{ cursor: 'pointer' }}>edit</Text>
+              </Pressable>
             </View>
           )
         })}
