@@ -1,8 +1,8 @@
 import { combine, devtools } from 'zustand/middleware'
+import { keyBy, map, omit } from 'lodash'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
 import create from 'zustand'
-import { filter, keyBy, keys, map, mapValues, omit, omitBy, pickBy, reduce } from 'lodash'
 
 export const useAuthStore = create(
   devtools(
@@ -23,6 +23,9 @@ export const useAuthStore = create(
 export type Product = {
   id: string
   name: string
+  type: string
+  image: string
+  barCode: string
 }
 
 export const useProductsStore = create(
@@ -96,6 +99,27 @@ export const useProductsStore = create(
 
           set((state) => ({ products: { ...state.products, ...entities } }))
           return { ids }
+        },
+        async updateProduct(
+          id: string,
+          params: {
+            name?: string
+            type?: string
+            barCode?: string
+          },
+        ) {
+          const { jwt } = useAuthStore.getState()
+          const { data } = await axios.patch<Product[]>(
+            `${process.env.API_URL}/products/1`,
+            params,
+            {
+              headers: { Authorization: jwt },
+            },
+          )
+          set((state) => ({
+            ...state,
+            products: { ...state.products, [id]: { ...state.products[id], ...params } },
+          }))
         },
         async searchProducts(params: { name: string }) {
           const { jwt } = useAuthStore.getState()
