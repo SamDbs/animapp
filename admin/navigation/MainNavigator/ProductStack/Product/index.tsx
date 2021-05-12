@@ -64,17 +64,17 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
               <FieldWithLabel
                 label="Name"
                 value={product.name}
-                onChangeValue={(val: string) => updateProduct(product.id, { name: val })}
+                onChangeValue={(val) => updateProduct(product.id, { name: val })}
               />
               <FieldWithLabel
                 label="Type"
                 value={product.type}
-                onChangeValue={(val: string) => updateProduct(product.id, { type: val })}
+                onChangeValue={(val) => updateProduct(product.id, { type: val })}
               />
               <FieldWithLabel
                 label="Bar code"
-                value={product.barCode}
-                onChangeValue={(val: string) => updateProduct(product.id, { barCode: val })}
+                value={product.barCode || ''}
+                onChangeValue={(val) => updateProduct(product.id, { barCode: val })}
               />
             </View>
           </>

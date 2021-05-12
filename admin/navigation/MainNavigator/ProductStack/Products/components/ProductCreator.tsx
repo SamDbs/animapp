@@ -31,17 +31,17 @@ export default function ProductCreator({ style }: any) {
       <FieldWithLabel
         label="Name"
         value={product.name}
-        onChangeValue={(val: string) => setProduct((current) => ({ ...current, name: val }))}
+        onChangeValue={(val) => setProduct((current) => ({ ...current, name: val }))}
       />
       <FieldWithLabel
         label="Type"
         value={product.type}
-        onChangeValue={(val: string) => setProduct((current) => ({ ...current, type: val }))}
+        onChangeValue={(val) => setProduct((current) => ({ ...current, type: val }))}
       />
       <FieldWithLabel
         label="Bar code"
         value={product.barCode}
-        onChangeValue={(val: string) => setProduct((current) => ({ ...current, barCode: val }))}
+        onChangeValue={(val) => setProduct((current) => ({ ...current, barCode: val }))}
       />
       {!!error && (
         <Text style={{ backgroundColor: '#f55', padding: 8, marginBottom: 16 }}>{error}</Text>

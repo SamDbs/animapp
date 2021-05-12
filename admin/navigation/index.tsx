@@ -1,7 +1,5 @@
-import { ColorSchemeName } from 'react-native'
 import { createStackNavigator } from '@react-navigation/stack'
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native'
-import { useAsyncStorage } from '@react-native-async-storage/async-storage'
 import React, { useEffect, useState } from 'react'
 
 import { useAuthStore } from '@hooks/stores'
@@ -17,18 +15,18 @@ const Stack = createStackNavigator<RootStackParamList>()
 
 export default function RootNavigator() {
   const colorScheme = useColorScheme()
-  const { getItem } = useAsyncStorage('jwt')
-  const jwt = useAuthStore((state) => state.jwt)
-  const setJwt = useAuthStore((state) => state.setJwt)
+  const [jwt, loginUsingAsyncStorage] = useAuthStore((state) => [
+    state.jwt,
+    state.loginUsingAsyncStorage,
+  ])
   const [isInitialized, setInitialized] = useState(false)
 
   useEffect(() => {
-    async function initFromLocalStorage() {
-      const localStorageJwt = await getItem()
-      if (localStorageJwt) setJwt(localStorageJwt)
+    async function init() {
+      await loginUsingAsyncStorage()
       setInitialized(true)
     }
-    initFromLocalStorage()
+    init()
   }, [])
 
   const isConnected = !!jwt

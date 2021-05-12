@@ -1,23 +1,41 @@
 import { combine, devtools } from 'zustand/middleware'
 import { keyBy, map, omit } from 'lodash'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import axios from 'axios'
 import create from 'zustand'
+
+import createFetcher from '@utils/createFetcher'
+
+let fetcher = createFetcher()
 
 export const useAuthStore = create(
   devtools(
     combine({ jwt: '' as string }, (set) => ({
       async login({ login, password }: { login: string; password: string }) {
-        const { data } = await axios.post(`${process.env.API_URL}/auth`, { login, password })
+        const { data } = await fetcher.post(`/auth`, { login, password })
         const { jwt } = data
 
         await AsyncStorage.setItem('jwt', jwt)
-
         return set({ jwt })
       },
-      setJwt: (jwt: string) => set({ jwt }),
+      async loginUsingAsyncStorage() {
+        const jwt = await AsyncStorage.getItem('jwt')
+
+        if (jwt) return set({ jwt })
+        else return set({ jwt: '' })
+      },
+      async logout() {
+        await AsyncStorage.removeItem('jwt')
+        return set({ jwt: '' })
+      },
     })),
   ),
+)
+
+useAuthStore.subscribe(
+  (jwt: string) => {
+    fetcher = createFetcher(jwt)
+  },
+  (state) => state.jwt,
 )
 
 export type Product = {
@@ -78,7 +96,7 @@ export const useProductsStore = create(
         },
         async getProductById(id: string) {
           const { jwt } = useAuthStore.getState()
-          const { data } = await axios.get<Product>(`${process.env.API_URL}/products/${id}`, {
+          const { data } = await fetcher.get<Product>(`/products/${id}`, {
             headers: { Authorization: jwt },
           })
           const product = { ...data, id: data.id.toString() }
@@ -88,7 +106,7 @@ export const useProductsStore = create(
         },
         async getProducts() {
           const { jwt } = useAuthStore.getState()
-          const { data } = await axios.get<Product[]>(`${process.env.API_URL}/products`, {
+          const { data } = await fetcher.get<Product[]>(`/products`, {
             headers: { Authorization: jwt },
           })
 
@@ -108,22 +126,18 @@ export const useProductsStore = create(
             barCode?: string
           },
         ) {
-          const { jwt } = useAuthStore.getState()
-          const { data } = await axios.patch<Product[]>(
-            `${process.env.API_URL}/products/1`,
-            params,
-            {
-              headers: { Authorization: jwt },
-            },
-          )
           set((state) => ({
             ...state,
             products: { ...state.products, [id]: { ...state.products[id], ...params } },
           }))
+          const { jwt } = useAuthStore.getState()
+          await fetcher.patch(`/products/${id}`, params, {
+            headers: { Authorization: jwt },
+          })
         },
         async searchProducts(params: { name: string }) {
           const { jwt } = useAuthStore.getState()
-          const { data } = await axios.get<Product[]>(`${process.env.API_URL}/products`, {
+          const { data } = await fetcher.get<Product[]>(`/products`, {
             headers: { Authorization: jwt },
             params,
           })
@@ -138,7 +152,7 @@ export const useProductsStore = create(
         },
         createProduct(params: { barCode: string; name: string; type: string }) {
           const { jwt } = useAuthStore.getState()
-          return axios.post(`${process.env.API_URL}/products`, params, {
+          return fetcher.post(`/products`, params, {
             headers: { Authorization: jwt },
           })
         },
