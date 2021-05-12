@@ -9,13 +9,14 @@ function GetAllowedContactFilters(key: string): key is keyof Contact {
   return allowedContactFilterKeys.includes(key as keyof Contact)
 }
 
-function getFilters(query: Request['query']): FindManyOptions<Product> | undefined {
+function getFilters(query: Request['query']): FindManyOptions<Contact> | undefined {
   const where: FindManyOptions<Contact>['where'] = {}
   const options: FindManyOptions<Contact> = { where }
 
   Object.entries(query).forEach(([key, value]) => {
     if (key && GetAllowedContactFilters(key)) {
-      if (key === 'name') where[key] = new FindOperator('ilike', `%${value}%`)
+      if (key === 'name' || key === 'email' || key === 'message')
+        where[key] = new FindOperator('ilike', `%${value}%`)
       else where[key] = value
     }
   })
