@@ -3,7 +3,7 @@ import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-nativ
 import { useNavigation } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
 
-import { useProductsStore } from '@hooks/stores'
+import useProductsStore from '@hooks/stores/product'
 import Card from '@components/Card'
 
 export default function ProductList({ style }: { style: View['props']['style'] }) {

@@ -1,15 +1,14 @@
-import { ActivityIndicator, Image, View } from 'react-native'
+import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect, useState } from 'react'
 
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
 import FieldTranslatable from '@components/FieldTranslatable'
-import {
-  useProductsStore,
+import useProductsStore, {
   Product as ProductEntity,
   useProductTranslationStore,
-} from '@hooks/stores'
+} from '@hooks/stores/product'
 
 import { ProductStackParamList } from '../../../../types'
 
@@ -41,7 +40,7 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
   }, [])
 
   return (
-    <View style={{ padding: 16 }}>
+    <ScrollView style={{ padding: 16 }}>
       <Card>
         {isLoading && !product && <ActivityIndicator />}
         {product && (
@@ -96,6 +95,6 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
           </>
         )}
       </Card>
-    </View>
+    </ScrollView>
   )
 }

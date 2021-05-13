@@ -2,7 +2,7 @@ import { createStackNavigator } from '@react-navigation/stack'
 import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native'
 import React, { useEffect, useState } from 'react'
 
-import { useAuthStore } from '@hooks/stores'
+import useAuthStore from '@hooks/stores/auth'
 import useColorScheme from '@hooks/useColorScheme'
 
 import { RootStackParamList } from '../types'

@@ -1,7 +1,8 @@
+import { Pressable, Text, TextInput, View } from 'react-native'
+import { Picker } from '@react-native-picker/picker'
 import React, { useCallback, useEffect, useState } from 'react'
-import { Text, TextInput, View } from 'react-native'
 
-import { Product } from '@hooks/stores'
+import { Product } from '@hooks/stores/product'
 import { UseStore } from 'zustand'
 
 const statusColor = {
@@ -33,6 +34,9 @@ export default function FieldTranslatable<T extends Product>({
 }: Props<T>) {
   const [ids, setIds] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [isCreating, setIsCreating] = useState(false)
+  const [creatingLanguage, setCreatingLanguage] = useState(null)
+  const [creatingTranslation, setCreatingTranslation] = useState('')
   const getTranslations = useStore(translationGetterSelector)
   const updateTranslation = useStore(translationUpdaterSelector)
   const translations = useStore(useCallback(translationsSelectorCreator(ids), [ids]))
@@ -61,7 +65,7 @@ export default function FieldTranslatable<T extends Product>({
         return (
           <View
             key={translation.id}
-            style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+            style={{ alignItems: 'center', flex: 1, flexDirection: 'row' }}>
             <View style={{ width: 100 }}>
               <Text>{translation.languageId}</Text>
             </View>
@@ -71,6 +75,8 @@ export default function FieldTranslatable<T extends Product>({
                 borderColor: statusColor[status],
                 borderWidth: 1,
                 borderRadius: 3,
+                flex: 1,
+                marginBottom: 8,
               }}
               onChangeText={(text) =>
                 updateTranslation(baseEntityId, translation.languageId, field, text)
@@ -80,6 +86,36 @@ export default function FieldTranslatable<T extends Product>({
           </View>
         )
       })}
+      {!isCreating ? (
+        <Pressable onPress={() => setIsCreating(true)}>
+          <Text>+</Text>
+        </Pressable>
+      ) : (
+        <View style={{ alignItems: 'center', flex: 1, flexDirection: 'row' }}>
+          <Picker
+            style={{ width: 100, borderWidth: 0, padding: 0 }}
+            selectedValue={creatingLanguage}
+            onValueChange={setCreatingLanguage}>
+            <Picker.Item label="Java" value="java" />
+          </Picker>
+          <TextInput
+            style={{
+              padding: 8,
+              borderColor: statusColor[status],
+              borderWidth: 1,
+              borderRadius: 3,
+              flex: 1,
+              marginBottom: 8,
+            }}
+            onBlur={() => {
+              setIsCreating(false)
+              setCreatingTranslation('')
+            }}
+            value={creatingTranslation}
+            onChangeText={setCreatingTranslation}
+          />
+        </View>
+      )}
     </View>
   )
 }

@@ -1,7 +1,7 @@
 import { Button, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 
-import { useProductsStore } from '@hooks/stores'
+import useProductsStore from '@hooks/stores/product'
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
 
