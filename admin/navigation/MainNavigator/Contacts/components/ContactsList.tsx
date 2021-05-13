@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
-import { useProductsStore } from '@hooks/stores'
+import useContactsStore from '@hooks/stores/contact'
 import Card from '@components/Card'
-import debounce from '@utils/debounce'
+import debounce from 'lodash/fp'
 
-export default function ProductList({ isLoading, style }: any) {
-  const [ids, setProductIds] = useState<string[]>([])
-  const [registerIds, unregisterIds, getProducts, searchProducts] = useProductsStore((state) => [
+export default function ContactList({ isLoading, style }: any) {
+  const [ids, setContactIds] = useState<string[]>([])
+  const [registerIds, unregisterIds, getContacts, searchContacts] = useContactsStore((state) => [
     state.registerIds,
     state.unregisterIds,
-    state.getProducts,
-    state.searchProducts,
+    state.getContacts,
+    state.searchContacts,
   ])
 
   useEffect(() => {
@@ -19,31 +19,31 @@ export default function ProductList({ isLoading, style }: any) {
     return () => unregisterIds(ids)
   }, [ids])
 
-  const products = useProductsStore(
-    useCallback((state) => ids.map((id) => state.products[id]), [ids]),
+  const contacts = useContactsStore(
+    useCallback((state) => ids.map((id) => state.contacts[id]), [ids]),
   )
 
   const searchDebounced = useCallback(
-    debounce(async (text: string) => {
-      const { ids } = await searchProducts({ name: text })
-      setProductIds(ids)
-    }, 500),
+    debounce(500, async (text: string) => {
+      const { ids } = await searchContacts({ name: text })
+      setContactIds(ids)
+    }),
     [],
   )
 
   useEffect(() => {
     async function fn() {
-      const { ids } = await getProducts()
-      setProductIds(ids)
+      const { ids } = await getContacts()
+      setContactIds(ids)
     }
     fn()
   }, [])
 
-  const noResult = !products.length
+  const noResult = !contacts.length
 
   return (
     <Card style={style}>
-      <Text style={{ fontSize: 18 }}>Product list</Text>
+      <Text style={{ fontSize: 18 }}>Contact list</Text>
       <View
         style={{
           flexDirection: 'row',
@@ -78,17 +78,18 @@ export default function ProductList({ isLoading, style }: any) {
             <Text>No result.</Text>
           </View>
         )}
-        {products.filter(Boolean).map((product: any, i: number) => {
+        {contacts.filter(Boolean).map((contact: any, i: number) => {
           return (
             <View
-              key={product.id}
+              key={contact.id}
               style={{
                 padding: 8,
                 borderBottomColor: '#ccc',
-                borderBottomWidth: i === products.length - 1 ? 0 : 1,
+                borderBottomWidth: i === contacts.length - 1 ? 0 : 1,
                 backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
               }}>
-              <Text>{product.name}</Text>
+              <Text>{contact.name}</Text>
+              <Text>{contact.message}</Text>
             </View>
           )
         })}
