@@ -30,7 +30,6 @@ export default function RootNavigator() {
   }, [])
 
   const isConnected = !!jwt
-
   if (!isInitialized) return null
 
   return (

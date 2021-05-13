@@ -7,6 +7,7 @@ export default {
       Auth: { screens: { Login: 'login' } },
       Main: {
         screens: {
+          Contacts: 'contacts',
           ProductStack: {
             screens: {
               Products: 'products',

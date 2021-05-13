@@ -15,6 +15,7 @@ export type AuthStackParamList = {
 
 export type MainTabParamList = {
   ProductStack: undefined
+  Contacts: undefined
 }
 
 export type ProductStackParamList = {
