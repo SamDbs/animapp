@@ -1,11 +1,17 @@
-import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, Image, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, Image, View } from 'react-native'
 import { StackScreenProps } from '@react-navigation/stack'
-import { ProductStackParamList } from 'types'
+import React, { useEffect, useState } from 'react'
 
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
-import { useProductsStore } from '@hooks/stores'
+import FieldTranslatable from '@components/FieldTranslatable'
+import {
+  useProductsStore,
+  Product as ProductEntity,
+  useProductTranslationStore,
+} from '@hooks/stores'
+
+import { ProductStackParamList } from '../../../../types'
 
 export default function Product(props: StackScreenProps<ProductStackParamList, 'Product'>) {
   const [id, setId] = useState('')
@@ -73,8 +79,18 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
               />
               <FieldWithLabel
                 label="Bar code"
-                value={product.barCode || ''}
+                value={product.barCode}
                 onChangeValue={(val) => updateProduct(product.id, { barCode: val })}
+              />
+              <FieldTranslatable<ProductEntity>
+                field="description"
+                label="Description"
+                baseEntityId={product.id}
+                useStore={useProductTranslationStore}
+                translationGetterSelector={(state) => state.getProductTranslations}
+                translationUpdaterSelector={(state) => state.updateProductTranslation}
+                translationsSelectorCreator={(ids: ProductEntity['id'][]) => (state: any) =>
+                  ids.map((id) => state.productTranslations[id])}
               />
             </View>
           </>

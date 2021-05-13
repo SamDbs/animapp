@@ -1,38 +1,37 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import { debounce } from 'lodash/fp'
 import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import { useProductsStore } from '@hooks/stores'
 import Card from '@components/Card'
-import debounce from '@utils/debounce'
-import { useNavigation } from '@react-navigation/native'
 
 export default function ProductList({ style }: { style: View['props']['style'] }) {
   const [ids, setProductIds] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const navigation = useNavigation()
   const [registerIds, unregisterIds, getProducts, searchProducts] = useProductsStore((state) => [
     state.registerIds,
     state.unregisterIds,
     state.getProducts,
     state.searchProducts,
   ])
-  const navigation = useNavigation()
+  const products = useProductsStore(
+    useCallback((state) => ids.map((id) => state.products[id]), [ids]),
+  )
 
   useEffect(() => {
     registerIds(ids)
     return () => unregisterIds(ids)
   }, [ids])
 
-  const products = useProductsStore(
-    useCallback((state) => ids.map((id) => state.products[id]), [ids]),
-  )
-
   const searchDebounced = useCallback(
-    debounce(async (text: string) => {
+    debounce(500, async (text: string) => {
       setIsLoading(true)
       const { ids } = await searchProducts({ name: text })
       setProductIds(ids)
       setIsLoading(false)
-    }, 500),
+    }),
     [],
   )
 
