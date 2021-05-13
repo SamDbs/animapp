@@ -4,26 +4,28 @@ import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/
 import { useAsyncStorage } from '@react-native-async-storage/async-storage'
 import React, { useEffect, useState } from 'react'
 
-import { login } from '../features/auth/actions'
+import { useAuthStore } from '@hooks/stores'
+import useColorScheme from '@hooks/useColorScheme'
+
 import { RootStackParamList } from '../types'
-import { useDispatch, useSelector } from '../hooks/redux'
 import AuthStackNavigator from './AuthStackNavigator'
 import LinkingConfiguration from './LinkingConfiguration'
 import MainNavigator from './MainNavigator'
-import NotFoundScreen from '../screens/NotFoundScreen'
+import NotFoundScreen from './NotFoundScreen'
 
 const Stack = createStackNavigator<RootStackParamList>()
 
-export default function RootNavigator({ colorScheme }: { colorScheme: ColorSchemeName }) {
-  const { getItem, setItem } = useAsyncStorage('jwt')
-  const dispatch = useDispatch()
-  const jwt = useSelector((state) => state.auth.jwt)
+export default function RootNavigator() {
+  const colorScheme = useColorScheme()
+  const { getItem } = useAsyncStorage('jwt')
+  const jwt = useAuthStore((state) => state.jwt)
+  const setJwt = useAuthStore((state) => state.setJwt)
   const [isInitialized, setInitialized] = useState(false) 
 
   useEffect(() => {
     async function initFromLocalStorage() {
       const localStorageJwt = await getItem()
-      if (localStorageJwt) dispatch({ type: login.fulfilled.type, payload: localStorageJwt })
+      if (localStorageJwt) setJwt(localStorageJwt)
       setInitialized(true)
     }
     initFromLocalStorage()
