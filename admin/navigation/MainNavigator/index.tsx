@@ -8,6 +8,8 @@ import { MainTabParamList } from '../../types'
 import Colors from '../../constants/Colors'
 import Menu from './components/Menu'
 import Products from './Products'
+import Contacts from './Contacts'
+
 
 const BottomTab = createBottomTabNavigator<MainTabParamList>()
 
@@ -22,6 +24,7 @@ export default function TabNavigator() {
         tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}
         tabBar={() => null}>
         <BottomTab.Screen name="Products" component={Products} />
+        <BottomTab.Screen name="Contacts" component={Contacts} />
       </BottomTab.Navigator>
     </View>
   )
