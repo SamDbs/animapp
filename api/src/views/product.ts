@@ -39,10 +39,11 @@ export function viewProduct(product: Product, language: Language['id'] | undefin
 
   const productClient = {
     id: product.id,
-    brand: product.brand?.name,
-    type: product.type,
     name: product.name,
+    type: product.type,
+    barCode: product.barCode,
     image: product?.image?.url,
+    brand: product.brand?.name,
     description: translation?.description ?? 'This product is not translated yet',
   }
   return productClient

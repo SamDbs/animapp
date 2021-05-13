@@ -44,7 +44,7 @@ app.use(cors())
 app.use(express.json())
 
 app.use((req, res, next) => {
-  console.log('req:', req.path, req.query)
+  console.log('req:', req.method, req.path, req.query)
   // setTimeout(next, 5000)
   next()
 })
