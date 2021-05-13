@@ -3,7 +3,7 @@ import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
 import useContactsStore from '@hooks/stores/contact'
 import Card from '@components/Card'
-import debounce from '@utils/debounce'
+import debounce from 'lodash/fp'
 
 export default function ContactList({ isLoading, style }: any) {
   const [ids, setContactIds] = useState<string[]>([])
@@ -24,10 +24,10 @@ export default function ContactList({ isLoading, style }: any) {
   )
 
   const searchDebounced = useCallback(
-    debounce(async (text: string) => {
+    debounce(500, async (text: string) => {
       const { ids } = await searchContacts({ name: text })
       setContactIds(ids)
-    }, 500),
+    }),
     [],
   )
 

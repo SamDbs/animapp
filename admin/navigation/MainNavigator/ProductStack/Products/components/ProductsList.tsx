@@ -1,40 +1,46 @@
+import { debounce } from 'lodash/fp'
+import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
-import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
-import { useProductsStore } from '@hooks/stores'
+import useProductsStore from '@hooks/stores/product'
 import Card from '@components/Card'
-import debounce from '@utils/debounce'
 
-export default function ProductList({ isLoading, style }: any) {
+export default function ProductList({ style }: { style: View['props']['style'] }) {
   const [ids, setProductIds] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const navigation = useNavigation()
   const [registerIds, unregisterIds, getProducts, searchProducts] = useProductsStore((state) => [
     state.registerIds,
     state.unregisterIds,
     state.getProducts,
     state.searchProducts,
   ])
+  const products = useProductsStore(
+    useCallback((state) => ids.map((id) => state.products[id]), [ids]),
+  )
 
   useEffect(() => {
     registerIds(ids)
     return () => unregisterIds(ids)
   }, [ids])
 
-  const products = useProductsStore(
-    useCallback((state) => ids.map((id) => state.products[id]), [ids]),
-  )
-
   const searchDebounced = useCallback(
-    debounce(async (text: string) => {
+    debounce(500, async (text: string) => {
+      setIsLoading(true)
       const { ids } = await searchProducts({ name: text })
       setProductIds(ids)
-    }, 500),
+      setIsLoading(false)
+    }),
     [],
   )
 
   useEffect(() => {
     async function fn() {
+      setIsLoading(true)
       const { ids } = await getProducts()
       setProductIds(ids)
+      setIsLoading(false)
     }
     fn()
   }, [])
@@ -87,8 +93,13 @@ export default function ProductList({ isLoading, style }: any) {
                 borderBottomColor: '#ccc',
                 borderBottomWidth: i === products.length - 1 ? 0 : 1,
                 backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
               }}>
               <Text>{product.name}</Text>
+              <Pressable onPress={() => navigation.navigate(`Product`, { id: product.id })}>
+                <Text style={{ cursor: 'pointer' }}>edit</Text>
+              </Pressable>
             </View>
           )
         })}

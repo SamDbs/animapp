@@ -1,29 +1,9 @@
 import { Button, Text, TextInput, View } from 'react-native'
 import React, { useState } from 'react'
 
-import { useProductsStore } from '@hooks/stores'
+import useProductsStore from '@hooks/stores/product'
 import Card from '@components/Card'
-
-function Row({
-  label,
-  onChangeValue,
-  value,
-}: {
-  label: string
-  onChangeValue: any
-  value: string
-}) {
-  return (
-    <View style={{ marginBottom: 16 }}>
-      <Text style={{ marginBottom: 8 }}>{label}</Text>
-      <TextInput
-        style={{ padding: 8, borderColor: '#ccc', borderWidth: 1, borderRadius: 3 }}
-        onChangeText={onChangeValue}
-        value={value}
-      />
-    </View>
-  )
-}
+import FieldWithLabel from '@components/FieldWithLabel'
 
 const initialState = { type: '', name: '', barCode: '', brandId: 3 }
 
@@ -48,20 +28,20 @@ export default function ProductCreator({ style }: any) {
   return (
     <Card style={style}>
       <Text style={{ fontSize: 18, marginBottom: 16 }}>Create a product</Text>
-      <Row
-        label="Type"
-        value={product.type}
-        onChangeValue={(val: string) => setProduct((current) => ({ ...current, type: val }))}
-      />
-      <Row
+      <FieldWithLabel
         label="Name"
         value={product.name}
-        onChangeValue={(val: string) => setProduct((current) => ({ ...current, name: val }))}
+        onChangeValue={(val) => setProduct((current) => ({ ...current, name: val }))}
       />
-      <Row
+      <FieldWithLabel
+        label="Type"
+        value={product.type}
+        onChangeValue={(val) => setProduct((current) => ({ ...current, type: val }))}
+      />
+      <FieldWithLabel
         label="Bar code"
         value={product.barCode}
-        onChangeValue={(val: string) => setProduct((current) => ({ ...current, barCode: val }))}
+        onChangeValue={(val) => setProduct((current) => ({ ...current, barCode: val }))}
       />
       {!!error && (
         <Text style={{ backgroundColor: '#f55', padding: 8, marginBottom: 16 }}>{error}</Text>

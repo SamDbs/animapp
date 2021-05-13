@@ -1,8 +1,8 @@
 import { combine, devtools } from 'zustand/middleware'
 import axios from 'axios'
 import create from 'zustand'
-import { useAuthStore } from '@hooks/stores'
-import { filter, keyBy, keys, map, mapValues, omit, omitBy, pickBy, reduce } from 'lodash'
+import useAuthStore from '@hooks/stores/auth'
+import { keyBy, map, omit } from 'lodash'
 
 export type Contact = {
   id: string
