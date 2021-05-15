@@ -24,6 +24,12 @@ export type ProductStackParamList = {
   Product: { id: string }
 }
 
+export type IngredientStackParamList = {
+  Ingredients: undefined
+  Ingredient: { id: string }
+}
+
+
 
 export type TabOneParamList = {
   TabOneScreen: undefined

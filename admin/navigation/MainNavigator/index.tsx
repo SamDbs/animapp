@@ -7,7 +7,7 @@ import useColorScheme from '@hooks/useColorScheme'
 import { MainTabParamList } from '../../types'
 import Colors from '../../constants/Colors'
 import Menu from './components/Menu'
-import Ingredients from './Ingredients'
+import Ingredients from './IngredientStack/Ingredient'
 import Contacts from './Contacts'
 import ProductStack from './ProductStack'
 
