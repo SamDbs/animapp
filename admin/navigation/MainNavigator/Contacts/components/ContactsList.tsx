@@ -3,7 +3,7 @@ import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
 import useContactsStore from '@hooks/stores/contact'
 import Card from '@components/Card'
-import debounce from 'lodash/fp'
+import { debounce } from 'lodash/fp'
 
 export default function ContactList({ isLoading, style }: any) {
   const [ids, setContactIds] = useState<string[]>([])
