@@ -4,8 +4,7 @@ import React, { useEffect, useState } from 'react'
 
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
-import FieldTranslatable from '@components/FieldTranslatable'
-import useIngredientsStore, { Ingredient as IngredientEntity } from '@hooks/stores/ingredient'
+import useIngredientsStore from '@hooks/stores/ingredient'
 
 import { IngredientStackParamList } from '../../../../types'
 
