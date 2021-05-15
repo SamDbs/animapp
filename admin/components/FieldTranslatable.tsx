@@ -6,10 +6,12 @@ import type { StateSelector, UseStore } from 'zustand'
 import type { Product } from '@hooks/stores/product'
 import type { ProductTranslation } from '@hooks/stores/product-translation'
 import useLanguagesStore, { Language } from '@hooks/stores/languages'
+import { Ingredient } from '@hooks/stores/ingredient'
+import { IngredientTranslation } from '@hooks/stores/ingredient-translation'
 
 type Props<
-  Item extends Product,
-  ItemTranslation extends ProductTranslation,
+  Item extends Product | Ingredient,
+  ItemTranslation extends ProductTranslation | IngredientTranslation,
   StoreShape extends object,
 > = {
   baseEntityId: Item['id']
@@ -33,8 +35,8 @@ type Props<
 }
 
 export default function FieldTranslatable<
-  Item extends Product,
-  ItemTranslation extends ProductTranslation,
+  Item extends Product | Ingredient,
+  ItemTranslation extends ProductTranslation | IngredientTranslation,
   StoreShape extends object,
 >({
   baseEntityId,

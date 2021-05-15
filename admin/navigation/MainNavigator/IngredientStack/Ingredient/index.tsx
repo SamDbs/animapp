@@ -4,9 +4,14 @@ import React, { useEffect, useState } from 'react'
 
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
-import useIngredientsStore from '@hooks/stores/ingredient'
+import FieldTranslatable from '@components/FieldTranslatable'
+import useIngredientsStore, {
+  Ingredient as IngredientEntity,
+  IngredientStoreState,
+} from '@hooks/stores/ingredient'
 
 import { IngredientStackParamList } from '../../../../types'
+import { IngredientTranslation } from '@hooks/stores/ingredient-translation'
 
 export default function Ingredient(
   props: StackScreenProps<IngredientStackParamList, 'Ingredient'>,
@@ -66,26 +71,8 @@ export default function Ingredient(
               />
             </View>
             <View>
-              <FieldWithLabel
-                label="Name"
-                value={ingredient.name}
-                onChangeValue={(val) => updateIngredient(ingredient.id, { name: val })}
-              />
-              <FieldWithLabel
-                label="Description"
-                value={ingredient.description}
-                onChangeValue={(val) => updateIngredient(ingredient.id, { description: val })}
-              />
-              <FieldWithLabel
-                label="Review"
-                value={ingredient.review}
-                onChangeValue={(val) => updateIngredient(ingredient.id, { review: val })}
-              />
-              <FieldWithLabel
-                label="Image"
-                value={ingredient.image}
-                onChangeValue={(val) => updateIngredient(ingredient.id, { image: val })}
-              />
+              {/* TODO */}
+              {/* <FieldTranslatable<IngredientEntity, IngredientTranslation, IngredientStoreState> /> */}
             </View>
           </>
         )}
