@@ -5,10 +5,11 @@ import React, { useEffect, useState } from 'react'
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
 import FieldTranslatable from '@components/FieldTranslatable'
-import useProductsStore, {
-  Product as ProductEntity,
-  useProductTranslationStore,
-} from '@hooks/stores/product'
+import useProductsStore, { Product as ProductEntity } from '@hooks/stores/product'
+import useProductTranslationStore, {
+  ProductTranslation,
+  ProductTranslationStore,
+} from '@hooks/stores/product-translation'
 
 import { ProductStackParamList } from '../../../../types'
 
@@ -81,14 +82,13 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
                 value={product.barCode}
                 onChangeValue={(val) => updateProduct(product.id, { barCode: val })}
               />
-              <FieldTranslatable<ProductEntity>
-                field="description"
-                label="Description"
+              <FieldTranslatable<ProductEntity, ProductTranslation, ProductTranslationStore>
+                fields={{ description: 'Description' }}
                 baseEntityId={product.id}
                 useStore={useProductTranslationStore}
                 translationGetterSelector={(state) => state.getProductTranslations}
                 translationUpdaterSelector={(state) => state.updateProductTranslation}
-                translationsSelectorCreator={(ids: ProductEntity['id'][]) => (state: any) =>
+                translationsSelectorCreator={(ids) => (state) =>
                   ids.map((id) => state.productTranslations[id])}
               />
             </View>
