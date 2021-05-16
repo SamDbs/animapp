@@ -5,13 +5,13 @@ import React, { useEffect, useState } from 'react'
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
 import FieldTranslatable from '@components/FieldTranslatable'
-import useIngredientsStore, {
-  Ingredient as IngredientEntity,
-  IngredientStoreState,
-} from '@hooks/stores/ingredient'
+import useIngredientsStore, { Ingredient as IngredientEntity } from '@hooks/stores/ingredient'
 
 import { IngredientStackParamList } from '../../../../types'
-import { IngredientTranslation } from '@hooks/stores/ingredient-translation'
+import useIngredientTranslationStore, {
+  IngredientTranslation,
+  IngredientTranslationStore,
+} from '@hooks/stores/ingredientTranslation'
 
 export default function Ingredient(
   props: StackScreenProps<IngredientStackParamList, 'Ingredient'>,
@@ -72,7 +72,15 @@ export default function Ingredient(
             </View>
             <View>
               {/* TODO */}
-              {/* <FieldTranslatable<IngredientEntity, IngredientTranslation, IngredientStoreState> /> */}
+              <FieldTranslatable<IngredientEntity, IngredientTranslation, IngredientTranslationStore>
+                fields={{ description: 'Description', review: 'Review', name: 'Name' }}
+                baseEntityId={ingredient.id}
+                useStore={useIngredientTranslationStore}
+                translationGetterSelector={(state) => state.getIngredientTranslations}
+                translationUpdaterSelector={(state) => state.updateIngredientTranslation}
+                translationsSelectorCreator={(ids) => (state) =>
+                  ids.map((id) => state.ingredientTranslations[id])}
+              />
             </View>
           </>
         )}

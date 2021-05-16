@@ -4,10 +4,10 @@ import React, { useCallback, useEffect, useState } from 'react'
 import type { StateSelector, UseStore } from 'zustand'
 
 import type { Product } from '@hooks/stores/product'
-import type { ProductTranslation } from '@hooks/stores/product-translation'
+import type { ProductTranslation } from '@hooks/stores/productTranslation'
 import useLanguagesStore, { Language } from '@hooks/stores/languages'
 import { Ingredient } from '@hooks/stores/ingredient'
-import { IngredientTranslation } from '@hooks/stores/ingredient-translation'
+import { IngredientTranslation } from '@hooks/stores/ingredientTranslation'
 
 type Props<
   Item extends Product | Ingredient,
