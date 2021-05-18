@@ -48,6 +48,9 @@ export default function FieldTranslatable<
 }: Props<Item, ItemTranslation, StoreShape>) {
   const [ids, setIds] = useState<ItemTranslation['id'][]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [createdTranslation, setCreatedTranslation] = useState<{
+    [key: string]: Partial<ItemTranslation>
+  }>({})
   const getTranslations = useStore(translationGetterSelector)
   const updateTranslation = useStore(translationUpdaterSelector)
   const translations = useStore(useCallback(translationsSelectorCreator(ids), [ids]))
@@ -124,11 +127,28 @@ export default function FieldTranslatable<
                           }}
                           multiline
                           numberOfLines={2}
-                          onChangeText={(text) =>
-                            updateTranslation(baseEntityId, language.id, {
-                              [field]: text,
-                            } as unknown as Partial<ItemTranslation>)
-                          }
+                          onChangeText={(text) => {
+                            const newValue = {
+                              ...createdTranslation,
+                              [translationId]: {
+                                ...createdTranslation[translationId],
+                                [field]: text,
+                              },
+                            }
+                            setCreatedTranslation(newValue)
+                            if (
+                              Object.keys(newValue[translationId]).length !==
+                                fieldsToTranslate.length &&
+                              !currentTranslation
+                            ) {
+                              return
+                            }
+                            updateTranslation(
+                              baseEntityId,
+                              language.id,
+                              newValue[translationId] as unknown as Partial<ItemTranslation>,
+                            )
+                          }}
                           defaultValue={currentTranslation ? currentTranslation[field] : ''}
                         />
                       </View>

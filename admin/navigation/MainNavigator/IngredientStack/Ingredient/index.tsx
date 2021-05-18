@@ -71,7 +71,6 @@ export default function Ingredient(
               />
             </View>
             <View>
-              {/* TODO */}
               <FieldTranslatable<IngredientEntity, IngredientTranslation, IngredientTranslationStore>
                 fields={{ description: 'Description', review: 'Review', name: 'Name' }}
                 baseEntityId={ingredient.id}

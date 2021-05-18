@@ -5,6 +5,7 @@ import { debounce, keyBy } from 'lodash/fp'
 import { fetcher } from './index'
 import type { Language } from './languages'
 import type { Ingredient } from './ingredient'
+import { AxiosInstance, AxiosRequestConfig } from 'axios'
 
 export type IngredientTranslation = {
   id: string
@@ -33,7 +34,7 @@ export type IngredientTranslationStore = {
 }
 
 let combinedIngredientTranslationsUpdate: Record<
-IngredientTranslation['languageId'],
+  IngredientTranslation['languageId'],
   Partial<IngredientTranslation>
 > = {}
 
@@ -41,6 +42,7 @@ async function prepareIngredientTranslationsUpdate(
   ingredientId: Ingredient['id'],
   languageId: Language['id'],
   params: Partial<IngredientTranslation>,
+  method: AxiosRequestConfig['method'],
 ) {
   combinedIngredientTranslationsUpdate = {
     ...combinedIngredientTranslationsUpdate,
@@ -49,20 +51,28 @@ async function prepareIngredientTranslationsUpdate(
       ...params,
     },
   }
-  await sendIngredientTranslationUpdateDebounced(ingredientId)
+  await sendIngredientTranslationUpdateDebounced(ingredientId, method)
 }
 
-const sendIngredientTranslationUpdateDebounced = debounce(1000, async (ingredientId: Ingredient['id']) => {
-  await Promise.all(
-    Object.keys(combinedIngredientTranslationsUpdate).map((key) =>
-      fetcher.patch(
-        `/ingredients/${ingredientId}/translations/${key}`,
-        combinedIngredientTranslationsUpdate[key],
+const sendIngredientTranslationUpdateDebounced = debounce(
+  1000,
+  async (ingredientId: Ingredient['id'], method: AxiosRequestConfig['method']) => {
+    await Promise.all(
+      Object.keys(combinedIngredientTranslationsUpdate).map((key) =>
+        method === 'post'
+          ? fetcher(`/ingredients/${ingredientId}/translations`, {
+              method,
+              data: { languageId: key, ...combinedIngredientTranslationsUpdate[key] },
+            })
+          : fetcher(`/ingredients/${ingredientId}/translations/${key}`, {
+              method,
+              data: combinedIngredientTranslationsUpdate[key],
+            }),
       ),
-    ),
-  )
-  combinedIngredientTranslationsUpdate = {}
-})
+    )
+    combinedIngredientTranslationsUpdate = {}
+  },
+)
 
 const useIngredientTranslationStore = create<IngredientTranslationStore>(
   devtools((set, get) => ({
@@ -91,17 +101,13 @@ const useIngredientTranslationStore = create<IngredientTranslationStore>(
       const id = `${ingredientId}-${languageId}`
       if (!get().ingredientTranslations[id]) {
         set((state) => ({
-          ingredientTranslations: { ...state.ingredientTranslations, [id]: params as any },
+          ingredientTranslations: { ...state.ingredientTranslations, [id]: {...params, languageId, ingredientId
+          } as any },
         }))
 
-        await fetcher.post<IngredientTranslation[]>(`/ingredients/${ingredientId}/translations`, {
-          languageId,
-          ...get().ingredientTranslations[id],
-        })
-      
+        await prepareIngredientTranslationsUpdate(ingredientId, languageId, params, 'post')
         return
       }
-
       set((state) => ({
         ingredientTranslations: {
           ...state.ingredientTranslations,
@@ -111,7 +117,7 @@ const useIngredientTranslationStore = create<IngredientTranslationStore>(
           },
         },
       }))
-      await prepareIngredientTranslationsUpdate(ingredientId, languageId, params)
+      await prepareIngredientTranslationsUpdate(ingredientId, languageId, params, 'patch')
     },
     async createIngredientTranslation() {},
   })),
