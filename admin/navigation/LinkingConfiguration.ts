@@ -7,6 +7,12 @@ export default {
       Auth: { screens: { Login: 'login' } },
       Main: {
         screens: {
+          IngredientStack: {
+            screens: {
+              Ingredients: 'ingredients',
+              Ingredient: 'ingredients/:id',
+            },
+          },
           Contacts: 'contacts',
           ProductStack: {
             screens: {

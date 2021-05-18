@@ -9,7 +9,7 @@ import useProductsStore, { Product as ProductEntity } from '@hooks/stores/produc
 import useProductTranslationStore, {
   ProductTranslation,
   ProductTranslationStore,
-} from '@hooks/stores/product-translation'
+} from '@hooks/stores/productTranslation'
 
 import { ProductStackParamList } from '../../../../types'
 

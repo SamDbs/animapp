@@ -4,12 +4,14 @@ import React, { useCallback, useEffect, useState } from 'react'
 import type { StateSelector, UseStore } from 'zustand'
 
 import type { Product } from '@hooks/stores/product'
-import type { ProductTranslation } from '@hooks/stores/product-translation'
+import type { ProductTranslation } from '@hooks/stores/productTranslation'
 import useLanguagesStore, { Language } from '@hooks/stores/languages'
+import { Ingredient } from '@hooks/stores/ingredient'
+import { IngredientTranslation } from '@hooks/stores/ingredientTranslation'
 
 type Props<
-  Item extends Product,
-  ItemTranslation extends ProductTranslation,
+  Item extends Product | Ingredient,
+  ItemTranslation extends ProductTranslation | IngredientTranslation,
   StoreShape extends object,
 > = {
   baseEntityId: Item['id']
@@ -33,8 +35,8 @@ type Props<
 }
 
 export default function FieldTranslatable<
-  Item extends Product,
-  ItemTranslation extends ProductTranslation,
+  Item extends Product | Ingredient,
+  ItemTranslation extends ProductTranslation | IngredientTranslation,
   StoreShape extends object,
 >({
   baseEntityId,
@@ -46,6 +48,9 @@ export default function FieldTranslatable<
 }: Props<Item, ItemTranslation, StoreShape>) {
   const [ids, setIds] = useState<ItemTranslation['id'][]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [createdTranslation, setCreatedTranslation] = useState<{
+    [key: string]: Partial<ItemTranslation>
+  }>({})
   const getTranslations = useStore(translationGetterSelector)
   const updateTranslation = useStore(translationUpdaterSelector)
   const translations = useStore(useCallback(translationsSelectorCreator(ids), [ids]))
@@ -122,11 +127,28 @@ export default function FieldTranslatable<
                           }}
                           multiline
                           numberOfLines={2}
-                          onChangeText={(text) =>
-                            updateTranslation(baseEntityId, language.id, {
-                              [field]: text,
-                            } as unknown as Partial<ItemTranslation>)
-                          }
+                          onChangeText={(text) => {
+                            const newValue = {
+                              ...createdTranslation,
+                              [translationId]: {
+                                ...createdTranslation[translationId],
+                                [field]: text,
+                              },
+                            }
+                            setCreatedTranslation(newValue)
+                            if (
+                              Object.keys(newValue[translationId]).length !==
+                                fieldsToTranslate.length &&
+                              !currentTranslation
+                            ) {
+                              return
+                            }
+                            updateTranslation(
+                              baseEntityId,
+                              language.id,
+                              newValue[translationId] as unknown as Partial<ItemTranslation>,
+                            )
+                          }}
                           defaultValue={currentTranslation ? currentTranslation[field] : ''}
                         />
                       </View>

@@ -6,94 +6,94 @@ import { keyBy, map, omit } from 'lodash'
 
 export type Contact = {
   id: string
+  name: string
+  email: string
+  message: string
 }
 
-const useContactsStore = create(
-  devtools(
-    combine(
-      {
-        contacts: {} as Record<Contact['id'], Contact>,
-        usedContactIds: {} as Record<Contact['id'], number>,
-      },
-      (set) => ({
-        registerIds(ids: Contact['id'][]) {
-          set((state) => {
-            const update: Record<Contact['id'], number> = ids.reduce(
-              (acc, id) => ({
-                ...acc,
-                [id]: id in state.usedContactIds ? state.usedContactIds[id] + 1 : 1,
-              }),
-              {},
-            )
+export type ContactStoreState = {
+  contacts: Record<Contact['id'], Contact>
+  usedContactIds: Record<Contact['id'], number>
+  registerIds: (ids: Contact['id'][]) => void
+  unregisterIds: (ids: Contact['id'][]) => void
+  getContacts: () => Promise<{ ids: Contact['id'][] }>
+  searchContacts: (params: { name: string }) => Promise<{ ids: Contact['id'][] }>
+}
 
-            const newState = {
-              ...state,
-              usedContactIds: { ...state.usedContactIds, ...update },
-            }
+const useContactsStore = create<ContactStoreState>(
+  devtools((set) => ({
+    contacts: {},
+    usedContactIds: {},
+    registerIds(ids: Contact['id'][]) {
+      set((state) => {
+        const update: Record<Contact['id'], number> = ids.reduce(
+          (acc, id) => ({
+            ...acc,
+            [id]: id in state.usedContactIds ? state.usedContactIds[id] + 1 : 1,
+          }),
+          {},
+        )
 
-            const idsToDelete = Object.entries(newState.usedContactIds)
-              .filter(([, value]) => value < 1)
-              .map(([key]) => key)
+        const newState = {
+          ...state,
+          usedContactIds: { ...state.usedContactIds, ...update },
+        }
 
-            const finalState = {
-              ...newState,
-              contacts: omit(newState.contacts, idsToDelete),
-              usedContactIds: omit(newState.usedContactIds, idsToDelete),
-            }
-            return finalState
-          })
-        },
-        unregisterIds(ids: Contact['id'][]) {
-          set((state) => {
-            const update: Record<Contact['id'], number> = ids.reduce(
-              (acc, id) => ({
-                ...acc,
-                [id]: id in state.usedContactIds ? state.usedContactIds[id] - 1 : 0,
-              }),
-              {},
-            )
-            const newState = { ...state, usedContactIds: { ...state.usedContactIds, ...update } }
-            return newState
-          })
-        },
-        async getContacts() {
-          const { jwt } = useAuthStore.getState()
-          const { data } = await axios.get<Contact[]>(`${process.env.API_URL}/contacts`, {
-            headers: { Authorization: jwt },
-          })
+        const idsToDelete = Object.entries(newState.usedContactIds)
+          .filter(([, value]) => value < 1)
+          .map(([key]) => key)
 
-          const contacts = data.map((contact) => ({ ...contact, id: contact.id.toString() }))
+        const finalState = {
+          ...newState,
+          contacts: omit(newState.contacts, idsToDelete),
+          usedContactIds: omit(newState.usedContactIds, idsToDelete),
+        }
+        return finalState
+      })
+    },
+    unregisterIds(ids: Contact['id'][]) {
+      set((state) => {
+        const update: Record<Contact['id'], number> = ids.reduce(
+          (acc, id) => ({
+            ...acc,
+            [id]: id in state.usedContactIds ? state.usedContactIds[id] - 1 : 0,
+          }),
+          {},
+        )
+        const newState = { ...state, usedContactIds: { ...state.usedContactIds, ...update } }
+        return newState
+      })
+    },
+    async getContacts() {
+      const { jwt } = useAuthStore.getState()
+      const { data } = await axios.get<Contact[]>(`${process.env.API_URL}/contacts`, {
+        headers: { Authorization: jwt },
+      })
 
-          const ids = map(contacts, (contact) => contact.id)
-          const entities = keyBy(contacts, (contact) => contact.id)
+      const contacts = data.map((contact) => ({ ...contact, id: contact.id.toString() }))
 
-          set((state) => ({ contacts: { ...state.contacts, ...entities } }))
-          return { ids }
-        },
-        async searchContacts(params: { name: string }) {
-          const { jwt } = useAuthStore.getState()
-          const { data } = await axios.get<Contact[]>(`${process.env.API_URL}/contacts`, {
-            headers: { Authorization: jwt },
-            params,
-          })
+      const ids = map(contacts, (contact) => contact.id)
+      const entities = keyBy(contacts, (contact) => contact.id)
 
-          const contacts = data.map((contact) => ({ ...contact, id: contact.id.toString() }))
+      set((state) => ({ contacts: { ...state.contacts, ...entities } }))
+      return { ids }
+    },
+    async searchContacts(params: { name: string }) {
+      const { jwt } = useAuthStore.getState()
+      const { data } = await axios.get<Contact[]>(`${process.env.API_URL}/contacts`, {
+        headers: { Authorization: jwt },
+        params,
+      })
 
-          const ids = map(contacts, (contact) => contact.id)
-          const entities = keyBy(contacts, (contact) => contact.id)
+      const contacts = data.map((contact) => ({ ...contact, id: contact.id.toString() }))
 
-          set((state) => ({ contacts: { ...state.contacts, ...entities } }))
-          return { ids }
-        },
-        createContact(params: { name: string; email: string; message: string }) {
-          const { jwt } = useAuthStore.getState()
-          return axios.post(`${process.env.API_URL}/contacts`, params, {
-            headers: { Authorization: jwt },
-          })
-        },
-      }),
-    ),
-  ),
+      const ids = map(contacts, (contact) => contact.id)
+      const entities = keyBy(contacts, (contact) => contact.id)
+
+      set((state) => ({ contacts: { ...state.contacts, ...entities } }))
+      return { ids }
+    },
+  })),
 )
 
 export default useContactsStore
