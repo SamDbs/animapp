@@ -10,7 +10,7 @@ import { AxiosInstance, AxiosRequestConfig } from 'axios'
 export type IngredientTranslation = {
   id: string
   ingredientId: Ingredient['id']
-  languageId: Ingredient['id']
+  languageId: Language['id']
   description: string
   review: string
   name: string
@@ -30,6 +30,8 @@ export type IngredientTranslationStore = {
     ingredientId: Ingredient['id'],
     languageId: Language['id'],
     description: string,
+    review: string,
+    name: string,
   ) => Promise<void>
 }
 
