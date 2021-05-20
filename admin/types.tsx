@@ -17,6 +17,7 @@ export type MainTabParamList = {
   ProductStack: undefined
   Contacts: undefined
   IngredientStack: undefined
+  FaqStack: undefined
 }
 
 export type ProductStackParamList = {
