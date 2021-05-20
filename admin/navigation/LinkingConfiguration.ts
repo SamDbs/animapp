@@ -13,6 +13,12 @@ export default {
               Ingredient: 'ingredients/:id',
             },
           },
+          FaqStack: {
+            screens: {
+              Faqs: 'faq',
+              Faq: 'faq/:id',
+            },
+          },
           Contacts: 'contacts',
           ProductStack: {
             screens: {

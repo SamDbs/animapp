@@ -5,14 +5,13 @@ import React, { useEffect, useState } from 'react'
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
 import FieldTranslatable from '@components/FieldTranslatable'
-import useIngredientsStore, { Ingredient as IngredientEntity } from '@hooks/stores/ingredient'
+import useFaqStore, { Faq as FaqEntity } from '@hooks/stores/faq'
 
-import { IngredientStackParamList } from '../../../../types'
+import { FaqStackParamList } from '../../../../types'
 import useFaqTranslationStore, {
   FaqTranslation,
   FaqTranslationStore,
 } from '@hooks/stores/faqTranslation'
-import useFaqStore from '@hooks/stores/faq'
 
 export default function Faq(
   props: StackScreenProps<FaqStackParamList, 'Faq'>,

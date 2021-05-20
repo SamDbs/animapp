@@ -8,10 +8,12 @@ import type { ProductTranslation } from '@hooks/stores/productTranslation'
 import useLanguagesStore, { Language } from '@hooks/stores/languages'
 import { Ingredient } from '@hooks/stores/ingredient'
 import { IngredientTranslation } from '@hooks/stores/ingredientTranslation'
+import { Faq } from '@hooks/stores/faq'
+import { FaqTranslation } from '@hooks/stores/faqTranslation'
 
 type Props<
-  Item extends Product | Ingredient,
-  ItemTranslation extends ProductTranslation | IngredientTranslation,
+  Item extends Product | Ingredient | Faq,
+  ItemTranslation extends ProductTranslation | IngredientTranslation | FaqTranslation,
   StoreShape extends object,
 > = {
   baseEntityId: Item['id']
@@ -35,8 +37,8 @@ type Props<
 }
 
 export default function FieldTranslatable<
-  Item extends Product | Ingredient,
-  ItemTranslation extends ProductTranslation | IngredientTranslation,
+  Item extends Product | Ingredient | Faq,
+  ItemTranslation extends ProductTranslation | IngredientTranslation | FaqTranslation,
   StoreShape extends object,
 >({
   baseEntityId,

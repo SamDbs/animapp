@@ -26,7 +26,7 @@ export default function TabNavigator() {
         tabBar={() => null}>
         <BottomTab.Screen name="IngredientStack" component={IngredientStack} />
         <BottomTab.Screen name="Contacts" component={Contacts} />
-        <BottomTab.Screen name="Faq" component={Contacts} />
+        <BottomTab.Screen name="FaqStack" component={FaqStack} />
         <BottomTab.Screen name="ProductStack" component={ProductStack} />
       </BottomTab.Navigator>
     </View>

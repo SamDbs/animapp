@@ -29,6 +29,11 @@ export type IngredientStackParamList = {
   Ingredient: { id: string }
 }
 
+export type FaqStackParamList = {
+  Faqs: undefined
+  Faq: { id: string }
+}
+
 export type TabOneParamList = {
   TabOneScreen: undefined
 }
