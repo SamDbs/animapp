@@ -12,24 +12,25 @@ import useFaqTranslationStore, {
   FaqTranslation,
   FaqTranslationStore,
 } from '@hooks/stores/faqTranslation'
+import useFaqStore from '@hooks/stores/faq'
 
-export default function Ingredient(
-  props: StackScreenProps<IngredientStackParamList, 'Ingredient'>,
+export default function Faq(
+  props: StackScreenProps<FaqStackParamList, 'Faq'>,
 ) {
   const [id, setId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const ingredient = useIngredientsStore((state) => state.ingredients[props.route.params.id])
-  const [registerIds, unregisterIds, getIngredientById, updateIngredient] = useIngredientsStore(
+  const faq = useFaqStore((state) => state.faqs[props.route.params.id])
+  const [registerIds, unregisterIds, getFaqById, updateFaq] = useFaqStore(
     (state) => [
       state.registerIds,
       state.unregisterIds,
-      state.getIngredientById,
-      state.updateIngredient,
+      state.getFaqById,
+      state.updateFaq,
     ],
   )
 
   useEffect(() => {
-    if (!ingredient) return
+    if (!faq) return
     registerIds([id])
     return () => unregisterIds([id])
   }, [id])
@@ -37,7 +38,7 @@ export default function Ingredient(
   useEffect(() => {
     async function fn() {
       setIsLoading(true)
-      const { id } = await getIngredientById(props.route.params.id)
+      const { id } = await getFaqById(props.route.params.id)
       setId(id)
       setIsLoading(false)
     }
@@ -47,8 +48,8 @@ export default function Ingredient(
   return (
     <ScrollView style={{ padding: 16 }}>
       <Card>
-        {isLoading && !ingredient && <ActivityIndicator />}
-        {ingredient && (
+        {isLoading && !faq && <ActivityIndicator />}
+        {faq && (
           <>
             <View
               style={{
@@ -71,14 +72,14 @@ export default function Ingredient(
               />
             </View>
             <View>
-              <FieldTranslatable<IngredientEntity, IngredientTranslation, IngredientTranslationStore>
-                fields={{ description: 'Description', review: 'Review', name: 'Name' }}
-                baseEntityId={ingredient.id}
-                useStore={useIngredientTranslationStore}
-                translationGetterSelector={(state) => state.getIngredientTranslations}
-                translationUpdaterSelector={(state) => state.updateIngredientTranslation}
+              <FieldTranslatable<FaqEntity, FaqTranslation, FaqTranslationStore>
+                fields={{ question: 'Question', answer: 'Answer' }}
+                baseEntityId={faq.id}
+                useStore={useFaqTranslationStore}
+                translationGetterSelector={(state) => state.getFaqTranslations}
+                translationUpdaterSelector={(state) => state.updateFaqTranslation}
                 translationsSelectorCreator={(ids) => (state) =>
-                  ids.map((id) => state.ingredientTranslations[id])}
+                  ids.map((id) => state.faqTranslations[id])}
               />
             </View>
           </>
