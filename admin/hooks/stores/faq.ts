@@ -109,8 +109,8 @@ const useFaqStore = create<FaqStoreState>(
       }))
       await prepareFaqUpdate(id, params)
     },
-    async searchFaqs(q: string) {
-      const { data } = await fetcher.get<Faq[]>(`/faq`, { params: { q } })
+    async searchFaqs(query: string) {
+      const { data } = await fetcher.get<Faq[]>(`/faq`, { params: { q: query } })
 
       const faqs = data.map((faq) => ({
         ...faq,

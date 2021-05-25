@@ -2,11 +2,11 @@ import Faq from '../models/faq'
 import Language from '../models/language'
 import FaqTranslation from '../models/faqTranslation'
 
-export function viewFaqs(faqs: Faq[], language: Language['id'] = 'FR') {
+export function viewFaqs(faqs: Faq[], language: Language['id'] = 'EN') {
   return faqs.map((faq) => viewFaq(faq, language))
 }
 
-export function viewFaq(faq: Faq, language: Language['id'] = 'FR') {
+export function viewFaq(faq: Faq, language: Language['id'] = 'EN') {
   let faqTranslation = faq.translations.find((t) => t.languageId === language)
 
   if (!faqTranslation) faqTranslation = faq.translations.find((t) => t.languageId === 'FR')

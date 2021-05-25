@@ -1,12 +1,55 @@
+import { FindManyOptions, FindOperator, In } from 'typeorm'
 import { RequestHandler } from 'express'
 
 import Faq from '../models/faq'
 import FaqTranslation from '../models/faqTranslation'
 import { viewFaq, viewFaqs, viewFaqTranslation, viewFaqWithTranslations } from '../views/faq'
 
+// const allowedFaqFilterKeys: (keyof FaqTranslation)[] = ['question', 'answer']
+// function GetAllowedFaqFilters(key: string): key is keyof FaqTranslation {
+//   return allowedFaqFilterKeys.includes(key as keyof FaqTranslation)
+// }
+
+// async function getFilters(
+//   query: Request['query'],
+// ): Promise<FindManyOptions<Faq>['where'] | undefined> {
+//   const where: FindManyOptions<FaqTranslation>['where'] = {}
+
+//   Object.entries(query).forEach(([key, value]) => {
+//     if (key && GetAllowedFaqFilters(key)) {
+//       if (key === 'question' || key === 'answer')
+//         where[key] = new FindOperator('ilike', `%${value}%`)
+//       else where[key] = value
+//     }
+//   })
+
+//   if (!Object.keys(where).length) return
+//   const translations = await FaqTranslation.find({ where })
+//   const faqIds = translations.map((translation) => translation.faqId)
+//   const whereFaq: FindManyOptions<Faq>['where'] = { id: In(faqIds) }
+//   return whereFaq
+// }
+
 export const getAllFaq: RequestHandler = async (req, res) => {
+  if (req.query.q) {
+    const translations = await FaqTranslation.find({
+      where: [
+        { question: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
+        { answer: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
+      ],
+    })
+    const faqIds = translations.map((translation) => translation.faqId)
+    const where: FindManyOptions<Faq>['where'] = { id: In(faqIds) }
+    const faqs = await Faq.find({
+      relations: ['translations'],
+      order: { id: 'ASC' },
+      where,
+    })
+    res.json(viewFaqs(faqs, req.params.lang?.toString()))
+    return
+  }
   const faqs = await Faq.find({ relations: ['translations'], order: { id: 'ASC' } })
-  res.json(viewFaqs(faqs, req.params.lang))
+  res.json(viewFaqs(faqs, req.params.lang?.toString()))
 }
 
 export const getFaqById: RequestHandler = async (req, res) => {

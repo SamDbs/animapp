@@ -25,7 +25,7 @@ export default function ContactList({ isLoading, style }: any) {
 
   const searchDebounced = useCallback(
     debounce(500, async (text: string) => {
-      const { ids } = await searchContacts({ name: text })
+      const { ids } = await searchContacts(text)
       setContactIds(ids)
     }),
     [],

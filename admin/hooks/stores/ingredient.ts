@@ -111,8 +111,8 @@ const useIngredientsStore = create<IngredientStoreState>(
       }))
       await prepareIngredientUpdate(id, params)
     },
-    async searchIngredients(q: string) {
-      const { data } = await fetcher.get<Ingredient[]>(`/ingredients`, { params: { q } })
+    async searchIngredients(query: string) {
+      const { data } = await fetcher.get<Ingredient[]>(`/ingredients`, { params: { q: query } })
 
       const ingredients = data.map((ingredient) => ({
         ...ingredient,
