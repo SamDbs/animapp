@@ -6,7 +6,10 @@ import { NotAuthorizedError } from '../middleware/errorHandler'
 import Admin from '../models/admin'
 
 export const authenticate: RequestHandler = async (req, res) => {
-  const admin = await Admin.findOneOrFail({ where: { login: req.body.login } })
+  const admin = await Admin.findOne({ where: { login: req.body.login } })
+
+  if (!admin) throw new NotAuthorizedError()
+
   const passwordIsCorrect = await compare(req.body.password, admin.password)
 
   if (!passwordIsCorrect) throw new NotAuthorizedError()

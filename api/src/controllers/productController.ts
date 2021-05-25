@@ -14,6 +14,7 @@ import ProductTranslation from '../models/productTranslation'
 import ProductAnalyticalConstituent from '../models/productAnalyticalConstituent'
 import AnalyticalConstituent from '../models/analyticalConstituent'
 import Image from '../models/image'
+import { MissingParamError } from '../middleware/errorHandler'
 
 const allowedProductFilterKeys: (keyof Product)[] = ['id', 'name', 'barCode']
 function GetAllowedProductFilters(key: string): key is keyof Product {
@@ -61,7 +62,7 @@ export const getProductById: RequestHandler = async (req, res) => {
 }
 
 export const createProduct: RequestHandler = async (req, res) => {
-  if (!req.body.name) throw new Error('A product needs a name')
+  if (!req.body.name) throw new MissingParamError('A product needs a name')
 
   const product = Product.create(req.body as Product)
   await product.save()

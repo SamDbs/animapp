@@ -5,6 +5,7 @@ import { EntityColumnNotFound } from 'typeorm/error/EntityColumnNotFound'
 
 export class NotFoundError extends Error {}
 export class NotAuthorizedError extends Error {}
+export class MissingParamError extends Error {}
 export class ConflictError extends Error {}
 
 export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
@@ -16,8 +17,8 @@ export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
     res.status(404).json({ message: 'Entity not found' })
     return
   }
-  if (error instanceof QueryFailedError) {
-    res.status(400).json({ message: 'Bad request' })
+  if (error instanceof QueryFailedError || error instanceof MissingParamError) {
+    res.status(400).json({ message: error?.message ?? 'Bad request' })
     return
   }
   if (error instanceof ConflictError) {
