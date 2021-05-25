@@ -19,7 +19,7 @@ export default function ProductCreator({ style }: any) {
       await createProduct(product)
       setProduct({ ...initialState })
     } catch (e) {
-      setError(e.message)
+      setError(e?.response?.data?.message ?? 'An unknown error occured.')
     } finally {
       setLoading(false)
     }

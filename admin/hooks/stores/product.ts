@@ -35,6 +35,7 @@ export type ProductStoreState = {
   getProducts: () => Promise<{ ids: Product['id'][] }>
   updateProduct: (id: Product['id'], params: Partial<Product>) => Promise<void>
   searchProducts: (filters: { name: Product['name'] }) => Promise<{ ids: Product['id'][] }>
+  createProduct: (params: { barCode: string; name: string; type: string }) => Promise<unknown>
 }
 
 const useProductsStore = create<ProductStoreState>(
