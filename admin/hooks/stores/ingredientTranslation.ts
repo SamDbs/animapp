@@ -10,7 +10,7 @@ import { AxiosInstance, AxiosRequestConfig } from 'axios'
 export type IngredientTranslation = {
   id: string
   ingredientId: Ingredient['id']
-  languageId: Ingredient['id']
+  languageId: Language['id']
   description: string
   review: string
   name: string
@@ -18,6 +18,7 @@ export type IngredientTranslation = {
 
 export type IngredientTranslationStore = {
   ingredientTranslations: Record<string, Partial<IngredientTranslation>>
+  creatingIds: string[]
   getIngredientTranslations: (
     ingredientId: Ingredient['id'],
   ) => Promise<{ ids: IngredientTranslation['id'][] }>
@@ -30,6 +31,8 @@ export type IngredientTranslationStore = {
     ingredientId: Ingredient['id'],
     languageId: Language['id'],
     description: string,
+    review: string,
+    name: string,
   ) => Promise<void>
 }
 
@@ -51,32 +54,37 @@ async function prepareIngredientTranslationsUpdate(
       ...params,
     },
   }
+  if (method === 'post') {
+    await sendIngredientTranslationUpdate(ingredientId, method)
+    return
+  }
   await sendIngredientTranslationUpdateDebounced(ingredientId, method)
 }
-
-const sendIngredientTranslationUpdateDebounced = debounce(
-  1000,
-  async (ingredientId: Ingredient['id'], method: AxiosRequestConfig['method']) => {
-    await Promise.all(
-      Object.keys(combinedIngredientTranslationsUpdate).map((key) =>
-        method === 'post'
-          ? fetcher(`/ingredients/${ingredientId}/translations`, {
-              method,
-              data: { languageId: key, ...combinedIngredientTranslationsUpdate[key] },
-            })
-          : fetcher(`/ingredients/${ingredientId}/translations/${key}`, {
-              method,
-              data: combinedIngredientTranslationsUpdate[key],
-            }),
-      ),
-    )
-    combinedIngredientTranslationsUpdate = {}
-  },
-)
+const sendIngredientTranslationUpdate = async (
+  ingredientId: Ingredient['id'],
+  method: AxiosRequestConfig['method'],
+) => {
+  await Promise.all(
+    Object.keys(combinedIngredientTranslationsUpdate).map((key) =>
+      method === 'post'
+        ? fetcher(`/ingredients/${ingredientId}/translations`, {
+            method,
+            data: { languageId: key, ...combinedIngredientTranslationsUpdate[key] },
+          })
+        : fetcher(`/ingredients/${ingredientId}/translations/${key}`, {
+            method,
+            data: combinedIngredientTranslationsUpdate[key],
+          }),
+    ),
+  )
+  combinedIngredientTranslationsUpdate = {}
+}
+const sendIngredientTranslationUpdateDebounced = debounce(1000, sendIngredientTranslationUpdate)
 
 const useIngredientTranslationStore = create<IngredientTranslationStore>(
   devtools((set, get) => ({
     ingredientTranslations: {},
+    creatingIds: [],
     async getIngredientTranslations(ingredientId: Ingredient['id']) {
       const { data } = await fetcher.get<IngredientTranslation[]>(
         `/ingredients/${ingredientId}/translations`,
@@ -101,18 +109,28 @@ const useIngredientTranslationStore = create<IngredientTranslationStore>(
       const id = `${ingredientId}-${languageId}`
       if (!get().ingredientTranslations[id]) {
         set((state) => ({
-          ingredientTranslations: { ...state.ingredientTranslations, [id]: {...params, languageId, ingredientId
-          } as any },
+          ingredientTranslations: {
+            ...state.ingredientTranslations,
+            [id]: { ...params, languageId, ingredientId } as any,
+          },
+          creatingIds: [...state.creatingIds, id],
         }))
-
         await prepareIngredientTranslationsUpdate(ingredientId, languageId, params, 'post')
+        set((state) => ({
+          ingredientTranslations: {
+            ...state.ingredientTranslations,
+            [id]: { ...state.ingredientTranslations[id] } as any,
+          },
+          creatingIds: state.creatingIds.filter(currentId => currentId !== id),
+        }))
         return
       }
+      if (get().creatingIds.includes(id)) return
       set((state) => ({
         ingredientTranslations: {
           ...state.ingredientTranslations,
-          [`${ingredientId}-${languageId}`]: {
-            ...state.ingredientTranslations[`${ingredientId}-${languageId}`],
+          [id]: {
+            ...state.ingredientTranslations[id],
             ...params,
           },
         },

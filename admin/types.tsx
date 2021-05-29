@@ -17,6 +17,7 @@ export type MainTabParamList = {
   ProductStack: undefined
   Contacts: undefined
   IngredientStack: undefined
+  FaqStack: undefined
 }
 
 export type ProductStackParamList = {
@@ -27,6 +28,11 @@ export type ProductStackParamList = {
 export type IngredientStackParamList = {
   Ingredients: undefined
   Ingredient: { id: string }
+}
+
+export type FaqStackParamList = {
+  Faqs: undefined
+  Faq: { id: string }
 }
 
 export type TabOneParamList = {

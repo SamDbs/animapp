@@ -1,5 +1,5 @@
 import { FindManyOptions, FindOperator, In } from 'typeorm'
-import { Request, RequestHandler } from 'express'
+import { RequestHandler } from 'express'
 
 import Image from '../models/image'
 import Ingredient from '../models/ingredient'
@@ -11,36 +11,28 @@ import {
   viewIngredientTranslations,
 } from '../views/ingredient'
 
-const allowedIngredientFilterKeys: (keyof IngredientTranslation)[] = ['name']
-function GetAllowedIngredientFilters(key: string): key is keyof IngredientTranslation {
-  return allowedIngredientFilterKeys.includes(key as keyof IngredientTranslation)
-}
-
-async function getFilters(
-  query: Request['query'],
-): Promise<FindManyOptions<Ingredient>['where'] | undefined> {
-  const where: FindManyOptions<IngredientTranslation>['where'] = {}
-
-  Object.entries(query).forEach(([key, value]) => {
-    if (key && GetAllowedIngredientFilters(key)) {
-      if (key === 'name') where[key] = new FindOperator('ilike', `%${value}%`)
-      else where[key] = value
-    }
-  })
-
-  if (!Object.keys(where).length) return
-  const translations = await IngredientTranslation.find({ where })
-  const ingredientIds = translations.map((translation) => translation.ingredientId)
-  const whereIngredient: FindManyOptions<Ingredient>['where'] = { id: In(ingredientIds) }
-  return whereIngredient
-}
-
 export const getAllIngredients: RequestHandler = async (req, res) => {
-  const where = await getFilters(req.query)
+  if (req.query.q) {
+    const translations = await IngredientTranslation.find({
+      where: [
+        { name: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
+        { description: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
+        { review: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
+      ],
+    })
+    const ingredientIds = translations.map((translation) => translation.ingredientId)
+    const where: FindManyOptions<Ingredient>['where'] = { id: In(ingredientIds) }
+    const ingredients = await Ingredient.find({
+      relations: ['translations'],
+      order: { id: 'ASC' },
+      where,
+    })
+    res.json(viewIngredients(ingredients, req.params.lang?.toString()))
+    return
+  }
   const ingredients = await Ingredient.find({
     relations: ['translations'],
     order: { id: 'ASC' },
-    where,
   })
   res.json(viewIngredients(ingredients, req.query.lang?.toString()))
 }

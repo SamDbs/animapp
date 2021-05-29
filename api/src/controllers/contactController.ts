@@ -1,34 +1,22 @@
-import { FindManyOptions, FindOperator } from 'typeorm'
-import { Request, RequestHandler } from 'express'
+import { FindOperator } from 'typeorm'
+import { RequestHandler } from 'express'
 
 import Contact from '../models/contact'
 import { viewContact, viewContacts } from '../views/contact'
 
-const allowedContactFilterKeys: (keyof Contact)[] = ['id', 'name', 'email', 'message']
-function GetAllowedContactFilters(key: string): key is keyof Contact {
-  return allowedContactFilterKeys.includes(key as keyof Contact)
-}
-
-function getFilters(query: Request['query']): FindManyOptions<Contact> | undefined {
-  const where: FindManyOptions<Contact>['where'] = {}
-  const options: FindManyOptions<Contact> = { where }
-
-  Object.entries(query).forEach(([key, value]) => {
-    if (key && GetAllowedContactFilters(key)) {
-      if (key === 'name' || key === 'email' || key === 'message')
-        where[key] = new FindOperator('ilike', `%${value}%`)
-      else where[key] = value
-    }
-  })
-
-  if (!Object.keys(where).length) return
-
-  return options
-}
-
 export const getAllContacts: RequestHandler = async (req, res) => {
-  const filters = getFilters(req.query)
-  const contacts = await Contact.find(filters)
+  if (req.query.q) {
+    const contacts = await Contact.find({
+      where: [
+        { email: new FindOperator('ilike', `%${req.query.q}%`) },
+        { name: new FindOperator('ilike', `%${req.query.q}%`) },
+        { message: new FindOperator('ilike', `%${req.query.q}%`) },
+      ],
+    })
+    res.json(viewContacts(contacts))
+    return
+  }
+  const contacts = await Contact.find()
   res.json(viewContacts(contacts))
 }
 

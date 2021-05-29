@@ -1,49 +1,57 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { Text, TextInput, View, ActivityIndicator } from 'react-native'
-
-import useContactsStore from '@hooks/stores/contact'
-import Card from '@components/Card'
 import { debounce } from 'lodash/fp'
+import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
+import React, { useCallback, useEffect, useState } from 'react'
 
-export default function ContactList({ isLoading, style }: any) {
-  const [ids, setContactIds] = useState<string[]>([])
-  const [registerIds, unregisterIds, getContacts, searchContacts] = useContactsStore((state) => [
-    state.registerIds,
-    state.unregisterIds,
-    state.getContacts,
-    state.searchContacts,
-  ])
+import useFaqStore from '@hooks/stores/faq'
+import Card from '@components/Card'
+
+export default function FaqList({ style }: { style: View['props']['style'] }) {
+  const [ids, setFaqIds] = useState<string[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const navigation = useNavigation()
+  const [registerIds, unregisterIds, getFaqs, searchFaqs] = useFaqStore(
+    (state) => [
+      state.registerIds,
+      state.unregisterIds,
+      state.getFaqs,
+      state.searchFaqs,
+    ],
+  )
+  const faqs = useFaqStore(
+    useCallback((state) => ids.map((id) => state.faqs[id]), [ids]),
+  )
 
   useEffect(() => {
     registerIds(ids)
     return () => unregisterIds(ids)
   }, [ids])
 
-  const contacts = useContactsStore(
-    useCallback((state) => ids.map((id) => state.contacts[id]), [ids]),
-  )
-
   const searchDebounced = useCallback(
     debounce(500, async (text: string) => {
-      const { ids } = await searchContacts(text)
-      setContactIds(ids)
+      setIsLoading(true)
+      const { ids } = await searchFaqs(text)
+      setFaqIds(ids)
+      setIsLoading(false)
     }),
     [],
   )
 
   useEffect(() => {
     async function fn() {
-      const { ids } = await getContacts()
-      setContactIds(ids)
+      setIsLoading(true)
+      const { ids } = await getFaqs()
+      setFaqIds(ids)
+      setIsLoading(false)
     }
     fn()
   }, [])
 
-  const noResult = !contacts.length
+  const noResult = !faqs.length
 
   return (
     <Card style={style}>
-      <Text style={{ fontSize: 18 }}>Contact list</Text>
+      <Text style={{ fontSize: 18 }}>Faq list</Text>
       <View
         style={{
           flexDirection: 'row',
@@ -78,18 +86,23 @@ export default function ContactList({ isLoading, style }: any) {
             <Text>No result.</Text>
           </View>
         )}
-        {contacts.filter(Boolean).map((contact: any, i: number) => {
+        {faqs.filter(Boolean).map((faq, i: number) => {
           return (
             <View
-              key={contact.id}
+              key={faq.id}
               style={{
                 padding: 8,
                 borderBottomColor: '#ccc',
-                borderBottomWidth: i === contacts.length - 1 ? 0 : 1,
+                borderBottomWidth: i === faqs.length - 1 ? 0 : 1,
                 backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
               }}>
-              <Text>{contact.name}</Text>
-              <Text>{contact.message}</Text>
+              <Text>{faq.question}</Text>
+              <Text>{faq.answer}</Text>
+              <Pressable onPress={() => navigation.navigate(`Faq`, { id: faq.id })}>
+                <Text style={{ cursor: 'pointer' }}>edit</Text>
+              </Pressable>
             </View>
           )
         })}

@@ -9,6 +9,7 @@ import Colors from '../../constants/Colors'
 import Menu from './components/Menu'
 import IngredientStack from './IngredientStack'
 import Contacts from './Contacts'
+import FaqStack from './FaqStack'
 import ProductStack from './ProductStack'
 
 const BottomTab = createBottomTabNavigator<MainTabParamList>()
@@ -25,6 +26,7 @@ export default function TabNavigator() {
         tabBar={() => null}>
         <BottomTab.Screen name="IngredientStack" component={IngredientStack} />
         <BottomTab.Screen name="Contacts" component={Contacts} />
+        <BottomTab.Screen name="FaqStack" component={FaqStack} />
         <BottomTab.Screen name="ProductStack" component={ProductStack} />
       </BottomTab.Navigator>
     </View>

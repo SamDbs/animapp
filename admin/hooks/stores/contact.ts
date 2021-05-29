@@ -3,6 +3,7 @@ import axios from 'axios'
 import create from 'zustand'
 import useAuthStore from '@hooks/stores/auth'
 import { keyBy, map, omit } from 'lodash'
+import { fetcher } from '.'
 
 export type Contact = {
   id: string
@@ -17,7 +18,7 @@ export type ContactStoreState = {
   registerIds: (ids: Contact['id'][]) => void
   unregisterIds: (ids: Contact['id'][]) => void
   getContacts: () => Promise<{ ids: Contact['id'][] }>
-  searchContacts: (params: { name: string }) => Promise<{ ids: Contact['id'][] }>
+  searchContacts: (query: string) => Promise<{ ids: Contact['id'][] }>
 }
 
 const useContactsStore = create<ContactStoreState>(
@@ -65,10 +66,7 @@ const useContactsStore = create<ContactStoreState>(
       })
     },
     async getContacts() {
-      const { jwt } = useAuthStore.getState()
-      const { data } = await axios.get<Contact[]>(`${process.env.API_URL}/contacts`, {
-        headers: { Authorization: jwt },
-      })
+      const { data } = await fetcher.get<Contact[]>(`/contacts`)
 
       const contacts = data.map((contact) => ({ ...contact, id: contact.id.toString() }))
 
@@ -78,11 +76,9 @@ const useContactsStore = create<ContactStoreState>(
       set((state) => ({ contacts: { ...state.contacts, ...entities } }))
       return { ids }
     },
-    async searchContacts(params: { name: string }) {
-      const { jwt } = useAuthStore.getState()
-      const { data } = await axios.get<Contact[]>(`${process.env.API_URL}/contacts`, {
-        headers: { Authorization: jwt },
-        params,
+    async searchContacts(query: string) {
+      const { data } = await fetcher.get<Contact[]>(`/contacts`, {
+        params: { q: query },
       })
 
       const contacts = data.map((contact) => ({ ...contact, id: contact.id.toString() }))
