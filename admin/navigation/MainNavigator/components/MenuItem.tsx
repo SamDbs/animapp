@@ -1,12 +1,14 @@
 import * as React from 'react'
-import { Text, View } from 'react-native'
+import { Pressable, Text } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 
-type Props = { title: string }
+type Props = { title: string; to: string }
 
-export default function MenuItem({ title }: Props) {
+export default function MenuItem({ to, title }: Props) {
+  const navigation = useNavigation()
   return (
-    <View style={{ padding: 16 }}>
+    <Pressable style={{ cursor: 'pointer', padding: 16 }} onPress={() => navigation.navigate(to)}>
       <Text style={{ fontSize: 14 }}>{title}</Text>
-    </View>
+    </Pressable>
   )
 }
