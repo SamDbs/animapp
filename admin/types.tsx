@@ -35,6 +35,11 @@ export type FaqStackParamList = {
   Faq: { id: string }
 }
 
+export type BrandStackParamList = {
+  Brands: undefined
+  Brand: { id: string }
+}
+
 export type TabOneParamList = {
   TabOneScreen: undefined
 }

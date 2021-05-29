@@ -26,6 +26,12 @@ export default {
               Product: 'products/:id',
             },
           },
+          BrandStack: {
+            screens: {
+              Brands: 'brands',
+              Brand: 'brands/:id',
+            },
+          },
         },
       },
       NotFound: '*',
