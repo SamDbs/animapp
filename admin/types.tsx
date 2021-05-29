@@ -14,15 +14,21 @@ export type AuthStackParamList = {
 }
 
 export type MainTabParamList = {
-  ProductStack: undefined
   Contacts: undefined
-  IngredientStack: undefined
   FaqStack: undefined
+  IngredientStack: undefined
+  LanguageStack: undefined
+  ProductStack: undefined
 }
 
 export type ProductStackParamList = {
   Products: undefined
   Product: { id: string }
+}
+
+export type LanguageStackParamList = {
+  Languages: undefined
+  Language: { id: string }
 }
 
 export type IngredientStackParamList = {

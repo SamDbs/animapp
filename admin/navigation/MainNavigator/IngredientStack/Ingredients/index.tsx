@@ -2,7 +2,6 @@ import React from 'react'
 import { Text, View } from 'react-native'
 
 import IngredientsList from './components/IngredientList'
-// import ProductCreator from './components/ProductCreator'
 
 function Header() {
   return (
@@ -17,7 +16,6 @@ export default function Ingredients() {
     <View style={{ flex: 1, padding: 16 }}>
       <Header />
       <IngredientsList style={{ marginBottom: 16 }} />
-      {/* <ProductCreator /> */}
     </View>
   )
 }
