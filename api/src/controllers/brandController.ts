@@ -1,33 +1,40 @@
-import { FindManyOptions, FindOperator } from 'typeorm'
-import { Request, RequestHandler } from 'express'
+import { FindOperator } from 'typeorm'
+import { RequestHandler } from 'express'
 
 import Brand from '../models/brand'
 import { ConflictError } from '../middleware/errorHandler'
 
-const allowedBrandFilterKeys: (keyof Brand)[] = ['id', 'name']
-function GetAllowedBrandFilters(key: string): key is keyof Brand {
-  return allowedBrandFilterKeys.includes(key as keyof Brand)
-}
+// const allowedBrandFilterKeys: (keyof Brand)[] = ['id', 'name']
+// function GetAllowedBrandFilters(key: string): key is keyof Brand {
+//   return allowedBrandFilterKeys.includes(key as keyof Brand)
+// }
 
-function getFilters(query: Request['query']): FindManyOptions<Brand> | undefined {
-  const where: FindManyOptions<Brand>['where'] = {}
-  const options: FindManyOptions<Brand> = { where }
+// function getFilters(query: Request['query']): FindManyOptions<Brand> | undefined {
+//   const where: FindManyOptions<Brand>['where'] = {}
+//   const options: FindManyOptions<Brand> = { where }
 
-  Object.entries(query).forEach(([key, value]) => {
-    if (key && GetAllowedBrandFilters(key)) {
-      if (key === 'name') where[key] = new FindOperator('ilike', `%${value}%`)
-      else where[key] = value
-    }
-  })
+//   Object.entries(query).forEach(([key, value]) => {
+//     if (key && GetAllowedBrandFilters(key)) {
+//       if (key === 'name') where[key] = new FindOperator('ilike', `%${value}%`)
+//       else where[key] = value
+//     }
+//   })
 
-  if (!Object.keys(where).length) return
+//   if (!Object.keys(where).length) return
 
-  return options
-}
+//   return options
+// }
 
 export const getAllBrands: RequestHandler = async (req, res) => {
-  const filters = getFilters(req.query)
-  const brands = await Brand.find(filters)
+  if (req.query.q) {
+    const brands = await Brand.find({
+      where: [{ name: new FindOperator('ilike', `%${req.query.q}%`) }],
+      order: { id: 'ASC' },
+    })
+    res.json(brands)
+    return
+  }
+  const brands = await Brand.find()
   res.json(brands)
 }
 

@@ -12,6 +12,8 @@ import LanguageStack from './LanguageStack'
 import Contacts from './Contacts'
 import FaqStack from './FaqStack'
 import ProductStack from './ProductStack'
+import BrandStack from './BrandStack'
+
 
 const BottomTab = createBottomTabNavigator<MainTabParamList>()
 
@@ -30,6 +32,8 @@ export default function TabNavigator() {
         <BottomTab.Screen name="LanguageStack" component={LanguageStack} />
         <BottomTab.Screen name="FaqStack" component={FaqStack} />
         <BottomTab.Screen name="ProductStack" component={ProductStack} />
+        <BottomTab.Screen name="BrandStack" component={BrandStack} />
+
       </BottomTab.Navigator>
     </View>
   )
