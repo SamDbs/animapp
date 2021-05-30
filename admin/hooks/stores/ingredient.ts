@@ -34,6 +34,7 @@ export type IngredientStoreState = {
   getIngredients: () => Promise<{ ids: Ingredient['id'][] }>
   updateIngredient: (id: Ingredient['id'], params: Partial<Ingredient>) => Promise<void>
   searchIngredients: (query: string) => Promise<{ ids: Ingredient['id'][] }>
+  createIngredient: () => Promise<unknown>
 }
 
 const useIngredientsStore = create<IngredientStoreState>(
@@ -124,6 +125,9 @@ const useIngredientsStore = create<IngredientStoreState>(
 
       set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
       return { ids }
+    },
+    createIngredient() {
+      return fetcher.post(`/ingredients`)
     },
   })),
 )

@@ -18,6 +18,8 @@ export type BrandStore = {
   getBrandById: (id: Brand['id']) => Promise<{ id: Brand['id'] }>
   updateBrand: (id: Brand['id'], params: Partial<Brand>) => Promise<void>
   searchBrands: (query: string) => Promise<{ ids: Brand['id'][] }>
+  createBrand: (params: { name: string }) => Promise<unknown>
+
 }
 
 let combinedBrandUpdate = {}
@@ -121,6 +123,9 @@ const useBrandStore = create<BrandStore>(
 
       set((state) => ({ brands: { ...state.brands, ...entities } }))
       return { ids }
+    },
+    createBrand(params: { name: string }) {
+      return fetcher.post(`/brands`, params)
     },
   })),
 )

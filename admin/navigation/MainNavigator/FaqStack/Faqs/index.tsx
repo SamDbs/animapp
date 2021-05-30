@@ -2,7 +2,7 @@ import React from 'react'
 import { Text, View } from 'react-native'
 
 import FaqList from './components/FaqList'
-// import ProductCreator from './components/ProductCreator'
+import FaqCreator from './components/FaqCreator'
 
 function Header() {
   return (
@@ -17,7 +17,7 @@ export default function Faqs() {
     <View style={{ flex: 1, padding: 16 }}>
       <Header />
       <FaqList style={{ marginBottom: 16 }} />
-      {/* <ProductCreator /> */}
+      <FaqCreator />
     </View>
   )
 }
