@@ -1,6 +1,6 @@
 import { debounce } from 'lodash/fp'
-import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { Text, TextInput, View, ActivityIndicator } from 'react-native'
+import { Link } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import useBrandStore from '@hooks/stores/brand'
@@ -9,18 +9,13 @@ import Card from '@components/Card'
 export default function BrandList({ style }: { style: View['props']['style'] }) {
   const [ids, setBrandIds] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const navigation = useNavigation()
-  const [registerIds, unregisterIds, getBrands, searchBrands] = useBrandStore(
-    (state) => [
-      state.registerIds,
-      state.unregisterIds,
-      state.getBrands,
-      state.searchBrands,
-    ],
-  )
-  const brands = useBrandStore(
-    useCallback((state) => ids.map((id) => state.brands[id]), [ids]),
-  )
+  const [registerIds, unregisterIds, getBrands, searchBrands] = useBrandStore((state) => [
+    state.registerIds,
+    state.unregisterIds,
+    state.getBrands,
+    state.searchBrands,
+  ])
+  const brands = useBrandStore(useCallback((state) => ids.map((id) => state.brands[id]), [ids]))
 
   useEffect(() => {
     registerIds(ids)
@@ -99,9 +94,9 @@ export default function BrandList({ style }: { style: View['props']['style'] }) 
                 justifyContent: 'space-between',
               }}>
               <Text>{brand.name}</Text>
-              <Pressable onPress={() => navigation.navigate(`Brand`, { id: brand.id })}>
+              <Link to={`/brands/${brand.id}`}>
                 <Text style={{ cursor: 'pointer' }}>edit</Text>
-              </Pressable>
+              </Link>
             </View>
           )
         })}

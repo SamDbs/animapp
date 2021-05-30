@@ -3,7 +3,6 @@ import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect, useState } from 'react'
 
 import Card from '@components/Card'
-import FieldWithLabel from '@components/FieldWithLabel'
 import FieldTranslatable from '@components/FieldTranslatable'
 import useFaqStore, { Faq as FaqEntity } from '@hooks/stores/faq'
 
@@ -12,21 +11,18 @@ import useFaqTranslationStore, {
   FaqTranslation,
   FaqTranslationStore,
 } from '@hooks/stores/faqTranslation'
+import { PageHeader } from '@components/Themed'
 
-export default function Faq(
-  props: StackScreenProps<FaqStackParamList, 'Faq'>,
-) {
+export default function Faq(props: StackScreenProps<FaqStackParamList, 'Faq'>) {
   const [id, setId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const faq = useFaqStore((state) => state.faqs[props.route.params.id])
-  const [registerIds, unregisterIds, getFaqById, updateFaq] = useFaqStore(
-    (state) => [
-      state.registerIds,
-      state.unregisterIds,
-      state.getFaqById,
-      state.updateFaq,
-    ],
-  )
+  const [registerIds, unregisterIds, getFaqById, updateFaq] = useFaqStore((state) => [
+    state.registerIds,
+    state.unregisterIds,
+    state.getFaqById,
+    state.updateFaq,
+  ])
 
   useEffect(() => {
     if (!faq) return
@@ -46,6 +42,7 @@ export default function Faq(
 
   return (
     <ScrollView style={{ padding: 16 }}>
+      <PageHeader>Question &amp; Answer</PageHeader>
       <Card>
         {isLoading && !faq && <ActivityIndicator />}
         {faq && (

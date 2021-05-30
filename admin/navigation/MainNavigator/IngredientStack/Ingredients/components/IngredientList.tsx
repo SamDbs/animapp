@@ -1,6 +1,6 @@
 import { debounce } from 'lodash/fp'
-import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { Text, TextInput, View, ActivityIndicator } from 'react-native'
+import { Link } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import useIngredientsStore from '@hooks/stores/ingredient'
@@ -9,15 +9,17 @@ import Card from '@components/Card'
 export default function IngredientList({ style }: { style: View['props']['style'] }) {
   const [ids, setIngredientIds] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const navigation = useNavigation()
-  const [registerIds, unregisterIds, getIngredients, searchIngredients] = useIngredientsStore(
-    (state) => [
-      state.registerIds,
-      state.unregisterIds,
-      state.getIngredients,
-      state.searchIngredients,
-    ],
-  )
+  const [
+    registerIds,
+    unregisterIds,
+    getIngredients,
+    searchIngredients,
+  ] = useIngredientsStore((state) => [
+    state.registerIds,
+    state.unregisterIds,
+    state.getIngredients,
+    state.searchIngredients,
+  ])
   const ingredients = useIngredientsStore(
     useCallback((state) => ids.map((id) => state.ingredients[id]), [ids]),
   )
@@ -102,9 +104,9 @@ export default function IngredientList({ style }: { style: View['props']['style'
               <Text>{ingredient.review}</Text>
               <Text>{ingredient.description}</Text>
               <Text>{ingredient.image}</Text>
-              <Pressable onPress={() => navigation.navigate(`Ingredient`, { id: ingredient.id })}>
+              <Link to={`/ingredients/${ingredient.id}`}>
                 <Text style={{ cursor: 'pointer' }}>edit</Text>
-              </Pressable>
+              </Link>
             </View>
           )
         })}

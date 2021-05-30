@@ -6,15 +6,15 @@ import type { StateSelector, UseStore } from 'zustand'
 import type { Product } from '@hooks/stores/product'
 import type { ProductTranslation } from '@hooks/stores/productTranslation'
 import useLanguagesStore, { Language } from '@hooks/stores/languages'
-import { Ingredient } from '@hooks/stores/ingredient'
-import { IngredientTranslation } from '@hooks/stores/ingredientTranslation'
-import { Faq } from '@hooks/stores/faq'
-import { FaqTranslation } from '@hooks/stores/faqTranslation'
+import type { Ingredient } from '@hooks/stores/ingredient'
+import type { IngredientTranslation } from '@hooks/stores/ingredientTranslation'
+import type { Faq } from '@hooks/stores/faq'
+import type { FaqTranslation } from '@hooks/stores/faqTranslation'
 
 type Props<
   Item extends Product | Ingredient | Faq,
   ItemTranslation extends ProductTranslation | IngredientTranslation | FaqTranslation,
-  StoreShape extends object,
+  StoreShape extends object
 > = {
   baseEntityId: Item['id']
   fields: Partial<Record<keyof ItemTranslation, string>>
@@ -39,7 +39,7 @@ type Props<
 export default function FieldTranslatable<
   Item extends Product | Ingredient | Faq,
   ItemTranslation extends ProductTranslation | IngredientTranslation | FaqTranslation,
-  StoreShape extends object,
+  StoreShape extends object
 >({
   baseEntityId,
   fields,
@@ -63,10 +63,10 @@ export default function FieldTranslatable<
 
   const languageIds = Object.keys(languages)
 
-  useEffect(() => {
-    console.log('should register the id here')
-    return () => console.log('should unregister here')
-  }, [ids])
+  // useEffect(() => {
+  //   console.log('should register the id here')
+  //   return () => console.log('should unregister here')
+  // }, [ids])
 
   useEffect(() => {
     async function init() {
@@ -77,7 +77,7 @@ export default function FieldTranslatable<
       setIsLoading(false)
     }
     init()
-  }, [])
+  }, [baseEntityId])
 
   if (isLoading) return null
 
@@ -148,7 +148,7 @@ export default function FieldTranslatable<
                             updateTranslation(
                               baseEntityId,
                               language.id,
-                              newValue[translationId] as unknown as Partial<ItemTranslation>,
+                              (newValue[translationId] as unknown) as Partial<ItemTranslation>,
                             )
                           }}
                           defaultValue={currentTranslation ? currentTranslation[field] : ''}

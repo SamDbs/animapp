@@ -9,7 +9,10 @@ const Stack = createStackNavigator<LanguageStackParamList>()
 
 export default function IngredientStack() {
   return (
-    <Stack.Navigator initialRouteName="Languages" screenOptions={{ animationEnabled: true }}>
+    <Stack.Navigator
+      headerMode="none"
+      initialRouteName="Languages"
+      screenOptions={{ animationEnabled: true }}>
       <Stack.Screen name="Languages" component={Languages} />
       <Stack.Screen name="Language" component={Language} />
     </Stack.Navigator>

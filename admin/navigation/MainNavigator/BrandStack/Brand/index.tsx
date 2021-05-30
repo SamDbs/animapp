@@ -3,26 +3,22 @@ import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect, useState } from 'react'
 
 import Card from '@components/Card'
-import useBrandStore, { Brand as BrandEntity, BrandStore } from '@hooks/stores/brand'
+import useBrandStore from '@hooks/stores/brand'
 
 import { BrandStackParamList } from '../../../../types'
 import FieldWithLabel from '@components/FieldWithLabel'
+import { PageHeader } from '@components/Themed'
 
-
-export default function Brand(
-  props: StackScreenProps<BrandStackParamList, 'Brand'>,
-) {
+export default function Brand(props: StackScreenProps<BrandStackParamList, 'Brand'>) {
   const [id, setId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const brand = useBrandStore((state) => state.brands[props.route.params.id])
-  const [registerIds, unregisterIds, getBrandById, updateBrand] = useBrandStore(
-    (state) => [
-      state.registerIds,
-      state.unregisterIds,
-      state.getBrandById,
-      state.updateBrand,
-    ],
-  )
+  const [registerIds, unregisterIds, getBrandById, updateBrand] = useBrandStore((state) => [
+    state.registerIds,
+    state.unregisterIds,
+    state.getBrandById,
+    state.updateBrand,
+  ])
 
   useEffect(() => {
     if (!brand) return
@@ -42,6 +38,7 @@ export default function Brand(
 
   return (
     <ScrollView style={{ padding: 16 }}>
+      <PageHeader>Brand</PageHeader>
       <Card>
         {isLoading && !brand && <ActivityIndicator />}
         {brand && (
@@ -67,7 +64,7 @@ export default function Brand(
               />
             </View>
             <View>
-            <FieldWithLabel
+              <FieldWithLabel
                 label="Name"
                 value={brand.name}
                 onChangeValue={(val) => updateBrand(brand.id, { name: val })}

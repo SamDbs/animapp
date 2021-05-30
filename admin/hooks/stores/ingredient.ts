@@ -3,6 +3,7 @@ import create from 'zustand'
 import { debounce, keyBy, omit } from 'lodash/fp'
 
 import { fetcher } from './index'
+import { Product } from './product'
 
 export type Ingredient = {
   id: string
@@ -25,7 +26,7 @@ const sendIngredientCombinedUpdateDebounce = debounce(
   },
 )
 
-export type IngredientStoreState = {
+export type IngredientStore = {
   ingredients: Record<Ingredient['id'], Ingredient>
   usedIngredientIds: Record<Ingredient['id'], number>
   registerIds: (ids: Ingredient['id'][]) => void
@@ -35,9 +36,10 @@ export type IngredientStoreState = {
   updateIngredient: (id: Ingredient['id'], params: Partial<Ingredient>) => Promise<void>
   searchIngredients: (query: string) => Promise<{ ids: Ingredient['id'][] }>
   createIngredient: () => Promise<unknown>
+  getIngredientsByProductId: (productId: Product['id']) => Promise<{ ids: Ingredient['id'][] }>
 }
 
-const useIngredientsStore = create<IngredientStoreState>(
+const useIngredientsStore = create<IngredientStore>(
   devtools((set) => ({
     ingredients: {},
     usedIngredientIds: {},
@@ -128,6 +130,21 @@ const useIngredientsStore = create<IngredientStoreState>(
     },
     createIngredient() {
       return fetcher.post(`/ingredients`)
+    },
+    async getIngredientsByProductId(productId) {
+      const { data } = await fetcher.get<Ingredient[]>(`/products/${productId}/ingredients`)
+
+      const ingredients = data.map((ingredient) => ({
+        ...ingredient,
+        id: ingredient.id.toString(),
+      }))
+
+      const ids = ingredients.map((ingredient) => ingredient.id)
+      const entities = keyBy((ingredient) => ingredient.id, ingredients)
+
+      set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
+
+      return { ids }
     },
   })),
 )
