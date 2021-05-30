@@ -118,6 +118,8 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             ownerEntityId={product.id}
             ownedItemsGetterSelector={(state) => state.getIngredientsByProductId}
             ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.ingredients[id])}
+            registerOwnedIdsSelector={(state) => state.registerIds}
+            unregisterOwnedIdsSelector={(state) => state.unregisterIds}
           />
         )}
       </Card>

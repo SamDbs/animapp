@@ -18,7 +18,7 @@ export default function Ingredient(
 ) {
   const [id, setId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const ingredient = useIngredientsStore((state) => state.ingredients[props.route.params.id])
+  const ingredient = useIngredientsStore((state) => state.ingredients[props.route.params?.id])
   const [registerIds, unregisterIds, getIngredientById] = useIngredientsStore((state) => [
     state.registerIds,
     state.unregisterIds,
@@ -32,6 +32,7 @@ export default function Ingredient(
   }, [id])
 
   useEffect(() => {
+    if (!props.route.params?.id) return
     async function fn() {
       setIsLoading(true)
       const { id } = await getIngredientById(props.route.params.id)
@@ -39,7 +40,7 @@ export default function Ingredient(
       setIsLoading(false)
     }
     fn()
-  }, [props.route.params.id])
+  }, [props.route.params?.id])
 
   return (
     <ScrollView style={{ padding: 16 }}>

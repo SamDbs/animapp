@@ -16,6 +16,8 @@ type Props<OwnerItem extends Product, OwnedItem extends Ingredient, StoreShape e
   ownedItemsSelectorCreator: (
     ids: OwnedItem['id'][],
   ) => StateSelector<StoreShape, Partial<OwnedItem>[]>
+  registerOwnedIdsSelector: StateSelector<StoreShape, (ids: OwnedItem['id'][]) => void>
+  unregisterOwnedIdsSelector: StateSelector<StoreShape, (ids: OwnedItem['id'][]) => void>
 }
 
 export default function ManyToMany<
@@ -27,13 +29,18 @@ export default function ManyToMany<
   useOwnedStore,
   ownedItemsGetterSelector,
   ownedItemsSelectorCreator,
+  registerOwnedIdsSelector,
+  unregisterOwnedIdsSelector,
 }: Props<OwnerItem, OwnedItem, StoreShape>) {
   const [ids, setIds] = useState<OwnedItem['id'][]>([])
   const [isLoading, setIsLoading] = useState(false)
   const getOwnedByOwnerId = useOwnedStore(ownedItemsGetterSelector)
   const ownedEntities = useOwnedStore(useCallback(ownedItemsSelectorCreator(ids), [ids]))
+  const registerOwnedIds = useOwnedStore(registerOwnedIdsSelector)
+  const unregisterOwnedIds = useOwnedStore(unregisterOwnedIdsSelector)
 
   useEffect(() => {
+    console.log('ownerEntityId', ownerEntityId)
     async function init() {
       setIsLoading(true)
       const { ids } = await getOwnedByOwnerId(ownerEntityId)
@@ -42,6 +49,11 @@ export default function ManyToMany<
     }
     init()
   }, [ownerEntityId])
+
+  useEffect(() => {
+    registerOwnedIds(ids)
+    return () => unregisterOwnedIds(ids)
+  }, [ids])
 
   if (isLoading) return <ActivityIndicator />
 
