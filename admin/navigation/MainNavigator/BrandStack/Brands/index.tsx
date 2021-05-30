@@ -2,7 +2,7 @@ import React from 'react'
 import { Text, View } from 'react-native'
 
 import BrandList from './components/BrandList'
-// import ProductCreator from './components/ProductCreator'
+import BrandCreator from './components/BrandCreator'
 
 function Header() {
   return (
@@ -17,7 +17,7 @@ export default function Brands() {
     <View style={{ flex: 1, padding: 16 }}>
       <Header />
       <BrandList style={{ marginBottom: 16 }} />
-      {/* <ProductCreator /> */}
+      <BrandCreator />
     </View>
   )
 }

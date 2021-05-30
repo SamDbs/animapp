@@ -32,6 +32,7 @@ export type FaqStoreState = {
   getFaqs: () => Promise<{ ids: Faq['id'][] }>
   updateFaq: (id: Faq['id'], params: Partial<Faq>) => Promise<void>
   searchFaqs: (query: string) => Promise<{ ids: Faq['id'][] }>
+  createFaq: () => Promise<unknown>
 }
 
 const useFaqStore = create<FaqStoreState>(
@@ -122,6 +123,9 @@ const useFaqStore = create<FaqStoreState>(
 
       set((state) => ({ faqs: { ...state.faqs, ...entities } }))
       return { ids }
+    },
+    createFaq() {
+      return fetcher.post(`/faq`)
     },
   })),
 )
