@@ -1,10 +1,11 @@
-import { FindManyOptions, FindOperator } from 'typeorm'
-import { Request, RequestHandler } from 'express'
+import { FindManyOptions, FindOperator, In } from 'typeorm'
+import { RequestHandler } from 'express'
 
 import {
   viewAnalyticalConstituent,
   viewAnalyticalConstituents,
   viewProduct,
+  viewProducts,
   viewProductTranslation,
   viewProductTranslations,
 } from '../views/product'
@@ -16,31 +17,34 @@ import AnalyticalConstituent from '../models/analyticalConstituent'
 import Image from '../models/image'
 import { MissingParamError } from '../middleware/errorHandler'
 
-const allowedProductFilterKeys: (keyof Product)[] = ['id', 'name', 'barCode']
-function GetAllowedProductFilters(key: string): key is keyof Product {
-  return allowedProductFilterKeys.includes(key as keyof Product)
-}
-
-function getFilters(query: Request['query']): FindManyOptions<Product> | undefined {
-  const where: FindManyOptions<Product>['where'] = {}
-  const options: FindManyOptions<Product> = { where }
-
-  Object.entries(query).forEach(([key, value]) => {
-    if (key && GetAllowedProductFilters(key)) {
-      if (key === 'name') where[key] = new FindOperator('ilike', `%${value}%`)
-      else where[key] = value
-    }
-  })
-
-  if (!Object.keys(where).length) return
-
-  return options
-}
-
 export const getAllProducts: RequestHandler = async (req, res) => {
-  const filters = getFilters(req.query)
-  const products = await Product.find(filters)
-  res.json(products)
+  if (req.query.q) {
+    const translations = await ProductTranslation.find({
+      where: { description: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
+    })
+
+    const productIds = translations.map((translation) => translation.productId)
+    const where: FindManyOptions<Product>['where'] = [
+      { id: In(productIds) },
+      { name: new FindOperator('ilike', `%${req.query.q}%`) },
+    ]
+
+    console.log('okokkkk')
+    const products = await Product.find({
+      relations: ['translations'],
+      order: { id: 'ASC' },
+      where,
+    })
+    console.log('okokkkk 2')
+    res.json(viewProducts(products, req.params.lang?.toString()))
+    return
+  }
+
+  const products = await Product.find({
+    relations: ['translations'],
+    order: { id: 'ASC' },
+  })
+  res.json(viewProducts(products, req.query.lang?.toString()))
 }
 
 export const getProductById: RequestHandler = async (req, res) => {

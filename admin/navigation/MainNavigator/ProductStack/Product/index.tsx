@@ -22,19 +22,15 @@ import { PageHeader } from '@components/Themed'
 export default function Product(props: StackScreenProps<ProductStackParamList, 'Product'>) {
   const [id, setId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [
-    product,
-    registerIds,
-    unregisterIds,
-    getProductById,
-    updateProduct,
-  ] = useProductsStore((state) => [
-    state.products[props.route.params.id],
-    state.registerIds,
-    state.unregisterIds,
-    state.getProductById,
-    state.updateProduct,
-  ])
+  const [product, registerIds, unregisterIds, getProductById, updateProduct] = useProductsStore(
+    (state) => [
+      state.products[props.route.params.id],
+      state.registerIds,
+      state.unregisterIds,
+      state.getProductById,
+      state.updateProduct,
+    ],
+  )
 
   useEffect(() => {
     if (!product) return
@@ -120,6 +116,8 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.ingredients[id])}
             registerOwnedIdsSelector={(state) => state.registerIds}
             unregisterOwnedIdsSelector={(state) => state.unregisterIds}
+            getItemsSelector={(state) => state.getIngredients}
+            searchItemsSelector={(state) => state.searchIngredients}
           />
         )}
       </Card>

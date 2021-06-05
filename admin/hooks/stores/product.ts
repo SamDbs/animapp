@@ -26,7 +26,7 @@ const sendProductCombinedUpdateDebounce = debounce(
   },
 )
 
-export type ProductStoreState = {
+export type ProductStore = {
   products: Record<Product['id'], Product>
   usedProductIds: Record<Product['id'], number>
   registerIds: (ids: Product['id'][]) => void
@@ -34,11 +34,11 @@ export type ProductStoreState = {
   getProductById: (id: Product['id']) => Promise<{ id: Product['id'] }>
   getProducts: () => Promise<{ ids: Product['id'][] }>
   updateProduct: (id: Product['id'], params: Partial<Product>) => Promise<void>
-  searchProducts: (filters: { name: Product['name'] }) => Promise<{ ids: Product['id'][] }>
+  searchProducts: (text: Product['name']) => Promise<{ ids: Product['id'][] }>
   createProduct: (params: { barCode: string; name: string; type: string }) => Promise<unknown>
 }
 
-const useProductsStore = create<ProductStoreState>(
+const useProductsStore = create<ProductStore>(
   devtools((set) => ({
     products: {},
     usedProductIds: {},
@@ -107,8 +107,8 @@ const useProductsStore = create<ProductStoreState>(
       }))
       await prepareProductUpdate(id, params)
     },
-    async searchProducts(params: { name: string }) {
-      const { data } = await fetcher.get<Product[]>(`/products`, { params })
+    async searchProducts(text: string) {
+      const { data } = await fetcher.get<Product[]>(`/products`, { params: { q: text } })
 
       const products = data.map((product) => ({ ...product, id: product.id.toString() }))
 

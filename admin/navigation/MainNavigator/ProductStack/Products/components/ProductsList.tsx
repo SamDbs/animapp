@@ -1,50 +1,23 @@
-import { debounce } from 'lodash/fp'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 import { Link } from '@react-navigation/native'
-import React, { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 
-import useProductsStore from '@hooks/stores/product'
+import useProductsStore, { ProductStore, Product } from '@hooks/stores/product'
 import Card from '@components/Card'
+import useSearchableList from '@hooks/useSearchableList'
 
 export default function ProductList({ style }: { style: View['props']['style'] }) {
-  const [ids, setProductIds] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [registerIds, unregisterIds, getProducts, searchProducts] = useProductsStore((state) => [
-    state.registerIds,
-    state.unregisterIds,
-    state.getProducts,
-    state.searchProducts,
-  ])
-  const products = useProductsStore(
-    useCallback((state) => ids.map((id) => state.products[id]), [ids]),
+  const {
+    isLoading,
+    items: products,
+    noResult,
+    searchDebounced,
+  } = useSearchableList<ProductStore, Product>(
+    useProductsStore,
+    (state) => state.getProducts,
+    (state) => state.searchProducts,
+    (ids) => (state) => ids.map((id) => state.products[id]),
   )
-
-  useEffect(() => {
-    registerIds(ids)
-    return () => unregisterIds(ids)
-  }, [ids])
-
-  const searchDebounced = useCallback(
-    debounce(500, async (text: string) => {
-      setIsLoading(true)
-      const { ids } = await searchProducts({ name: text })
-      setProductIds(ids)
-      setIsLoading(false)
-    }),
-    [],
-  )
-
-  useEffect(() => {
-    async function fn() {
-      setIsLoading(true)
-      const { ids } = await getProducts()
-      setProductIds(ids)
-      setIsLoading(false)
-    }
-    fn()
-  }, [])
-
-  const noResult = !products.length
 
   return (
     <Card style={style}>

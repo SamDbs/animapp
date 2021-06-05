@@ -1,5 +1,4 @@
 import { Text, TextInput, View } from 'react-native'
-import { Picker } from '@react-native-picker/picker'
 import React, { useCallback, useEffect, useState } from 'react'
 import type { StateSelector, UseStore } from 'zustand'
 
@@ -14,7 +13,7 @@ import type { FaqTranslation } from '@hooks/stores/faqTranslation'
 type Props<
   Item extends Product | Ingredient | Faq,
   ItemTranslation extends ProductTranslation | IngredientTranslation | FaqTranslation,
-  StoreShape extends object
+  StoreShape extends object,
 > = {
   baseEntityId: Item['id']
   fields: Partial<Record<keyof ItemTranslation, string>>
@@ -39,7 +38,7 @@ type Props<
 export default function FieldTranslatable<
   Item extends Product | Ingredient | Faq,
   ItemTranslation extends ProductTranslation | IngredientTranslation | FaqTranslation,
-  StoreShape extends object
+  StoreShape extends object,
 >({
   baseEntityId,
   fields,
@@ -148,7 +147,7 @@ export default function FieldTranslatable<
                             updateTranslation(
                               baseEntityId,
                               language.id,
-                              (newValue[translationId] as unknown) as Partial<ItemTranslation>,
+                              newValue[translationId] as unknown as Partial<ItemTranslation>,
                             )
                           }}
                           defaultValue={currentTranslation ? currentTranslation[field] : ''}
