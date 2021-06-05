@@ -9,7 +9,7 @@ import { AxiosInstance, AxiosRequestConfig } from 'axios'
 
 export type ConstituentTranslation = {
   id: string
-  constituentId: Constituent['id']
+  analyticalConstituentId: Constituent['id']
   languageId: Language['id']
   description: string
   name: string
@@ -35,7 +35,7 @@ export type ConstituentTranslationStore = {
 }
 
 let combinedConstituentTranslationsUpdate: Record<
-ConstituentTranslation['languageId'],
+  ConstituentTranslation['languageId'],
   Partial<ConstituentTranslation>
 > = {}
 
@@ -87,16 +87,17 @@ const useConstituentTranslationStore = create<ConstituentTranslationStore>(
       const { data } = await fetcher.get<ConstituentTranslation[]>(
         `/analyticalConstituents/${constituentId}/translations`,
       )
-
       const translations = data.map((translation) => ({
         ...translation,
-        id: `${translation.constituentId.toString()}-${translation.languageId.toString()}`,
+        id: `${translation.analyticalConstituentId.toString()}-${translation.languageId.toString()}`,
       }))
 
       const ids = translations.map((translation) => translation.id)
       const entities = keyBy((translation) => translation.id, translations)
 
-      set((state) => ({ constituentTranslations: { ...state.constituentTranslations, ...entities } }))
+      set((state) => ({
+        constituentTranslations: { ...state.constituentTranslations, ...entities },
+      }))
       return { ids }
     },
     async updateConstituentTranslation(
@@ -119,7 +120,7 @@ const useConstituentTranslationStore = create<ConstituentTranslationStore>(
             ...state.constituentTranslations,
             [id]: { ...state.constituentTranslations[id] } as any,
           },
-          creatingIds: state.creatingIds.filter(currentId => currentId !== id),
+          creatingIds: state.creatingIds.filter((currentId) => currentId !== id),
         }))
         return
       }

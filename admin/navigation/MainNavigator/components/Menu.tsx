@@ -10,9 +10,11 @@ export default function Menu() {
       <MenuItem title="Brands" to="BrandStack" />
       <MenuItem title="Products" to="ProductStack" />
       <MenuItem title="Ingredients" to="IngredientStack" />
+      <MenuItem title="Analytical Constituents" to="ConstituentStack" />
       <MenuItem title="Languages" to="LanguageStack" />
       <MenuItem title="FAQ" to="FaqStack" />
       <MenuItem title="Contacts" to="Contacts" />
+
     </View>
   )
 }
