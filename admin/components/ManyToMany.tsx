@@ -7,6 +7,31 @@ import { Ingredient } from '@hooks/stores/ingredient'
 import { Product } from '@hooks/stores/product'
 import useSearchableList from '@hooks/useSearchableList'
 
+type SubItemProps<OwnedItem extends Ingredient> = {
+  children: JSX.Element
+  item: Partial<OwnedItem>
+  entityLinkCreator: (entity: Partial<OwnedItem>) => string
+  even: boolean
+}
+
+function SubItem<OwnedItem extends Ingredient>(props: SubItemProps<OwnedItem>) {
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 8,
+        backgroundColor: props.even ? '#f5f5f5' : '#fff',
+        alignItems: 'center',
+      }}>
+      <Link to={props.entityLinkCreator(props.item)}>
+        <Text>{props.item.name}</Text>
+      </Link>
+      <View>{props.children}</View>
+    </View>
+  )
+}
+
 type Props<
   OwnerItem extends Product,
   OwnedItem extends Ingredient,
@@ -31,6 +56,7 @@ type Props<
 
   getItemsSelector: StateSelector<StoreShape, () => Promise<{ ids: string[] }>>
   searchItemsSelector: StateSelector<StoreShape, (str: string) => Promise<{ ids: string[] }>>
+  ownedEntityLinkCreator: (item: Partial<OwnedItem>) => string
 }
 
 export default function ManyToMany<
@@ -51,6 +77,7 @@ export default function ManyToMany<
   getItemsSelector,
   searchItemsSelector,
   relationParams,
+  ownedEntityLinkCreator,
 }: Props<OwnerItem, OwnedItem, StoreShape, RelationParams>) {
   const [ids, setIds] = useState<OwnedItem['id'][]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -59,7 +86,7 @@ export default function ManyToMany<
   const ownedEntities = useOwnedStore(ownedItemsSelector)
   const registerOwnedIds = useOwnedStore(registerOwnedIdsSelector)
   const unregisterOwnedIds = useOwnedStore(unregisterOwnedIdsSelector)
-
+  const [editing, setEditing] = useState(false)
   const {
     isLoading: isLoadingOwnedItems,
     items: ownedItems,
@@ -91,13 +118,27 @@ export default function ManyToMany<
 
   return (
     <View>
-      {ownedEntities.filter(Boolean).map((entity, i) => (
-        <Link key={i} to={`/ingredients/${entity.id}`}>
-          <Text>{entity.name}</Text>
-        </Link>
-      ))}
-      <View>
-        <View>
+      <View
+        style={{
+          marginTop: 16,
+          borderColor: '#ccc',
+          borderWidth: 1,
+          borderRadius: 3,
+          overflow: 'hidden',
+        }}>
+        {ownedEntities.filter(Boolean).map((item, i) => (
+          <SubItem<OwnedItem>
+            key={item.id}
+            entityLinkCreator={ownedEntityLinkCreator}
+            item={item}
+            even={i % 2 === 0}>
+            <Button title="Unlink" onPress={() => console.log('oui')} color="#c00" />
+          </SubItem>
+        ))}
+      </View>
+      {editing && (
+        <>
+          <Text style={{ marginTop: 16 }}>Link new items</Text>
           <TextInput
             style={{
               borderColor: '#ccc',
@@ -110,26 +151,33 @@ export default function ManyToMany<
             onChangeText={searchOwnedItems}
             placeholder="Search"
           />
-          {isLoadingOwnedItems && <ActivityIndicator />}
-          {!noResultOwnedItems &&
-            ownedItems
-              .filter((item) => !ids.includes(item.id as string))
-              .map((item) => {
-                return (
-                  <View
-                    key={item.id}
-                    style={{
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      marginBottom: 8,
-                    }}>
-                    <Text>{item.name}</Text>
-                    <Button title="Link" onPress={() => console.log('oui')} />
-                  </View>
-                )
-              })}
-        </View>
-      </View>
+          <View
+            style={{
+              marginTop: 16,
+              borderColor: '#ccc',
+              borderWidth: 1,
+              borderRadius: 3,
+              overflow: 'hidden',
+            }}>
+            {isLoadingOwnedItems && <ActivityIndicator />}
+            {!noResultOwnedItems &&
+              ownedItems
+                .filter((item) => !ids.includes(item.id as string))
+                .map((item, i) => {
+                  return (
+                    <SubItem<OwnedItem>
+                      key={item.id}
+                      entityLinkCreator={ownedEntityLinkCreator}
+                      item={item}
+                      even={i % 2 === 0}>
+                      <Button title="Link" onPress={() => console.log('oui')} />
+                    </SubItem>
+                  )
+                })}
+          </View>
+        </>
+      )}
+      <Button title={editing ? 'Close' : 'Edit'} onPress={() => setEditing((x) => !x)} />
     </View>
   )
 }

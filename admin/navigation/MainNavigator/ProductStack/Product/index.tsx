@@ -118,6 +118,7 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             unregisterOwnedIdsSelector={(state) => state.unregisterIds}
             getItemsSelector={(state) => state.getIngredients}
             searchItemsSelector={(state) => state.searchIngredients}
+            ownedEntityLinkCreator={(item) => `/ingredients/${item.id}`}
           />
         )}
       </Card>
