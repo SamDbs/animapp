@@ -1,10 +1,9 @@
+import { Text } from '@components/Themed'
 import React from 'react'
 import { View } from 'react-native'
 
-import { Text } from '@components/Themed'
-
-import IngredientsList from './components/IngredientList'
 import IngredientCreator from './components/IngredientCreator'
+import IngredientsList from './components/IngredientList'
 
 function Header() {
   return (

@@ -1,6 +1,5 @@
-import axios, { AxiosRequestConfig } from 'axios'
-
 import useAuthStore from '@hooks/stores/auth'
+import axios, { AxiosRequestConfig } from 'axios'
 
 export default function createFetcher(jwt?: string) {
   const config: AxiosRequestConfig = {

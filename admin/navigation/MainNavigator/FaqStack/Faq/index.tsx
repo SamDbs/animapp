@@ -1,27 +1,25 @@
-import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
-import { StackScreenProps } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
-
 import Card from '@components/Card'
 import FieldTranslatable from '@components/FieldTranslatable'
+import { PageHeader } from '@components/Themed'
 import useFaqStore, { Faq as FaqEntity } from '@hooks/stores/faq'
-
-import { FaqStackParamList } from '../../../../types'
 import useFaqTranslationStore, {
   FaqTranslation,
   FaqTranslationStore,
 } from '@hooks/stores/faqTranslation'
-import { PageHeader } from '@components/Themed'
+import { StackScreenProps } from '@react-navigation/stack'
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
+
+import { FaqStackParamList } from '../../../../types'
 
 export default function Faq(props: StackScreenProps<FaqStackParamList, 'Faq'>) {
   const [id, setId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const faq = useFaqStore((state) => state.faqs[props.route.params.id])
-  const [registerIds, unregisterIds, getFaqById, updateFaq] = useFaqStore((state) => [
+  const [registerIds, unregisterIds, getFaqById] = useFaqStore((state) => [
     state.registerIds,
     state.unregisterIds,
     state.getFaqById,
-    state.updateFaq,
   ])
 
   useEffect(() => {

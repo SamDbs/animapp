@@ -1,21 +1,18 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import { View } from 'react-native'
-import * as React from 'react'
-
 import useColorScheme from '@hooks/useColorScheme'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import * as React from 'react'
+import { View } from 'react-native'
 
-import { MainTabParamList } from '../../types'
 import Colors from '../../constants/Colors'
-import Menu from './components/Menu'
-import IngredientStack from './IngredientStack'
-import LanguageStack from './LanguageStack'
-import Contacts from './Contacts'
-import FaqStack from './FaqStack'
-import ProductStack from './ProductStack'
+import { MainTabParamList } from '../../types'
 import BrandStack from './BrandStack'
 import ConstituentStack from './ConstituentStack'
-
-
+import Contacts from './Contacts'
+import FaqStack from './FaqStack'
+import IngredientStack from './IngredientStack'
+import LanguageStack from './LanguageStack'
+import ProductStack from './ProductStack'
+import Menu from './components/Menu'
 
 const BottomTab = createBottomTabNavigator<MainTabParamList>()
 
@@ -36,8 +33,6 @@ export default function TabNavigator() {
         <BottomTab.Screen name="ProductStack" component={ProductStack} />
         <BottomTab.Screen name="BrandStack" component={BrandStack} />
         <BottomTab.Screen name="ConstituentStack" component={ConstituentStack} />
-
-
       </BottomTab.Navigator>
     </View>
   )

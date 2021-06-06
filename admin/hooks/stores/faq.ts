@@ -1,6 +1,6 @@
-import { devtools } from 'zustand/middleware'
+import { keyBy, omit } from 'lodash/fp'
 import create from 'zustand'
-import { debounce, keyBy, omit } from 'lodash/fp'
+import { devtools } from 'zustand/middleware'
 
 import { fetcher } from './index'
 
@@ -10,19 +10,6 @@ export type Faq = {
   answer: string
 }
 
-let combinedFaqUpdate = {}
-async function prepareFaqUpdate(id: Faq['id'], params: Partial<Faq>) {
-  combinedFaqUpdate = { ...combinedFaqUpdate, ...params }
-  await sendFaqCombinedUpdateDebounce(id, combinedFaqUpdate)
-}
-const sendFaqCombinedUpdateDebounce = debounce(
-  1000,
-  async (id: Faq['id'], params: Partial<Faq>) => {
-    await fetcher.patch(`/faq/${id}`, params)
-    combinedFaqUpdate = {}
-  },
-)
-
 export type FaqStoreState = {
   faqs: Record<Faq['id'], Faq>
   usedFaqIds: Record<Faq['id'], number>
@@ -30,7 +17,6 @@ export type FaqStoreState = {
   unregisterIds: (ids: Faq['id'][]) => void
   getFaqById: (id: Faq['id']) => Promise<{ id: Faq['id'] }>
   getFaqs: () => Promise<{ ids: Faq['id'][] }>
-  updateFaq: (id: Faq['id'], params: Partial<Faq>) => Promise<void>
   searchFaqs: (query: string) => Promise<{ ids: Faq['id'][] }>
   createFaq: () => Promise<unknown>
 }
@@ -102,13 +88,6 @@ const useFaqStore = create<FaqStoreState>(
 
       set((state) => ({ faqs: { ...state.faqs, ...entities } }))
       return { ids }
-    },
-    async updateFaq(id: Faq['id'], params: Partial<Faq>) {
-      set((state) => ({
-        ...state,
-        faqs: { ...state.faqs, [id]: { ...state.faqs[id], ...params } },
-      }))
-      await prepareFaqUpdate(id, params)
     },
     async searchFaqs(query: string) {
       const { data } = await fetcher.get<Faq[]>(`/faq`, { params: { q: query } })

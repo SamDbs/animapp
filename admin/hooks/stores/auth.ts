@@ -1,9 +1,9 @@
-import { combine, devtools } from 'zustand/middleware'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import createFetcher from '@utils/createFetcher'
 import create from 'zustand'
+import { combine, devtools } from 'zustand/middleware'
 
 import { fetcher, setFetcher } from './index'
-import createFetcher from '@utils/createFetcher'
 
 const useAuthStore = create(
   devtools(

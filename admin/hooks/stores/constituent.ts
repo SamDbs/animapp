@@ -1,6 +1,6 @@
-import { devtools } from 'zustand/middleware'
+import { keyBy, omit } from 'lodash/fp'
 import create from 'zustand'
-import { debounce, keyBy, omit } from 'lodash/fp'
+import { devtools } from 'zustand/middleware'
 
 import { fetcher } from './index'
 
@@ -10,19 +10,6 @@ export type Constituent = {
   description: string
 }
 
-let combinedConstituentUpdate = {}
-async function prepareConstituentUpdate(id: Constituent['id'], params: Partial<Constituent>) {
-  combinedConstituentUpdate = { ...combinedConstituentUpdate, ...params }
-  await sendConstituentCombinedUpdateDebounce(id, combinedConstituentUpdate)
-}
-const sendConstituentCombinedUpdateDebounce = debounce(
-  1000,
-  async (id: Constituent['id'], params: Partial<Constituent>) => {
-    await fetcher.patch(`/analyticalConstituents/${id}`, params)
-    combinedConstituentUpdate = {}
-  },
-)
-
 export type ConstituentStoreState = {
   constituents: Record<Constituent['id'], Constituent>
   usedConstituentIds: Record<Constituent['id'], number>
@@ -30,7 +17,6 @@ export type ConstituentStoreState = {
   unregisterIds: (ids: Constituent['id'][]) => void
   getConstituentById: (id: Constituent['id']) => Promise<{ id: Constituent['id'] }>
   getConstituents: () => Promise<{ ids: Constituent['id'][] }>
-  updateConstituent: (id: Constituent['id'], params: Partial<Constituent>) => Promise<void>
   searchConstituents: (query: string) => Promise<{ ids: Constituent['id'][] }>
   createConstituent: () => Promise<unknown>
 }
@@ -103,15 +89,10 @@ const useConstituentsStore = create<ConstituentStoreState>(
       set((state) => ({ constituents: { ...state.constituents, ...entities } }))
       return { ids }
     },
-    async updateConstituent(id: Constituent['id'], params: Partial<Constituent>) {
-      set((state) => ({
-        ...state,
-        constituents: { ...state.constituents, [id]: { ...state.constituents[id], ...params } },
-      }))
-      await prepareConstituentUpdate(id, params)
-    },
     async searchConstituents(query: string) {
-      const { data } = await fetcher.get<Constituent[]>(`/analyticalConstituents`, { params: { q: query } })
+      const { data } = await fetcher.get<Constituent[]>(`/analyticalConstituents`, {
+        params: { q: query },
+      })
 
       const constituents = data.map((constituent) => ({
         ...constituent,

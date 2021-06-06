@@ -1,9 +1,8 @@
-import { Text, View, ActivityIndicator } from 'react-native'
+import Card from '@components/Card'
+import useLanguageStore from '@hooks/stores/languages'
 import { Link } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
-
-import useLanguageStore from '@hooks/stores/languages'
-import Card from '@components/Card'
+import { Text, View, ActivityIndicator } from 'react-native'
 
 export default function IngredientList({ style }: { style: View['props']['style'] }) {
   const [ids, setIngredientIds] = useState<string[]>([])

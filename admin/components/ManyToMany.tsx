@@ -1,11 +1,10 @@
-import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
-import { Link } from '@react-navigation/native'
-import React, { useCallback, useEffect, useState } from 'react'
-import type { UseStore, StateSelector } from 'zustand'
-
 import { Ingredient } from '@hooks/stores/ingredient'
 import { Product } from '@hooks/stores/product'
 import useSearchableList from '@hooks/useSearchableList'
+import { Link } from '@react-navigation/native'
+import React, { useCallback, useEffect, useState } from 'react'
+import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
+import type { UseStore, StateSelector } from 'zustand'
 
 type SubItemProps<OwnedItem extends Ingredient> = {
   children?: JSX.Element | false
@@ -39,7 +38,7 @@ type Props<
     registerIds: (ids: string[]) => void
     unregisterIds: (ids: string[]) => void
   },
-  RelationParams extends {} = {},
+  RelationParams extends object = object,
 > = {
   ownerEntityId: OwnerItem['id']
   useOwnedStore: UseStore<StoreShape>
@@ -70,7 +69,7 @@ export default function ManyToMany<
     registerIds: (ids: string[]) => void
     unregisterIds: (ids: string[]) => void
   },
-  RelationParams extends {} = {},
+  RelationParams extends object = object,
 >({
   ownerEntityId,
   useOwnedStore,

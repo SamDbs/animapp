@@ -1,9 +1,8 @@
-import { Button, Text, TextInput, View } from 'react-native'
-import React, { useState } from 'react'
-
-import useProductsStore from '@hooks/stores/product'
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
+import useProductsStore from '@hooks/stores/product'
+import React, { useState } from 'react'
+import { Button, Text } from 'react-native'
 
 const initialState = { type: '', name: '', barCode: '', brandId: 3 }
 

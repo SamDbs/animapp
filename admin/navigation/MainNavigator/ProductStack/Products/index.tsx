@@ -1,10 +1,9 @@
-import React, { useState } from 'react'
+import { PageHeader } from '@components/Themed'
+import React from 'react'
 import { View } from 'react-native'
 
-import { PageHeader } from '@components/Themed'
-
-import ProductsList from './components/ProductsList'
 import ProductCreator from './components/ProductCreator'
+import ProductsList from './components/ProductsList'
 
 export default function Products() {
   return (

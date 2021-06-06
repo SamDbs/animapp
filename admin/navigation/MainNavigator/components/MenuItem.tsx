@@ -1,6 +1,6 @@
 import { Link } from '@react-navigation/native'
-import { Text } from 'react-native'
 import * as React from 'react'
+import { Text } from 'react-native'
 
 type Props = { title: string; to: string }
 

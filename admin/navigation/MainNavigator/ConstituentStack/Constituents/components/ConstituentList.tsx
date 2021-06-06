@@ -1,15 +1,13 @@
-import { debounce } from 'lodash/fp'
-import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
-import { Link, useNavigation } from '@react-navigation/native'
-import React, { useCallback, useEffect, useState } from 'react'
-
-import useConstituentsStore from '@hooks/stores/constituent'
 import Card from '@components/Card'
+import useConstituentsStore from '@hooks/stores/constituent'
+import { Link } from '@react-navigation/native'
+import { debounce } from 'lodash/fp'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
 export default function ConstituentList({ style }: { style: View['props']['style'] }) {
   const [ids, setConstituentIds] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const navigation = useNavigation()
   const [registerIds, unregisterIds, getConstituents, searchConstituents] = useConstituentsStore(
     (state) => [
       state.registerIds,

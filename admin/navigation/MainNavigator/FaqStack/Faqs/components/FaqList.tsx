@@ -1,10 +1,9 @@
-import { debounce } from 'lodash/fp'
-import { Text, TextInput, View, ActivityIndicator } from 'react-native'
-import { Link } from '@react-navigation/native'
-import React, { useCallback, useEffect, useState } from 'react'
-
-import useFaqStore from '@hooks/stores/faq'
 import Card from '@components/Card'
+import useFaqStore from '@hooks/stores/faq'
+import { Link } from '@react-navigation/native'
+import { debounce } from 'lodash/fp'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
 export default function FaqList({ style }: { style: View['props']['style'] }) {
   const [ids, setFaqIds] = useState<string[]>([])

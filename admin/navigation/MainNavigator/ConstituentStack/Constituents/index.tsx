@@ -1,9 +1,8 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 
-import ConstituentList from './components/ConstituentList'
 import ConstituentCreator from './components/ConstituentCreator'
-
+import ConstituentList from './components/ConstituentList'
 
 function Header() {
   return (
@@ -19,7 +18,6 @@ export default function Constituents() {
       <Header />
       <ConstituentList style={{ marginBottom: 16 }} />
       <ConstituentCreator />
-
     </View>
   )
 }

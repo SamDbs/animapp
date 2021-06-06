@@ -1,23 +1,22 @@
-import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native'
-import { StackScreenProps } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
-
 import Card from '@components/Card'
-import FieldWithLabel from '@components/FieldWithLabel'
 import FieldTranslatable from '@components/FieldTranslatable'
-import useProductsStore, { Product as ProductEntity } from '@hooks/stores/product'
+import FieldWithLabel from '@components/FieldWithLabel'
+import ManyToMany from '@components/ManyToMany'
+import { PageHeader } from '@components/Themed'
 import useIngredientStore, {
   Ingredient as IngredientEntity,
   IngredientStore,
 } from '@hooks/stores/ingredient'
+import useProductsStore, { Product as ProductEntity } from '@hooks/stores/product'
 import useProductTranslationStore, {
   ProductTranslation,
   ProductTranslationStore,
 } from '@hooks/stores/productTranslation'
+import { StackScreenProps } from '@react-navigation/stack'
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native'
 
 import { ProductStackParamList } from '../../../../types'
-import ManyToMany from '@components/ManyToMany'
-import { PageHeader } from '@components/Themed'
 
 export default function Product(props: StackScreenProps<ProductStackParamList, 'Product'>) {
   const [id, setId] = useState('')

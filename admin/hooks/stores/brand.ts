@@ -1,6 +1,6 @@
-import { devtools } from 'zustand/middleware'
+import { debounce, keyBy, omit } from 'lodash/fp'
 import create from 'zustand'
-import { debounce, map, keyBy, omit } from 'lodash/fp'
+import { devtools } from 'zustand/middleware'
 
 import { fetcher } from '.'
 
@@ -19,7 +19,6 @@ export type BrandStore = {
   updateBrand: (id: Brand['id'], params: Partial<Brand>) => Promise<void>
   searchBrands: (query: string) => Promise<{ ids: Brand['id'][] }>
   createBrand: (params: { name: string }) => Promise<unknown>
-
 }
 
 let combinedBrandUpdate = {}

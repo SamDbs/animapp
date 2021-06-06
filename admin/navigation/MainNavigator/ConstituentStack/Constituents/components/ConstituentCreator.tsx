@@ -1,10 +1,7 @@
-import { Button, Text, TextInput, View } from 'react-native'
-import React, { useState } from 'react'
-
-import useConstituentsStore from '@hooks/stores/constituent'
 import Card from '@components/Card'
-import FieldWithLabel from '@components/FieldWithLabel'
-
+import useConstituentsStore from '@hooks/stores/constituent'
+import React, { useState } from 'react'
+import { Button, Text } from 'react-native'
 
 export default function ConstituentCreator({ style }: any) {
   const [error, setError] = useState('')
