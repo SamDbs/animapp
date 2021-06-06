@@ -9,7 +9,10 @@ const Stack = createStackNavigator<FaqStackParamList>()
 
 export default function FaqStack() {
   return (
-    <Stack.Navigator initialRouteName="Faqs" screenOptions={{ animationEnabled: true }}>
+    <Stack.Navigator
+      headerMode="none"
+      initialRouteName="Faqs"
+      screenOptions={{ animationEnabled: true }}>
       <Stack.Screen name="Faqs" component={Faqs} />
       <Stack.Screen name="Faq" component={Faq} />
     </Stack.Navigator>

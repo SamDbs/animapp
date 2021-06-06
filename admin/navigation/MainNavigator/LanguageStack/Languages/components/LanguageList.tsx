@@ -1,6 +1,5 @@
-import { debounce } from 'lodash/fp'
-import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { Text, View, ActivityIndicator } from 'react-native'
+import { Link } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import useLanguageStore from '@hooks/stores/languages'
@@ -9,13 +8,12 @@ import Card from '@components/Card'
 export default function IngredientList({ style }: { style: View['props']['style'] }) {
   const [ids, setIngredientIds] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const navigation = useNavigation()
   const [registerIds, unregisterIds, getIngredients] = useLanguageStore((state) => [
     state.registerIds,
     state.unregisterIds,
     state.getAllLanguages,
   ])
-  const ingredients = useLanguageStore(
+  const languages = useLanguageStore(
     useCallback((state) => ids.map((id) => state.languages[id]), [ids]),
   )
 
@@ -34,7 +32,7 @@ export default function IngredientList({ style }: { style: View['props']['style'
     fn()
   }, [])
 
-  const noResult = !ingredients.length
+  const noResult = !languages.length
 
   return (
     <Card style={style}>
@@ -53,22 +51,22 @@ export default function IngredientList({ style }: { style: View['props']['style'
             <Text>No result.</Text>
           </View>
         )}
-        {ingredients.filter(Boolean).map((ingredient, i: number) => {
+        {languages.filter(Boolean).map((language, i: number) => {
           return (
             <View
-              key={ingredient.id}
+              key={language.id}
               style={{
                 padding: 8,
                 borderBottomColor: '#ccc',
-                borderBottomWidth: i === ingredients.length - 1 ? 0 : 1,
+                borderBottomWidth: i === languages.length - 1 ? 0 : 1,
                 backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
                 flexDirection: 'row',
                 justifyContent: 'space-between',
               }}>
-              <Text>{ingredient.name}</Text>
-              <Pressable onPress={() => navigation.navigate(`Language`, { id: ingredient.id })}>
+              <Text>{language.name}</Text>
+              <Link to={`/languages/${language.id}`}>
                 <Text style={{ cursor: 'pointer' }}>edit</Text>
-              </Pressable>
+              </Link>
             </View>
           )
         })}

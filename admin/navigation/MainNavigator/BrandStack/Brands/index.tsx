@@ -3,19 +3,12 @@ import { Text, View } from 'react-native'
 
 import BrandList from './components/BrandList'
 import BrandCreator from './components/BrandCreator'
-
-function Header() {
-  return (
-    <View style={{ marginBottom: 16 }}>
-      <Text style={{ fontSize: 22 }}>Brand dashboard</Text>
-    </View>
-  )
-}
+import { PageHeader } from '@components/Themed'
 
 export default function Brands() {
   return (
     <View style={{ flex: 1, padding: 16 }}>
-      <Header />
+      <PageHeader>Brands dashboard</PageHeader>
       <BrandList style={{ marginBottom: 16 }} />
       <BrandCreator />
     </View>

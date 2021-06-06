@@ -18,6 +18,7 @@ router.get('/', productController.getAllProducts)
 router.post('/', productController.createProduct)
 router.patch('/:id', productController.patchProduct)
 router.delete('/:id', productController.deleteProduct)
+router.patch('/:id/ingredients', productController.updateProductIngredients)
 router.put('/:id/image', upload.single('image'), productController.setProductImage)
 
 // CRUD AC

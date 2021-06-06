@@ -1,9 +1,10 @@
 import React from 'react'
-import { Text, View } from 'react-native'
+import { View } from 'react-native'
+
+import { Text } from '@components/Themed'
 
 import IngredientsList from './components/IngredientList'
 import IngredientCreator from './components/IngredientCreator'
-
 
 function Header() {
   return (
@@ -19,7 +20,6 @@ export default function Ingredients() {
       <Header />
       <IngredientsList style={{ marginBottom: 16 }} />
       <IngredientCreator />
-
     </View>
   )
 }

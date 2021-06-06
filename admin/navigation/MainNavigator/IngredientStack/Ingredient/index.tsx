@@ -2,8 +2,8 @@ import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect, useState } from 'react'
 
+import { PageHeader } from '@components/Themed'
 import Card from '@components/Card'
-import FieldWithLabel from '@components/FieldWithLabel'
 import FieldTranslatable from '@components/FieldTranslatable'
 import useIngredientsStore, { Ingredient as IngredientEntity } from '@hooks/stores/ingredient'
 
@@ -18,15 +18,12 @@ export default function Ingredient(
 ) {
   const [id, setId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const ingredient = useIngredientsStore((state) => state.ingredients[props.route.params.id])
-  const [registerIds, unregisterIds, getIngredientById, updateIngredient] = useIngredientsStore(
-    (state) => [
-      state.registerIds,
-      state.unregisterIds,
-      state.getIngredientById,
-      state.updateIngredient,
-    ],
-  )
+  const ingredient = useIngredientsStore((state) => state.ingredients[props.route.params?.id])
+  const [registerIds, unregisterIds, getIngredientById] = useIngredientsStore((state) => [
+    state.registerIds,
+    state.unregisterIds,
+    state.getIngredientById,
+  ])
 
   useEffect(() => {
     if (!ingredient) return
@@ -35,6 +32,7 @@ export default function Ingredient(
   }, [id])
 
   useEffect(() => {
+    if (!props.route.params?.id) return
     async function fn() {
       setIsLoading(true)
       const { id } = await getIngredientById(props.route.params.id)
@@ -42,10 +40,11 @@ export default function Ingredient(
       setIsLoading(false)
     }
     fn()
-  }, [])
+  }, [props.route.params?.id])
 
   return (
     <ScrollView style={{ padding: 16 }}>
+      <PageHeader>Ingredient</PageHeader>
       <Card>
         {isLoading && !ingredient && <ActivityIndicator />}
         {ingredient && (
@@ -71,7 +70,11 @@ export default function Ingredient(
               />
             </View>
             <View>
-              <FieldTranslatable<IngredientEntity, IngredientTranslation, IngredientTranslationStore>
+              <FieldTranslatable<
+                IngredientEntity,
+                IngredientTranslation,
+                IngredientTranslationStore
+              >
                 fields={{ description: 'Description', review: 'Review', name: 'Name' }}
                 baseEntityId={ingredient.id}
                 useStore={useIngredientTranslationStore}

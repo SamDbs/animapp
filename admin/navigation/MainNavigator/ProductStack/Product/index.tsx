@@ -1,4 +1,4 @@
-import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
+import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect, useState } from 'react'
 
@@ -6,23 +6,31 @@ import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
 import FieldTranslatable from '@components/FieldTranslatable'
 import useProductsStore, { Product as ProductEntity } from '@hooks/stores/product'
+import useIngredientStore, {
+  Ingredient as IngredientEntity,
+  IngredientStore,
+} from '@hooks/stores/ingredient'
 import useProductTranslationStore, {
   ProductTranslation,
   ProductTranslationStore,
 } from '@hooks/stores/productTranslation'
 
 import { ProductStackParamList } from '../../../../types'
+import ManyToMany from '@components/ManyToMany'
+import { PageHeader } from '@components/Themed'
 
 export default function Product(props: StackScreenProps<ProductStackParamList, 'Product'>) {
   const [id, setId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const product = useProductsStore((state) => state.products[props.route.params.id])
-  const [registerIds, unregisterIds, getProductById, updateProduct] = useProductsStore((state) => [
-    state.registerIds,
-    state.unregisterIds,
-    state.getProductById,
-    state.updateProduct,
-  ])
+  const [product, registerIds, unregisterIds, getProductById, updateProduct] = useProductsStore(
+    (state) => [
+      state.products[props.route.params.id],
+      state.registerIds,
+      state.unregisterIds,
+      state.getProductById,
+      state.updateProduct,
+    ],
+  )
 
   useEffect(() => {
     if (!product) return
@@ -42,7 +50,9 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
 
   return (
     <ScrollView style={{ padding: 16 }}>
+      <PageHeader>Product</PageHeader>
       <Card>
+        <Text style={{ fontSize: 18 }}>Product</Text>
         {isLoading && !product && <ActivityIndicator />}
         {product && (
           <>
@@ -93,6 +103,24 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
               />
             </View>
           </>
+        )}
+      </Card>
+      <Card style={{ marginVertical: 16 }}>
+        <Text style={{ fontSize: 18 }}>Attached ingredients</Text>
+        {isLoading && !product && <ActivityIndicator />}
+        {product && (
+          <ManyToMany<ProductEntity, IngredientEntity, IngredientStore>
+            useOwnedStore={useIngredientStore}
+            ownerEntityId={product.id}
+            ownedItemsGetterSelector={(state) => state.getIngredientsByProductId}
+            ownedItemsUpdaterSelector={(state) => state.updateIngredientsByProductId}
+            ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.ingredients[id])}
+            registerOwnedIdsSelector={(state) => state.registerIds}
+            unregisterOwnedIdsSelector={(state) => state.unregisterIds}
+            getItemsSelector={(state) => state.getIngredients}
+            searchItemsSelector={(state) => state.searchIngredients}
+            ownedEntityLinkCreator={(item) => `/ingredients/${item.id}`}
+          />
         )}
       </Card>
     </ScrollView>

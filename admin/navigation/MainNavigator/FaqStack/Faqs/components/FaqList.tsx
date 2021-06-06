@@ -1,6 +1,6 @@
 import { debounce } from 'lodash/fp'
-import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { Text, TextInput, View, ActivityIndicator } from 'react-native'
+import { Link } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
 
 import useFaqStore from '@hooks/stores/faq'
@@ -9,18 +9,13 @@ import Card from '@components/Card'
 export default function FaqList({ style }: { style: View['props']['style'] }) {
   const [ids, setFaqIds] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const navigation = useNavigation()
-  const [registerIds, unregisterIds, getFaqs, searchFaqs] = useFaqStore(
-    (state) => [
-      state.registerIds,
-      state.unregisterIds,
-      state.getFaqs,
-      state.searchFaqs,
-    ],
-  )
-  const faqs = useFaqStore(
-    useCallback((state) => ids.map((id) => state.faqs[id]), [ids]),
-  )
+  const [registerIds, unregisterIds, getFaqs, searchFaqs] = useFaqStore((state) => [
+    state.registerIds,
+    state.unregisterIds,
+    state.getFaqs,
+    state.searchFaqs,
+  ])
+  const faqs = useFaqStore(useCallback((state) => ids.map((id) => state.faqs[id]), [ids]))
 
   useEffect(() => {
     registerIds(ids)
@@ -100,9 +95,9 @@ export default function FaqList({ style }: { style: View['props']['style'] }) {
               }}>
               <Text>{faq.question}</Text>
               <Text>{faq.answer}</Text>
-              <Pressable onPress={() => navigation.navigate(`Faq`, { id: faq.id })}>
+              <Link to={`/faq/${faq.id}`}>
                 <Text style={{ cursor: 'pointer' }}>edit</Text>
-              </Pressable>
+              </Link>
             </View>
           )
         })}

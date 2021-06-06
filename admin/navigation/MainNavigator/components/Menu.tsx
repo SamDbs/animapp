@@ -7,14 +7,13 @@ import MenuItem from './MenuItem'
 export default function Menu() {
   return (
     <View style={{ backgroundColor: '#999', width: 200 }}>
-      <MenuItem title="Brands" to="BrandStack" />
-      <MenuItem title="Products" to="ProductStack" />
-      <MenuItem title="Ingredients" to="IngredientStack" />
-      <MenuItem title="Analytical Constituents" to="ConstituentStack" />
-      <MenuItem title="Languages" to="LanguageStack" />
-      <MenuItem title="FAQ" to="FaqStack" />
-      <MenuItem title="Contacts" to="Contacts" />
-
+      <MenuItem title="Brands" to="/brands" />
+      <MenuItem title="Products" to="/products" />
+      <MenuItem title="Ingredients" to="/ingredients" />
+      <MenuItem title="Analytical Constituents" to="/constituents" />
+      <MenuItem title="Languages" to="/languages" />
+      <MenuItem title="FAQ" to="/faq" />
+      <MenuItem title="Contacts" to="/contacts" />
     </View>
   )
 }
