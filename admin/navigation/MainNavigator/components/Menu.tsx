@@ -10,6 +10,7 @@ export default function Menu() {
       <MenuItem title="Brands" to="/brands" />
       <MenuItem title="Products" to="/products" />
       <MenuItem title="Ingredients" to="/ingredients" />
+      <MenuItem title="Analytical Constituents" to="/constituents" />
       <MenuItem title="Languages" to="/languages" />
       <MenuItem title="FAQ" to="/faq" />
       <MenuItem title="Contacts" to="/contacts" />

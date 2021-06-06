@@ -19,6 +19,12 @@ export default {
               Language: 'languages/:id',
             },
           },
+          ConstituentStack: {
+            screens: {
+              Constituents: 'constituents',
+              Constituent: 'constituents/:id',
+            },
+          },
           FaqStack: {
             screens: {
               Faqs: 'faq',

@@ -9,10 +9,16 @@ import type { Ingredient } from '@hooks/stores/ingredient'
 import type { IngredientTranslation } from '@hooks/stores/ingredientTranslation'
 import type { Faq } from '@hooks/stores/faq'
 import type { FaqTranslation } from '@hooks/stores/faqTranslation'
+import type { Constituent } from '@hooks/stores/constituent'
+import type { ConstituentTranslation } from '@hooks/stores/constituentTranslation'
 
 type Props<
   Item extends Product | Ingredient | Faq,
-  ItemTranslation extends ProductTranslation | IngredientTranslation | FaqTranslation,
+  ItemTranslation extends
+    | ProductTranslation
+    | IngredientTranslation
+    | FaqTranslation
+    | ConstituentTranslation,
   StoreShape extends object,
 > = {
   baseEntityId: Item['id']
@@ -36,8 +42,12 @@ type Props<
 }
 
 export default function FieldTranslatable<
-  Item extends Product | Ingredient | Faq,
-  ItemTranslation extends ProductTranslation | IngredientTranslation | FaqTranslation,
+  Item extends Product | Ingredient | Faq | Constituent,
+  ItemTranslation extends
+    | ProductTranslation
+    | IngredientTranslation
+    | FaqTranslation
+    | ConstituentTranslation,
   StoreShape extends object,
 >({
   baseEntityId,
