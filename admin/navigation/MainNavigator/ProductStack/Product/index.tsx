@@ -113,6 +113,7 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             useOwnedStore={useIngredientStore}
             ownerEntityId={product.id}
             ownedItemsGetterSelector={(state) => state.getIngredientsByProductId}
+            ownedItemsUpdaterSelector={(state) => state.updateIngredientsByProductId}
             ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.ingredients[id])}
             registerOwnedIdsSelector={(state) => state.registerIds}
             unregisterOwnedIdsSelector={(state) => state.unregisterIds}

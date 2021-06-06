@@ -8,7 +8,7 @@ import { Product } from '@hooks/stores/product'
 import useSearchableList from '@hooks/useSearchableList'
 
 type SubItemProps<OwnedItem extends Ingredient> = {
-  children: JSX.Element
+  children?: JSX.Element | false
   item: Partial<OwnedItem>
   entityLinkCreator: (entity: Partial<OwnedItem>) => string
   even: boolean
@@ -27,7 +27,7 @@ function SubItem<OwnedItem extends Ingredient>(props: SubItemProps<OwnedItem>) {
       <Link to={props.entityLinkCreator(props.item)}>
         <Text>{props.item.name}</Text>
       </Link>
-      <View>{props.children}</View>
+      {props.children && <View>{props.children}</View>}
     </View>
   )
 }
@@ -45,7 +45,11 @@ type Props<
   useOwnedStore: UseStore<StoreShape>
   ownedItemsGetterSelector: StateSelector<
     StoreShape,
-    (productId: OwnerItem['id']) => Promise<{ ids: OwnedItem['id'][] }>
+    (ownerId: OwnerItem['id']) => Promise<{ ids: OwnedItem['id'][] }>
+  >
+  ownedItemsUpdaterSelector: StateSelector<
+    StoreShape,
+    (ownerId: OwnerItem['id'], ownedId: OwnedItem['id']) => Promise<{ ids: OwnedItem['id'][] }>
   >
   ownedItemsSelectorCreator: (
     ids: OwnedItem['id'][],
@@ -71,6 +75,7 @@ export default function ManyToMany<
   ownerEntityId,
   useOwnedStore,
   ownedItemsGetterSelector,
+  ownedItemsUpdaterSelector,
   ownedItemsSelectorCreator,
   registerOwnedIdsSelector,
   unregisterOwnedIdsSelector,
@@ -82,6 +87,7 @@ export default function ManyToMany<
   const [ids, setIds] = useState<OwnedItem['id'][]>([])
   const [isLoading, setIsLoading] = useState(false)
   const getOwnedByOwnerId = useOwnedStore(ownedItemsGetterSelector)
+  const updateOwnedByOwnerId = useOwnedStore(ownedItemsUpdaterSelector)
   const ownedItemsSelector = useCallback(ownedItemsSelectorCreator(ids), [ids])
   const ownedEntities = useOwnedStore(ownedItemsSelector)
   const registerOwnedIds = useOwnedStore(registerOwnedIdsSelector)
@@ -114,6 +120,11 @@ export default function ManyToMany<
     return () => unregisterOwnedIds(ids)
   }, [ids])
 
+  const updateIngredient = async (ownedId: OwnedItem['id']) => {
+    const { ids } = await updateOwnedByOwnerId(ownerEntityId, ownedId)
+    setIds(ids)
+  }
+
   if (isLoading) return <ActivityIndicator />
 
   return (
@@ -132,7 +143,13 @@ export default function ManyToMany<
             entityLinkCreator={ownedEntityLinkCreator}
             item={item}
             even={i % 2 === 0}>
-            <Button title="Unlink" onPress={() => console.log('oui')} color="#c00" />
+            {editing && (
+              <Button
+                title="Unlink"
+                onPress={() => updateIngredient(item.id as string)}
+                color="#c00"
+              />
+            )}
           </SubItem>
         ))}
       </View>
@@ -146,14 +163,14 @@ export default function ManyToMany<
               borderRadius: 3,
               height: 30,
               paddingHorizontal: 8,
-              marginBottom: 16,
+              marginVertical: 8,
             }}
             onChangeText={searchOwnedItems}
             placeholder="Search"
           />
           <View
             style={{
-              marginTop: 16,
+              marginTop: 8,
               borderColor: '#ccc',
               borderWidth: 1,
               borderRadius: 3,
@@ -170,7 +187,7 @@ export default function ManyToMany<
                       entityLinkCreator={ownedEntityLinkCreator}
                       item={item}
                       even={i % 2 === 0}>
-                      <Button title="Link" onPress={() => console.log('oui')} />
+                      <Button title="Link" onPress={() => updateIngredient(item.id as string)} />
                     </SubItem>
                   )
                 })}

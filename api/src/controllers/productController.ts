@@ -16,6 +16,7 @@ import ProductAnalyticalConstituent from '../models/productAnalyticalConstituent
 import AnalyticalConstituent from '../models/analyticalConstituent'
 import Image from '../models/image'
 import { MissingParamError } from '../middleware/errorHandler'
+import Ingredient from '../models/ingredient'
 
 export const getAllProducts: RequestHandler = async (req, res) => {
   if (req.query.q) {
@@ -200,4 +201,25 @@ export const deleteProductTranslation: RequestHandler = async (req, res) => {
   })
   productTranslation.softRemove()
   res.sendStatus(200)
+}
+
+export const updateProductIngredients: RequestHandler = async (req, res) => {
+  const product = await Product.findOneOrFail(req.params.id, {
+    relations: ['ingredients'],
+  })
+
+  const alreadyExists = product.ingredients
+    .map((i) => i.id.toString())
+    .includes(req.body.ingredientId.toString())
+
+  if (alreadyExists) {
+    product.ingredients = product.ingredients.filter(
+      (i) => i.id.toString() !== req.body.ingredientId.toString(),
+    )
+  } else {
+    const ingredient = await Ingredient.findOneOrFail(req.body.ingredientId)
+    product.ingredients.push(ingredient)
+  }
+  await product.save()
+  getIngredientsByProduct(req, res, () => null)
 }
