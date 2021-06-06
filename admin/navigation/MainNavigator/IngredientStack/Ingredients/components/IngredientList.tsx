@@ -1,25 +1,21 @@
-import { debounce } from 'lodash/fp'
-import { Text, TextInput, View, ActivityIndicator } from 'react-native'
-import { Link } from '@react-navigation/native'
-import React, { useCallback, useEffect, useState } from 'react'
-
-import useIngredientsStore from '@hooks/stores/ingredient'
 import Card from '@components/Card'
+import useIngredientsStore from '@hooks/stores/ingredient'
+import { Link } from '@react-navigation/native'
+import { debounce } from 'lodash/fp'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
 export default function IngredientList({ style }: { style: View['props']['style'] }) {
   const [ids, setIngredientIds] = useState<string[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [
-    registerIds,
-    unregisterIds,
-    getIngredients,
-    searchIngredients,
-  ] = useIngredientsStore((state) => [
-    state.registerIds,
-    state.unregisterIds,
-    state.getIngredients,
-    state.searchIngredients,
-  ])
+  const [registerIds, unregisterIds, getIngredients, searchIngredients] = useIngredientsStore(
+    (state) => [
+      state.registerIds,
+      state.unregisterIds,
+      state.getIngredients,
+      state.searchIngredients,
+    ],
+  )
   const ingredients = useIngredientsStore(
     useCallback((state) => ids.map((id) => state.ingredients[id]), [ids]),
   )

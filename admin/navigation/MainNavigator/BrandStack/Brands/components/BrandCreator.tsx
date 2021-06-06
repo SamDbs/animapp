@@ -1,11 +1,10 @@
-import { Button, Text, TextInput, View } from 'react-native'
-import React, { useState } from 'react'
-
-import useBrandStore from '@hooks/stores/brand'
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
+import useBrandStore from '@hooks/stores/brand'
+import React, { useState } from 'react'
+import { Button, Text } from 'react-native'
 
-const initialState = {  name: '' }
+const initialState = { name: '' }
 
 export default function BrandCreator({ style }: any) {
   const [brand, setBrand] = useState({ ...initialState })

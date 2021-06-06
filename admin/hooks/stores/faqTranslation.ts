@@ -1,11 +1,11 @@
-import { devtools } from 'zustand/middleware'
-import create from 'zustand'
+import { AxiosRequestConfig } from 'axios'
 import { debounce, keyBy } from 'lodash/fp'
+import create from 'zustand'
+import { devtools } from 'zustand/middleware'
 
+import type { Faq } from './faq'
 import { fetcher } from './index'
 import type { Language } from './languages'
-import type { Faq } from './faq'
-import { AxiosInstance, AxiosRequestConfig } from 'axios'
 
 export type FaqTranslation = {
   id: string
@@ -17,9 +17,7 @@ export type FaqTranslation = {
 
 export type FaqTranslationStore = {
   faqTranslations: Record<string, Partial<FaqTranslation>>
-  getFaqTranslations: (
-    faqId: Faq['id'],
-  ) => Promise<{ ids: FaqTranslation['id'][] }>
+  getFaqTranslations: (faqId: Faq['id']) => Promise<{ ids: FaqTranslation['id'][] }>
   updateFaqTranslation: (
     faqId: Faq['id'],
     languageId: Language['id'],
@@ -29,14 +27,12 @@ export type FaqTranslationStore = {
     faqId: Faq['id'],
     languageId: Language['id'],
     question: string,
-    answer: string
+    answer: string,
   ) => Promise<void>
 }
 
-let combinedFaqTranslationsUpdate: Record<
-  FaqTranslation['languageId'],
-  Partial<FaqTranslation>
-> = {}
+let combinedFaqTranslationsUpdate: Record<FaqTranslation['languageId'], Partial<FaqTranslation>> =
+  {}
 
 async function prepareFaqTranslationsUpdate(
   faqId: Faq['id'],
@@ -78,9 +74,7 @@ const useFaqTranslationStore = create<FaqTranslationStore>(
   devtools((set, get) => ({
     faqTranslations: {},
     async getFaqTranslations(faqId: Faq['id']) {
-      const { data } = await fetcher.get<FaqTranslation[]>(
-        `/faq/${faqId}/translations`,
-      )
+      const { data } = await fetcher.get<FaqTranslation[]>(`/faq/${faqId}/translations`)
 
       const translations = data.map((translation) => ({
         ...translation,
@@ -101,8 +95,10 @@ const useFaqTranslationStore = create<FaqTranslationStore>(
       const id = `${faqId}-${languageId}`
       if (!get().faqTranslations[id]) {
         set((state) => ({
-          faqTranslations: { ...state.faqTranslations, [id]: {...params, languageId, faqId
-          } as any },
+          faqTranslations: {
+            ...state.faqTranslations,
+            [id]: { ...params, languageId, faqId } as any,
+          },
         }))
 
         await prepareFaqTranslationsUpdate(faqId, languageId, params, 'post')

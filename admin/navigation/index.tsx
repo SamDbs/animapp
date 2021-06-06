@@ -1,9 +1,8 @@
-import { createStackNavigator } from '@react-navigation/stack'
-import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native'
-import React, { useEffect, useState } from 'react'
-
 import useAuthStore from '@hooks/stores/auth'
 import useColorScheme from '@hooks/useColorScheme'
+import { NavigationContainer, DefaultTheme, DarkTheme } from '@react-navigation/native'
+import { createStackNavigator } from '@react-navigation/stack'
+import React, { useEffect, useState } from 'react'
 
 import { RootStackParamList } from '../types'
 import AuthStackNavigator from './AuthStackNavigator'

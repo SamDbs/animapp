@@ -1,11 +1,7 @@
-import { Button, Text, TextInput, View } from 'react-native'
-import React, { useState } from 'react'
-
-import useFaqStore from '@hooks/stores/faq'
 import Card from '@components/Card'
-import FieldWithLabel from '@components/FieldWithLabel'
-
-const initialState = { }
+import useFaqStore from '@hooks/stores/faq'
+import React, { useState } from 'react'
+import { Button, Text } from 'react-native'
 
 export default function FaqCreator({ style }: any) {
   const [error, setError] = useState('')

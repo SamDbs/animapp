@@ -1,6 +1,6 @@
-import { devtools } from 'zustand/middleware'
-import create from 'zustand'
 import { debounce, keyBy } from 'lodash/fp'
+import create from 'zustand'
+import { devtools } from 'zustand/middleware'
 
 import { fetcher } from './index'
 import type { Language } from './languages'

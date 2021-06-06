@@ -1,17 +1,15 @@
-import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
-import { StackScreenProps } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
-
 import Card from '@components/Card'
-import FieldWithLabel from '@components/FieldWithLabel'
 import FieldTranslatable from '@components/FieldTranslatable'
 import useConstituentsStore, { Constituent as ConstituentEntity } from '@hooks/stores/constituent'
-
-import { ConstituentStackParamList } from '../../../../types'
 import useConstituentTranslationStore, {
   ConstituentTranslation,
   ConstituentTranslationStore,
 } from '@hooks/stores/constituentTranslation'
+import { StackScreenProps } from '@react-navigation/stack'
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
+
+import { ConstituentStackParamList } from '../../../../types'
 
 export default function Constituent(
   props: StackScreenProps<ConstituentStackParamList, 'Constituent'>,
@@ -19,14 +17,11 @@ export default function Constituent(
   const [id, setId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const constituent = useConstituentsStore((state) => state.constituents[props.route.params.id])
-  const [registerIds, unregisterIds, getConstituentById, updateConstituent] = useConstituentsStore(
-    (state) => [
-      state.registerIds,
-      state.unregisterIds,
-      state.getConstituentById,
-      state.updateConstituent,
-    ],
-  )
+  const [registerIds, unregisterIds, getConstituentById] = useConstituentsStore((state) => [
+    state.registerIds,
+    state.unregisterIds,
+    state.getConstituentById,
+  ])
 
   useEffect(() => {
     if (!constituent) return

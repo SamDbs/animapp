@@ -1,6 +1,6 @@
-import { devtools } from 'zustand/middleware'
-import create from 'zustand'
 import { keyBy, omit, debounce } from 'lodash/fp'
+import create from 'zustand'
+import { devtools } from 'zustand/middleware'
 
 import { fetcher } from './index'
 import { Product } from './product'

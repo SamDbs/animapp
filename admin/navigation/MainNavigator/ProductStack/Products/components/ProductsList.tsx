@@ -1,10 +1,9 @@
-import { Text, TextInput, View, ActivityIndicator } from 'react-native'
+import Card from '@components/Card'
+import useProductsStore, { ProductStore, Product } from '@hooks/stores/product'
+import useSearchableList from '@hooks/useSearchableList'
 import { Link } from '@react-navigation/native'
 import React from 'react'
-
-import useProductsStore, { ProductStore, Product } from '@hooks/stores/product'
-import Card from '@components/Card'
-import useSearchableList from '@hooks/useSearchableList'
+import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
 export default function ProductList({ style }: { style: View['props']['style'] }) {
   const {

@@ -1,17 +1,16 @@
-import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
-import { StackScreenProps } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
-
-import { PageHeader } from '@components/Themed'
 import Card from '@components/Card'
 import FieldTranslatable from '@components/FieldTranslatable'
+import { PageHeader } from '@components/Themed'
 import useIngredientsStore, { Ingredient as IngredientEntity } from '@hooks/stores/ingredient'
-
-import { IngredientStackParamList } from '../../../../types'
 import useIngredientTranslationStore, {
   IngredientTranslation,
   IngredientTranslationStore,
 } from '@hooks/stores/ingredientTranslation'
+import { StackScreenProps } from '@react-navigation/stack'
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
+
+import { IngredientStackParamList } from '../../../../types'
 
 export default function Ingredient(
   props: StackScreenProps<IngredientStackParamList, 'Ingredient'>,

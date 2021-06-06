@@ -1,9 +1,9 @@
-import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
+import React from 'react'
 
 import { ProductStackParamList } from '../../../types'
-import Products from './Products'
 import Product from './Product'
+import Products from './Products'
 
 const Stack = createStackNavigator<ProductStackParamList>()
 

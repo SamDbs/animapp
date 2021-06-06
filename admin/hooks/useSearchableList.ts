@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
 import debounce from 'lodash/fp/debounce'
+import { useCallback, useEffect, useState } from 'react'
 import { StateSelector, UseStore } from 'zustand'
 
-export default function useSearchableList<StoreShape extends {}, EntityShape extends {}>(
+export default function useSearchableList<StoreShape extends object, EntityShape extends object>(
   useStore: UseStore<
     StoreShape & { registerIds: (ids: string[]) => void; unregisterIds: (ids: string[]) => void }
   >,

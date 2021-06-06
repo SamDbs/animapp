@@ -1,5 +1,5 @@
-import React from 'react'
 import { createStackNavigator } from '@react-navigation/stack'
+import React from 'react'
 
 import { IngredientStackParamList } from '../../../types'
 import Ingredient from './Ingredient'

@@ -1,11 +1,11 @@
-import { devtools } from 'zustand/middleware'
-import create from 'zustand'
+import { AxiosRequestConfig } from 'axios'
 import { debounce, keyBy } from 'lodash/fp'
+import create from 'zustand'
+import { devtools } from 'zustand/middleware'
 
+import type { Constituent } from './constituent'
 import { fetcher } from './index'
 import type { Language } from './languages'
-import type { Constituent } from './constituent'
-import { AxiosInstance, AxiosRequestConfig } from 'axios'
 
 export type ConstituentTranslation = {
   id: string

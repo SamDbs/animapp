@@ -17,7 +17,7 @@ jobs:
     - name: Install dependencies
       run: yarn install --frozen-lockfile
       working-directory: ${{env.wd}}
-    - name: Lint ./src
+    - name: Lint
       run: yarn run lint
       working-directory: ${{env.wd}}
     - name: Check typescript
@@ -25,4 +25,21 @@ jobs:
       working-directory: ${{env.wd}}
     - name: Unit test
       run: yarn run test
+      working-directory: ${{env.wd}}
+  check-admin:
+    runs-on: ubuntu-latest
+    env:
+      wd: ./admin
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache node modules
+      uses: actions/cache@v2
+      with:
+        path: "api/node_modules"
+        key: ${{ runner.os }}-modules-${{ hashFiles('admin/yarn.lock') }}
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+      working-directory: ${{env.wd}}
+    - name: Lint
+      run: yarn run lint
       working-directory: ${{env.wd}}

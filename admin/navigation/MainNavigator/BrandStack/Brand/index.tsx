@@ -1,13 +1,12 @@
-import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
-import { StackScreenProps } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
-
 import Card from '@components/Card'
-import useBrandStore from '@hooks/stores/brand'
-
-import { BrandStackParamList } from '../../../../types'
 import FieldWithLabel from '@components/FieldWithLabel'
 import { PageHeader } from '@components/Themed'
+import useBrandStore from '@hooks/stores/brand'
+import { StackScreenProps } from '@react-navigation/stack'
+import React, { useEffect, useState } from 'react'
+import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
+
+import { BrandStackParamList } from '../../../../types'
 
 export default function Brand(props: StackScreenProps<BrandStackParamList, 'Brand'>) {
   const [id, setId] = useState('')

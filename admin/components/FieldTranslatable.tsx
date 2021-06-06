@@ -1,16 +1,15 @@
-import { Text, TextInput, View } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
-import type { StateSelector, UseStore } from 'zustand'
-
-import type { Product } from '@hooks/stores/product'
-import type { ProductTranslation } from '@hooks/stores/productTranslation'
-import useLanguagesStore, { Language } from '@hooks/stores/languages'
-import type { Ingredient } from '@hooks/stores/ingredient'
-import type { IngredientTranslation } from '@hooks/stores/ingredientTranslation'
-import type { Faq } from '@hooks/stores/faq'
-import type { FaqTranslation } from '@hooks/stores/faqTranslation'
 import type { Constituent } from '@hooks/stores/constituent'
 import type { ConstituentTranslation } from '@hooks/stores/constituentTranslation'
+import type { Faq } from '@hooks/stores/faq'
+import type { FaqTranslation } from '@hooks/stores/faqTranslation'
+import type { Ingredient } from '@hooks/stores/ingredient'
+import type { IngredientTranslation } from '@hooks/stores/ingredientTranslation'
+import useLanguagesStore, { Language } from '@hooks/stores/languages'
+import type { Product } from '@hooks/stores/product'
+import type { ProductTranslation } from '@hooks/stores/productTranslation'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Text, TextInput, View } from 'react-native'
+import type { StateSelector, UseStore } from 'zustand'
 
 type Props<
   Item extends Product | Ingredient | Faq,

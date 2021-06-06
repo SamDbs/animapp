@@ -1,11 +1,11 @@
-import { devtools } from 'zustand/middleware'
-import create from 'zustand'
+import { AxiosRequestConfig } from 'axios'
 import { debounce, keyBy } from 'lodash/fp'
+import create from 'zustand'
+import { devtools } from 'zustand/middleware'
 
 import { fetcher } from './index'
-import type { Language } from './languages'
 import type { Ingredient } from './ingredient'
-import { AxiosInstance, AxiosRequestConfig } from 'axios'
+import type { Language } from './languages'
 
 export type IngredientTranslation = {
   id: string
@@ -121,7 +121,7 @@ const useIngredientTranslationStore = create<IngredientTranslationStore>(
             ...state.ingredientTranslations,
             [id]: { ...state.ingredientTranslations[id] } as any,
           },
-          creatingIds: state.creatingIds.filter(currentId => currentId !== id),
+          creatingIds: state.creatingIds.filter((currentId) => currentId !== id),
         }))
         return
       }

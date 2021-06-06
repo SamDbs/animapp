@@ -1,8 +1,7 @@
-import { Button, Text, TextInput, View } from 'react-native'
-import React, { useState } from 'react'
-
-import useAuthStore from '@hooks/stores/auth'
 import Card from '@components/Card'
+import useAuthStore from '@hooks/stores/auth'
+import React, { useState } from 'react'
+import { Button, Text, TextInput, View } from 'react-native'
 
 export default function Login() {
   const loginAction = useAuthStore((state) => state.login)

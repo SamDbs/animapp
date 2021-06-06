@@ -1,9 +1,9 @@
-import React from 'react'
-import { Text, View } from 'react-native'
-
-import BrandList from './components/BrandList'
-import BrandCreator from './components/BrandCreator'
 import { PageHeader } from '@components/Themed'
+import React from 'react'
+import { View } from 'react-native'
+
+import BrandCreator from './components/BrandCreator'
+import BrandList from './components/BrandList'
 
 export default function Brands() {
   return (

@@ -1,9 +1,9 @@
+import { PageHeader } from '@components/Themed'
 import React from 'react'
 import { View } from 'react-native'
 
-import FaqList from './components/FaqList'
 import FaqCreator from './components/FaqCreator'
-import { PageHeader } from '@components/Themed'
+import FaqList from './components/FaqList'
 
 export default function Faqs() {
   return (
