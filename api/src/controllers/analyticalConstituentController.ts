@@ -1,4 +1,5 @@
 import { RequestHandler } from 'express'
+import { FindManyOptions, FindOperator, In } from 'typeorm'
 
 import AnalyticalConstituent from '../models/analyticalConstituent'
 import ConstituentTranslation from '../models/constituentTranslation'
@@ -11,14 +12,37 @@ import {
 
 // Return all analytical constituent that exist in database according to the language sent in params
 export const getAllAnalyticalConstituents: RequestHandler = async (req, res) => {
+  if (req.query.q) {
+    const translations = await ConstituentTranslation.find({
+      where: [
+        { name: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
+        { description: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
+      ],
+    })
+    const constituentIds = translations.map((translation) => translation.analyticalConstituentId)
+    const where: FindManyOptions<AnalyticalConstituent>['where'] = { id: In(constituentIds) }
+
+    const analyticalConstituents = await AnalyticalConstituent.find({
+      relations: ['translations'],
+      order: { id: 'ASC' },
+      where,
+    })
+    res.json(
+      viewAnalyticalConstituentsClient(
+        analyticalConstituents,
+        req.params.lang?.toString().toUpperCase(),
+      ),
+    )
+  }
   const analyticalConstituents = await AnalyticalConstituent.find({
     relations: ['translations'],
     order: { id: 'ASC' },
   })
-  const { language } = req.query
-
   res.json(
-    viewAnalyticalConstituentsClient(analyticalConstituents, language?.toString().toUpperCase()),
+    viewAnalyticalConstituentsClient(
+      analyticalConstituents,
+      req.params.lang?.toString().toUpperCase(),
+    ),
   )
 }
 

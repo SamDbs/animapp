@@ -14,15 +14,24 @@ export type AuthStackParamList = {
 }
 
 export type MainTabParamList = {
-  ProductStack: undefined
+  BrandStack: undefined
   Contacts: undefined
-  IngredientStack: undefined
   FaqStack: undefined
+  IngredientStack: undefined
+  LanguageStack: undefined
+  ProductStack: undefined
+  ConstituentStack: undefined
+
 }
 
 export type ProductStackParamList = {
   Products: undefined
   Product: { id: string }
+}
+
+export type LanguageStackParamList = {
+  Languages: undefined
+  Language: { id: string }
 }
 
 export type IngredientStackParamList = {
@@ -33,6 +42,16 @@ export type IngredientStackParamList = {
 export type FaqStackParamList = {
   Faqs: undefined
   Faq: { id: string }
+}
+
+export type BrandStackParamList = {
+  Brands: undefined
+  Brand: { id: string }
+}
+
+export type ConstituentStackParamList = {
+  Constituents: undefined
+  Constituent: { id: string }
 }
 
 export type TabOneParamList = {

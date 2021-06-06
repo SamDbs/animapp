@@ -1,12 +1,13 @@
+import { Link } from '@react-navigation/native'
+import { Text } from 'react-native'
 import * as React from 'react'
-import { Text, View } from 'react-native'
 
-type Props = { title: string }
+type Props = { title: string; to: string }
 
-export default function MenuItem({ title }: Props) {
+export default function MenuItem({ to, title }: Props) {
   return (
-    <View style={{ padding: 16 }}>
+    <Link to={to} style={{ padding: 16 }}>
       <Text style={{ fontSize: 14 }}>{title}</Text>
-    </View>
+    </Link>
   )
 }

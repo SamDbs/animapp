@@ -26,7 +26,7 @@ const sendProductCombinedUpdateDebounce = debounce(
   },
 )
 
-export type ProductStoreState = {
+export type ProductStore = {
   products: Record<Product['id'], Product>
   usedProductIds: Record<Product['id'], number>
   registerIds: (ids: Product['id'][]) => void
@@ -34,94 +34,97 @@ export type ProductStoreState = {
   getProductById: (id: Product['id']) => Promise<{ id: Product['id'] }>
   getProducts: () => Promise<{ ids: Product['id'][] }>
   updateProduct: (id: Product['id'], params: Partial<Product>) => Promise<void>
-  searchProducts: (filters: { name: Product['name'] }) => Promise<{ ids: Product['id'][] }>
+  searchProducts: (text: Product['name']) => Promise<{ ids: Product['id'][] }>
   createProduct: (params: { barCode: string; name: string; type: string }) => Promise<unknown>
 }
 
-const useProductsStore = create<ProductStoreState>(
-  devtools((set) => ({
-    products: {},
-    usedProductIds: {},
-    registerIds(ids: Product['id'][]) {
-      set((state) => {
-        const update: Record<Product['id'], number> = ids.reduce(
-          (acc, id) => ({
-            ...acc,
-            [id]: id in state.usedProductIds ? state.usedProductIds[id] + 1 : 1,
-          }),
-          {},
-        )
+const useProductsStore = create<ProductStore>(
+  devtools(
+    (set) => ({
+      products: {},
+      usedProductIds: {},
+      registerIds(ids: Product['id'][]) {
+        set((state) => {
+          const update: Record<Product['id'], number> = ids.reduce(
+            (acc, id) => ({
+              ...acc,
+              [id]: id in state.usedProductIds ? state.usedProductIds[id] + 1 : 1,
+            }),
+            {},
+          )
 
-        const newState = {
+          const newState = {
+            ...state,
+            usedProductIds: { ...state.usedProductIds, ...update },
+          }
+
+          const idsToDelete = Object.entries(newState.usedProductIds)
+            .filter(([, value]) => value < 1)
+            .map(([key]) => key)
+
+          const finalState = {
+            ...newState,
+            products: omit(idsToDelete, newState.products),
+            usedProductIds: omit(idsToDelete, newState.usedProductIds),
+          }
+          return finalState
+        })
+      },
+      unregisterIds(ids: Product['id'][]) {
+        set((state) => {
+          const update: Record<Product['id'], number> = ids.reduce(
+            (acc, id) => ({
+              ...acc,
+              [id]: id in state.usedProductIds ? state.usedProductIds[id] - 1 : 0,
+            }),
+            {},
+          )
+          const newState = { ...state, usedProductIds: { ...state.usedProductIds, ...update } }
+          return newState
+        })
+      },
+      async getProductById(id: Product['id']) {
+        const { data } = await fetcher.get<Product>(`/products/${id}`)
+        const product = { ...data, id: data.id.toString() }
+
+        set((state) => ({ products: { ...state.products, [product.id]: product } }))
+        return { id }
+      },
+      async getProducts() {
+        const { data } = await fetcher.get<Product[]>(`/products`)
+
+        const products = data.map((product) => ({ ...product, id: product.id.toString() }))
+
+        const ids = products.map((product) => product.id)
+        const entities = keyBy((product) => product.id, products)
+
+        set((state) => ({ products: { ...state.products, ...entities } }))
+        return { ids }
+      },
+      async updateProduct(id: Product['id'], params: Partial<Product>) {
+        set((state) => ({
           ...state,
-          usedProductIds: { ...state.usedProductIds, ...update },
-        }
+          products: { ...state.products, [id]: { ...state.products[id], ...params } },
+        }))
+        await prepareProductUpdate(id, params)
+      },
+      async searchProducts(text: string) {
+        const { data } = await fetcher.get<Product[]>(`/products`, { params: { q: text } })
 
-        const idsToDelete = Object.entries(newState.usedProductIds)
-          .filter(([, value]) => value < 1)
-          .map(([key]) => key)
+        const products = data.map((product) => ({ ...product, id: product.id.toString() }))
 
-        const finalState = {
-          ...newState,
-          products: omit(idsToDelete, newState.products),
-          usedProductIds: omit(idsToDelete, newState.usedProductIds),
-        }
-        return finalState
-      })
-    },
-    unregisterIds(ids: Product['id'][]) {
-      set((state) => {
-        const update: Record<Product['id'], number> = ids.reduce(
-          (acc, id) => ({
-            ...acc,
-            [id]: id in state.usedProductIds ? state.usedProductIds[id] - 1 : 0,
-          }),
-          {},
-        )
-        const newState = { ...state, usedProductIds: { ...state.usedProductIds, ...update } }
-        return newState
-      })
-    },
-    async getProductById(id: Product['id']) {
-      const { data } = await fetcher.get<Product>(`/products/${id}`)
-      const product = { ...data, id: data.id.toString() }
+        const ids = products.map((product) => product.id)
+        const entities = keyBy((product) => product.id, products)
 
-      set((state) => ({ products: { ...state.products, [product.id]: product } }))
-      return { id }
-    },
-    async getProducts() {
-      const { data } = await fetcher.get<Product[]>(`/products`)
-
-      const products = data.map((product) => ({ ...product, id: product.id.toString() }))
-
-      const ids = products.map((product) => product.id)
-      const entities = keyBy((product) => product.id, products)
-
-      set((state) => ({ products: { ...state.products, ...entities } }))
-      return { ids }
-    },
-    async updateProduct(id: Product['id'], params: Partial<Product>) {
-      set((state) => ({
-        ...state,
-        products: { ...state.products, [id]: { ...state.products[id], ...params } },
-      }))
-      await prepareProductUpdate(id, params)
-    },
-    async searchProducts(params: { name: string }) {
-      const { data } = await fetcher.get<Product[]>(`/products`, { params })
-
-      const products = data.map((product) => ({ ...product, id: product.id.toString() }))
-
-      const ids = products.map((product) => product.id)
-      const entities = keyBy((product) => product.id, products)
-
-      set((state) => ({ products: { ...state.products, ...entities } }))
-      return { ids }
-    },
-    createProduct(params: { barCode: string; name: string; type: string }) {
-      return fetcher.post(`/products`, params)
-    },
-  })),
+        set((state) => ({ products: { ...state.products, ...entities } }))
+        return { ids }
+      },
+      createProduct(params: { barCode: string; name: string; type: string }) {
+        return fetcher.post(`/products`, params)
+      },
+    }),
+    'Product store',
+  ),
 )
 
 export default useProductsStore

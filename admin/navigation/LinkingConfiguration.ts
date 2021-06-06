@@ -13,6 +13,18 @@ export default {
               Ingredient: 'ingredients/:id',
             },
           },
+          LanguageStack: {
+            screens: {
+              Languages: 'languages',
+              Language: 'languages/:id',
+            },
+          },
+          ConstituentStack: {
+            screens: {
+              Constituents: 'constituents',
+              Constituent: 'constituents/:id',
+            },
+          },
           FaqStack: {
             screens: {
               Faqs: 'faq',
@@ -24,6 +36,12 @@ export default {
             screens: {
               Products: 'products',
               Product: 'products/:id',
+            },
+          },
+          BrandStack: {
+            screens: {
+              Brands: 'brands',
+              Brand: 'brands/:id',
             },
           },
         },
