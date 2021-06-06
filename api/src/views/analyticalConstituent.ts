@@ -4,7 +4,7 @@ import ConstituentTranslation from '../models/constituentTranslation'
 
 export function viewAnalyticalConstituentClient(
   analyticalConstituent: AnalyticalConstituent,
-  language: Language['id'] | undefined = 'FR',
+  language: Language['id'] | undefined = 'EN',
 ) {
   let translation = analyticalConstituent.translations.find((t) => t.languageId === language)
 
@@ -21,7 +21,7 @@ export function viewAnalyticalConstituentClient(
 
 export function viewAnalyticalConstituentsClient(
   analyticalConstituents: AnalyticalConstituent[],
-  language: Language['id'] | undefined = 'FR',
+  language: Language['id'] | undefined = 'EN',
 ) {
   return analyticalConstituents.map((analyticalConstituent) =>
     viewAnalyticalConstituentClient(analyticalConstituent, language),
