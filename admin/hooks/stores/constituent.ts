@@ -3,6 +3,7 @@ import create from 'zustand'
 import { devtools } from 'zustand/middleware'
 
 import { fetcher } from './index'
+import { Product } from './product'
 
 export type Constituent = {
   id: string
@@ -19,6 +20,11 @@ export type ConstituentStoreState = {
   getConstituents: () => Promise<{ ids: Constituent['id'][] }>
   searchConstituents: (query: string) => Promise<{ ids: Constituent['id'][] }>
   createConstituent: () => Promise<unknown>
+  getConstituentsByProductId: (productId: Product['id']) => Promise<{ ids: Constituent['id'][] }>
+  updateConstituentsByProductId: (
+    productId: Product['id'],
+    constituentId: Constituent['id'],
+  ) => Promise<{ ids: Constituent['id'][] }>
 }
 
 const useConstituentsStore = create<ConstituentStoreState>(
@@ -107,6 +113,38 @@ const useConstituentsStore = create<ConstituentStoreState>(
     },
     createConstituent() {
       return fetcher.post(`/analyticalConstituents`)
+    },
+    async getConstituentsByProductId(productId) {
+      const { data } = await fetcher.get<Constituent[]>(`/products/${productId}/analyticalconstituents`)
+
+      const constituents = data.map((constituent) => ({
+        ...constituent,
+        id: constituent.id.toString(),
+      }))
+
+      const ids = constituents.map((constituent) => constituent.id)
+      const entities = keyBy((constituent) => constituent.id, constituents)
+
+      set((state) => ({ constituents: { ...state.constituents, ...entities } }))
+
+      return { ids }
+    },
+    async updateConstituentsByProductId(productId, constituentId) {
+      const { data } = await fetcher.patch<Constituent[]>(`/products/${productId}/analyticalconstituents`, {
+        constituentId,
+      })
+
+      const constituents = data.map((constituent) => ({
+        ...constituent,
+        id: constituent.id.toString(),
+      }))
+
+      const ids = constituents.map((constituent) => constituent.id)
+      const entities = keyBy((constituent) => constituent.id, constituents)
+
+      set((state) => ({ constituents: { ...state.constituents, ...entities } }))
+
+      return { ids }
     },
   })),
 )

@@ -1,19 +1,20 @@
 import { Ingredient } from '@hooks/stores/ingredient'
 import { Product } from '@hooks/stores/product'
+import { Constituent } from '@hooks/stores/constituent'
 import useSearchableList from '@hooks/useSearchableList'
 import { Link } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
 import type { UseStore, StateSelector } from 'zustand'
 
-type SubItemProps<OwnedItem extends Ingredient> = {
+type SubItemProps<OwnedItem extends Ingredient | Constituent> = {
   children?: JSX.Element | false
   item: Partial<OwnedItem>
   entityLinkCreator: (entity: Partial<OwnedItem>) => string
   even: boolean
 }
 
-function SubItem<OwnedItem extends Ingredient>(props: SubItemProps<OwnedItem>) {
+function SubItem<OwnedItem extends Ingredient | Constituent>(props: SubItemProps<OwnedItem>) {
   return (
     <View
       style={{
@@ -33,7 +34,7 @@ function SubItem<OwnedItem extends Ingredient>(props: SubItemProps<OwnedItem>) {
 
 type Props<
   OwnerItem extends Product,
-  OwnedItem extends Ingredient,
+  OwnedItem extends Ingredient | Constituent,
   StoreShape extends {
     registerIds: (ids: string[]) => void
     unregisterIds: (ids: string[]) => void
@@ -64,7 +65,7 @@ type Props<
 
 export default function ManyToMany<
   OwnerItem extends Product,
-  OwnedItem extends Ingredient,
+  OwnedItem extends Ingredient | Constituent,
   StoreShape extends {
     registerIds: (ids: string[]) => void
     unregisterIds: (ids: string[]) => void
@@ -119,7 +120,7 @@ export default function ManyToMany<
     return () => unregisterOwnedIds(ids)
   }, [ids])
 
-  const updateIngredient = async (ownedId: OwnedItem['id']) => {
+  const updateOwned = async (ownedId: OwnedItem['id']) => {
     const { ids } = await updateOwnedByOwnerId(ownerEntityId, ownedId)
     setIds(ids)
   }
@@ -145,7 +146,7 @@ export default function ManyToMany<
             {editing && (
               <Button
                 title="Unlink"
-                onPress={() => updateIngredient(item.id as string)}
+                onPress={() => updateOwned(item.id as string)}
                 color="#c00"
               />
             )}
@@ -186,7 +187,7 @@ export default function ManyToMany<
                       entityLinkCreator={ownedEntityLinkCreator}
                       item={item}
                       even={i % 2 === 0}>
-                      <Button title="Link" onPress={() => updateIngredient(item.id as string)} />
+                      <Button title="Link" onPress={() => updateOwned(item.id as string)} />
                     </SubItem>
                   )
                 })}

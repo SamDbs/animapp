@@ -7,6 +7,10 @@ import useIngredientStore, {
   Ingredient as IngredientEntity,
   IngredientStore,
 } from '@hooks/stores/ingredient'
+import useConstituentStore, {
+  Constituent as ConstituentEntity,
+  ConstituentStoreState,
+} from '@hooks/stores/constituent'
 import useProductsStore, { Product as ProductEntity } from '@hooks/stores/product'
 import useProductTranslationStore, {
   ProductTranslation,
@@ -17,6 +21,7 @@ import React, { useEffect, useState } from 'react'
 import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native'
 
 import { ProductStackParamList } from '../../../../types'
+import useConstituentsStore from '@hooks/stores/constituent'
 
 export default function Product(props: StackScreenProps<ProductStackParamList, 'Product'>) {
   const [id, setId] = useState('')
@@ -119,6 +124,24 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             getItemsSelector={(state) => state.getIngredients}
             searchItemsSelector={(state) => state.searchIngredients}
             ownedEntityLinkCreator={(item) => `/ingredients/${item.id}`}
+          />
+        )}
+      </Card>
+      <Card style={{ marginVertical: 16 }}>
+        <Text style={{ fontSize: 18 }}>Attached Analytical Constituent</Text>
+        {isLoading && !product && <ActivityIndicator />}
+        {product && (
+          <ManyToMany<ProductEntity, ConstituentEntity, ConstituentStoreState >
+            useOwnedStore={useConstituentsStore}
+            ownerEntityId={product.id}
+            ownedItemsGetterSelector={(state) => state.getConstituentsByProductId}
+            ownedItemsUpdaterSelector={(state) => state.updateConstituentsByProductId}
+            ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.constituents[id])}
+            registerOwnedIdsSelector={(state) => state.registerIds}
+            unregisterOwnedIdsSelector={(state) => state.unregisterIds}
+            getItemsSelector={(state) => state.getConstituents}
+            searchItemsSelector={(state) => state.searchConstituents}
+            ownedEntityLinkCreator={(item) => `/analyticalConstituents/${item.id}`}
           />
         )}
       </Card>
