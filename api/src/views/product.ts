@@ -5,7 +5,7 @@ import ProductTranslation from '../models/productTranslation'
 
 export function viewAnalyticalConstituent(
   productAC: ProductAnalyticalConstituent,
-  language: Language['id'] | undefined = 'FR',
+  language: Language['id'] | undefined = 'EN',
 ) {
   let translation = productAC.analyticalConstituent.translations.find(
     (t) => t.languageId === language,
@@ -25,7 +25,7 @@ export function viewAnalyticalConstituent(
 
 export function viewAnalyticalConstituents(
   analyticalConstituents: ProductAnalyticalConstituent[],
-  language: Language['id'] = 'FR',
+  language: Language['id'] = 'EN',
 ) {
   return analyticalConstituents.map((analyticalConstituent) =>
     viewAnalyticalConstituent(analyticalConstituent, language),
@@ -49,7 +49,7 @@ export function viewProduct(product: Product, language: Language['id'] | undefin
   return productClient
 }
 
-export function viewProducts(ingredients: Product[], language: Language['id'] = 'FR') {
+export function viewProducts(ingredients: Product[], language: Language['id'] = 'EN') {
   return ingredients.map((ingredient) => viewProduct(ingredient, language))
 }
 
