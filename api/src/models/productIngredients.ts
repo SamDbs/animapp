@@ -10,27 +10,27 @@ import {
   UpdateDateColumn,
 } from 'typeorm'
 
-import AnalyticalConstituent from './analyticalConstituent'
+import Ingredient from './ingredient'
 import Product from './product'
 
 @Entity()
-export default class ProductAnalyticalConstituent extends BaseEntity {
+export default class ProductIngredient extends BaseEntity {
   @PrimaryColumn()
   productId!: number
 
   @PrimaryColumn()
-  analyticalConstituentId!: number
+  ingredientId!: number
 
   @Column({ nullable: true })
   quantity!: string
 
-  @ManyToOne(() => Product, (product) => product.analyticalConstituents)
+  @ManyToOne(() => Product, (product) => product.ingredients)
   @JoinColumn({ name: 'productId' })
   product!: Product
 
-  @ManyToOne(() => AnalyticalConstituent, (analyticalConstituent) => analyticalConstituent.products)
-  @JoinColumn({ name: 'analyticalConstituentId' })
-  analyticalConstituent!: AnalyticalConstituent
+  @ManyToOne(() => Ingredient, (ingredient) => ingredient.products)
+  @JoinColumn({ name: 'ingredientId' })
+  ingredient!: Ingredient
 
   @CreateDateColumn()
   createdAt!: Date

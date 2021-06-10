@@ -1,3 +1,4 @@
+import { Constituent } from '@hooks/stores/constituent'
 import { Ingredient } from '@hooks/stores/ingredient'
 import { Product } from '@hooks/stores/product'
 import useSearchableList from '@hooks/useSearchableList'
@@ -6,14 +7,14 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
 import type { UseStore, StateSelector } from 'zustand'
 
-type SubItemProps<OwnedItem extends Ingredient> = {
+type SubItemProps<OwnedItem extends Ingredient | Constituent> = {
   children?: JSX.Element | false
   item: Partial<OwnedItem>
   entityLinkCreator: (entity: Partial<OwnedItem>) => string
   even: boolean
 }
 
-function SubItem<OwnedItem extends Ingredient>(props: SubItemProps<OwnedItem>) {
+function SubItem<OwnedItem extends Ingredient | Constituent>(props: SubItemProps<OwnedItem>) {
   return (
     <View
       style={{
@@ -33,7 +34,7 @@ function SubItem<OwnedItem extends Ingredient>(props: SubItemProps<OwnedItem>) {
 
 type Props<
   OwnerItem extends Product,
-  OwnedItem extends Ingredient,
+  OwnedItem extends Ingredient | Constituent,
   StoreShape extends {
     registerIds: (ids: string[]) => void
     unregisterIds: (ids: string[]) => void
@@ -48,7 +49,11 @@ type Props<
   >
   ownedItemsUpdaterSelector: StateSelector<
     StoreShape,
-    (ownerId: OwnerItem['id'], ownedId: OwnedItem['id']) => Promise<{ ids: OwnedItem['id'][] }>
+    (ownerId: OwnerItem['id'], ownedId: OwnedItem['id']) => Promise<void>
+  >
+  ownedItemsDeletorSelector: StateSelector<
+    StoreShape,
+    (ownerId: OwnerItem['id'], ownedId: OwnedItem['id']) => Promise<void>
   >
   ownedItemsSelectorCreator: (
     ids: OwnedItem['id'][],
@@ -64,7 +69,7 @@ type Props<
 
 export default function ManyToMany<
   OwnerItem extends Product,
-  OwnedItem extends Ingredient,
+  OwnedItem extends Ingredient | Constituent,
   StoreShape extends {
     registerIds: (ids: string[]) => void
     unregisterIds: (ids: string[]) => void
@@ -75,6 +80,7 @@ export default function ManyToMany<
   useOwnedStore,
   ownedItemsGetterSelector,
   ownedItemsUpdaterSelector,
+  ownedItemsDeletorSelector,
   ownedItemsSelectorCreator,
   registerOwnedIdsSelector,
   unregisterOwnedIdsSelector,
@@ -84,9 +90,11 @@ export default function ManyToMany<
   ownedEntityLinkCreator,
 }: Props<OwnerItem, OwnedItem, StoreShape, RelationParams>) {
   const [ids, setIds] = useState<OwnedItem['id'][]>([])
+  console.log('ids', ids)
   const [isLoading, setIsLoading] = useState(false)
   const getOwnedByOwnerId = useOwnedStore(ownedItemsGetterSelector)
-  const updateOwnedByOwnerId = useOwnedStore(ownedItemsUpdaterSelector)
+  const upsertOwnedToOwner = useOwnedStore(ownedItemsUpdaterSelector)
+  const deleteOwnedFromOwner = useOwnedStore(ownedItemsDeletorSelector)
   const ownedItemsSelector = useCallback(ownedItemsSelectorCreator(ids), [ids])
   const ownedEntities = useOwnedStore(ownedItemsSelector)
   const registerOwnedIds = useOwnedStore(registerOwnedIdsSelector)
@@ -119,9 +127,14 @@ export default function ManyToMany<
     return () => unregisterOwnedIds(ids)
   }, [ids])
 
-  const updateIngredient = async (ownedId: OwnedItem['id']) => {
-    const { ids } = await updateOwnedByOwnerId(ownerEntityId, ownedId)
-    setIds(ids)
+  const updateOwned = async (ownedId: OwnedItem['id']) => {
+    await upsertOwnedToOwner(ownerEntityId, ownedId)
+    setIds((ids) => [...ids, ownedId])
+  }
+
+  const deleteOwned = async (ownedId: OwnedItem['id']) => {
+    await deleteOwnedFromOwner(ownerEntityId, ownedId)
+    setIds((ids) => ids.filter((x) => x !== ownedId))
   }
 
   if (isLoading) return <ActivityIndicator />
@@ -143,11 +156,7 @@ export default function ManyToMany<
             item={item}
             even={i % 2 === 0}>
             {editing && (
-              <Button
-                title="Unlink"
-                onPress={() => updateIngredient(item.id as string)}
-                color="#c00"
-              />
+              <Button title="Unlink" onPress={() => deleteOwned(item.id as string)} color="#c00" />
             )}
           </SubItem>
         ))}
@@ -186,7 +195,7 @@ export default function ManyToMany<
                       entityLinkCreator={ownedEntityLinkCreator}
                       item={item}
                       even={i % 2 === 0}>
-                      <Button title="Link" onPress={() => updateIngredient(item.id as string)} />
+                      <Button title="Link" onPress={() => updateOwned(item.id as string)} />
                     </SubItem>
                   )
                 })}

@@ -3,7 +3,6 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
-  ManyToMany,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -12,7 +11,7 @@ import {
 
 import Image from './image'
 import IngredientTranslation from './ingredientTranslation'
-import Product from './product'
+import ProductIngredient from './productIngredients'
 
 @Entity()
 export default class Ingredient extends BaseEntity {
@@ -25,8 +24,8 @@ export default class Ingredient extends BaseEntity {
   @OneToMany(() => IngredientTranslation, (translation) => translation.ingredient)
   translations!: IngredientTranslation[]
 
-  @ManyToMany(() => Product, (product) => product.ingredients)
-  products!: Product[]
+  @OneToMany(() => ProductIngredient, (product) => product.ingredient)
+  products!: ProductIngredient[]
 
   @CreateDateColumn()
   createdAt!: Date

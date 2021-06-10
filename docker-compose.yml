@@ -20,18 +20,3 @@ services:
       - "5432:5432"
     volumes:
       - ./api/pg_data:/var/lib/postgresql/data
-
-  pgadmin:
-    image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=pgadmin4@pgadmin.org
-      - PGADMIN_DEFAULT_PASSWORD=admin
-      - PGADMIN_LISTEN_PORT=80
-      - PGADMIN_SERVER_JSON_FILE=/pgadmin4/servers.json
-    ports:
-      - "5050:80"
-    volumes:
-      - type: bind
-        source: ./pgadmin-servers.json
-        target: /pgadmin4/servers.json
-    restart: unless-stopped

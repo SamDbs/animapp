@@ -60,7 +60,7 @@ app.use('/ingredients', ingredients)
 app.use('/contacts', contacts)
 app.use('/faq', faq)
 app.use('/languages', languages)
-app.use('/analyticalConstituents', analyticalConstituents)
+app.use('/analytical-constituents', analyticalConstituents)
 app.use('/auth', authentication)
 app.use('/admin', admin)
 

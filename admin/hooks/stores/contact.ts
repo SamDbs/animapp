@@ -21,74 +21,77 @@ export type ContactStoreState = {
 }
 
 const useContactsStore = create<ContactStoreState>(
-  devtools((set) => ({
-    contacts: {},
-    usedContactIds: {},
-    registerIds(ids: Contact['id'][]) {
-      set((state) => {
-        const update: Record<Contact['id'], number> = ids.reduce(
-          (acc, id) => ({
-            ...acc,
-            [id]: id in state.usedContactIds ? state.usedContactIds[id] + 1 : 1,
-          }),
-          {},
-        )
+  devtools(
+    (set) => ({
+      contacts: {},
+      usedContactIds: {},
+      registerIds(ids: Contact['id'][]) {
+        set((state) => {
+          const update: Record<Contact['id'], number> = ids.reduce(
+            (acc, id) => ({
+              ...acc,
+              [id]: id in state.usedContactIds ? state.usedContactIds[id] + 1 : 1,
+            }),
+            {},
+          )
 
-        const newState = {
-          ...state,
-          usedContactIds: { ...state.usedContactIds, ...update },
-        }
+          const newState = {
+            ...state,
+            usedContactIds: { ...state.usedContactIds, ...update },
+          }
 
-        const idsToDelete = Object.entries(newState.usedContactIds)
-          .filter(([, value]) => value < 1)
-          .map(([key]) => key)
+          const idsToDelete = Object.entries(newState.usedContactIds)
+            .filter(([, value]) => value < 1)
+            .map(([key]) => key)
 
-        const finalState = {
-          ...newState,
-          contacts: omit(newState.contacts, idsToDelete),
-          usedContactIds: omit(newState.usedContactIds, idsToDelete),
-        }
-        return finalState
-      })
-    },
-    unregisterIds(ids: Contact['id'][]) {
-      set((state) => {
-        const update: Record<Contact['id'], number> = ids.reduce(
-          (acc, id) => ({
-            ...acc,
-            [id]: id in state.usedContactIds ? state.usedContactIds[id] - 1 : 0,
-          }),
-          {},
-        )
-        const newState = { ...state, usedContactIds: { ...state.usedContactIds, ...update } }
-        return newState
-      })
-    },
-    async getContacts() {
-      const { data } = await fetcher.get<Contact[]>(`/contacts`)
+          const finalState = {
+            ...newState,
+            contacts: omit(newState.contacts, idsToDelete),
+            usedContactIds: omit(newState.usedContactIds, idsToDelete),
+          }
+          return finalState
+        })
+      },
+      unregisterIds(ids: Contact['id'][]) {
+        set((state) => {
+          const update: Record<Contact['id'], number> = ids.reduce(
+            (acc, id) => ({
+              ...acc,
+              [id]: id in state.usedContactIds ? state.usedContactIds[id] - 1 : 0,
+            }),
+            {},
+          )
+          const newState = { ...state, usedContactIds: { ...state.usedContactIds, ...update } }
+          return newState
+        })
+      },
+      async getContacts() {
+        const { data } = await fetcher.get<Contact[]>(`/contacts`)
 
-      const contacts = data.map((contact) => ({ ...contact, id: contact.id.toString() }))
+        const contacts = data.map((contact) => ({ ...contact, id: contact.id.toString() }))
 
-      const ids = map(contacts, (contact) => contact.id)
-      const entities = keyBy(contacts, (contact) => contact.id)
+        const ids = map(contacts, (contact) => contact.id)
+        const entities = keyBy(contacts, (contact) => contact.id)
 
-      set((state) => ({ contacts: { ...state.contacts, ...entities } }))
-      return { ids }
-    },
-    async searchContacts(query: string) {
-      const { data } = await fetcher.get<Contact[]>(`/contacts`, {
-        params: { q: query },
-      })
+        set((state) => ({ contacts: { ...state.contacts, ...entities } }))
+        return { ids }
+      },
+      async searchContacts(query: string) {
+        const { data } = await fetcher.get<Contact[]>(`/contacts`, {
+          params: { q: query },
+        })
 
-      const contacts = data.map((contact) => ({ ...contact, id: contact.id.toString() }))
+        const contacts = data.map((contact) => ({ ...contact, id: contact.id.toString() }))
 
-      const ids = map(contacts, (contact) => contact.id)
-      const entities = keyBy(contacts, (contact) => contact.id)
+        const ids = map(contacts, (contact) => contact.id)
+        const entities = keyBy(contacts, (contact) => contact.id)
 
-      set((state) => ({ contacts: { ...state.contacts, ...entities } }))
-      return { ids }
-    },
-  })),
+        set((state) => ({ contacts: { ...state.contacts, ...entities } }))
+        return { ids }
+      },
+    }),
+    'contact',
+  ),
 )
 
 export default useContactsStore

@@ -3,6 +3,10 @@ import FieldTranslatable from '@components/FieldTranslatable'
 import FieldWithLabel from '@components/FieldWithLabel'
 import ManyToMany from '@components/ManyToMany'
 import { PageHeader } from '@components/Themed'
+import useConstituentsStore, {
+  Constituent as ConstituentEntity,
+  ConstituentStoreState,
+} from '@hooks/stores/constituent'
 import useIngredientStore, {
   Ingredient as IngredientEntity,
   IngredientStore,
@@ -113,12 +117,32 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             ownerEntityId={product.id}
             ownedItemsGetterSelector={(state) => state.getIngredientsByProductId}
             ownedItemsUpdaterSelector={(state) => state.updateIngredientsByProductId}
+            ownedItemsDeletorSelector={(state) => state.deleteIngredientFromProductId}
             ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.ingredients[id])}
             registerOwnedIdsSelector={(state) => state.registerIds}
             unregisterOwnedIdsSelector={(state) => state.unregisterIds}
             getItemsSelector={(state) => state.getIngredients}
             searchItemsSelector={(state) => state.searchIngredients}
             ownedEntityLinkCreator={(item) => `/ingredients/${item.id}`}
+          />
+        )}
+      </Card>
+      <Card style={{ marginVertical: 16 }}>
+        <Text style={{ fontSize: 18 }}>Attached Analytical Constituent</Text>
+        {isLoading && !product && <ActivityIndicator />}
+        {product && (
+          <ManyToMany<ProductEntity, ConstituentEntity, ConstituentStoreState>
+            useOwnedStore={useConstituentsStore}
+            ownerEntityId={product.id}
+            ownedItemsGetterSelector={(state) => state.getConstituentsByProductId}
+            ownedItemsUpdaterSelector={(state) => state.updateConstituentsByProductId}
+            ownedItemsDeletorSelector={(state) => state.deleteConstituentFromProductId}
+            ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.constituents[id])}
+            registerOwnedIdsSelector={(state) => state.registerIds}
+            unregisterOwnedIdsSelector={(state) => state.unregisterIds}
+            getItemsSelector={(state) => state.getConstituents}
+            searchItemsSelector={(state) => state.searchConstituents}
+            ownedEntityLinkCreator={(item) => `/analytical-constituents/${item.id}`}
           />
         )}
       </Card>

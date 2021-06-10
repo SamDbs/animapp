@@ -40,134 +40,130 @@ export type IngredientStore = {
   updateIngredientsByProductId: (
     productId: Product['id'],
     ingredientId: Ingredient['id'],
-  ) => Promise<{ ids: Ingredient['id'][] }>
+  ) => Promise<void>
+  deleteIngredientFromProductId: (
+    productId: Product['id'],
+    ingredientId: Ingredient['id'],
+  ) => Promise<void>
 }
 
 const useIngredientsStore = create<IngredientStore>(
-  devtools((set) => ({
-    ingredients: {},
-    usedIngredientIds: {},
-    registerIds(ids: Ingredient['id'][]) {
-      set((state) => {
-        const update: Record<Ingredient['id'], number> = ids.reduce(
-          (acc, id) => ({
-            ...acc,
-            [id]: id in state.usedIngredientIds ? state.usedIngredientIds[id] + 1 : 1,
-          }),
-          {},
-        )
+  devtools(
+    (set) => ({
+      ingredients: {},
+      usedIngredientIds: {},
+      registerIds(ids: Ingredient['id'][]) {
+        set((state) => {
+          const update: Record<Ingredient['id'], number> = ids.reduce(
+            (acc, id) => ({
+              ...acc,
+              [id]: id in state.usedIngredientIds ? state.usedIngredientIds[id] + 1 : 1,
+            }),
+            {},
+          )
 
-        const newState = {
+          const newState = {
+            ...state,
+            usedIngredientIds: { ...state.usedIngredientIds, ...update },
+          }
+
+          const idsToDelete = Object.entries(newState.usedIngredientIds)
+            .filter(([, value]) => value < 1)
+            .map(([key]) => key)
+
+          const finalState = {
+            ...newState,
+            ingredients: omit(idsToDelete, newState.ingredients),
+            usedIngredientIds: omit(idsToDelete, newState.usedIngredientIds),
+          }
+          return finalState
+        })
+      },
+      unregisterIds(ids: Ingredient['id'][]) {
+        set((state) => {
+          const update: Record<Ingredient['id'], number> = ids.reduce(
+            (acc, id) => ({
+              ...acc,
+              [id]: id in state.usedIngredientIds ? state.usedIngredientIds[id] - 1 : 0,
+            }),
+            {},
+          )
+          const newState = {
+            ...state,
+            usedIngredientIds: { ...state.usedIngredientIds, ...update },
+          }
+          return newState
+        })
+      },
+      async getIngredientById(id: string) {
+        const { data } = await fetcher.get<Ingredient>(`/ingredients/${id}`)
+        const ingredient = { ...data, id: data.id.toString() }
+
+        set((state) => ({ ingredients: { ...state.ingredients, [ingredient.id]: ingredient } }))
+        return { id }
+      },
+      async getIngredients() {
+        const { data } = await fetcher.get<Ingredient[]>(`/ingredients`)
+
+        const ingredients = data.map((ingredient) => ({
+          ...ingredient,
+          id: ingredient.id.toString(),
+        }))
+
+        const ids = ingredients.map((ingredient) => ingredient.id)
+        const entities = keyBy((ingredient) => ingredient.id, ingredients)
+
+        set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
+        return { ids }
+      },
+      async updateIngredient(id: Ingredient['id'], params: Partial<Ingredient>) {
+        set((state) => ({
           ...state,
-          usedIngredientIds: { ...state.usedIngredientIds, ...update },
-        }
+          ingredients: { ...state.ingredients, [id]: { ...state.ingredients[id], ...params } },
+        }))
+        await prepareIngredientUpdate(id, params)
+      },
+      async searchIngredients(query: string) {
+        const { data } = await fetcher.get<Ingredient[]>(`/ingredients`, { params: { q: query } })
 
-        const idsToDelete = Object.entries(newState.usedIngredientIds)
-          .filter(([, value]) => value < 1)
-          .map(([key]) => key)
+        const ingredients = data.map((ingredient) => ({
+          ...ingredient,
+          id: ingredient.id.toString(),
+        }))
 
-        const finalState = {
-          ...newState,
-          ingredients: omit(idsToDelete, newState.ingredients),
-          usedIngredientIds: omit(idsToDelete, newState.usedIngredientIds),
-        }
-        return finalState
-      })
-    },
-    unregisterIds(ids: Ingredient['id'][]) {
-      set((state) => {
-        const update: Record<Ingredient['id'], number> = ids.reduce(
-          (acc, id) => ({
-            ...acc,
-            [id]: id in state.usedIngredientIds ? state.usedIngredientIds[id] - 1 : 0,
-          }),
-          {},
-        )
-        const newState = {
-          ...state,
-          usedIngredientIds: { ...state.usedIngredientIds, ...update },
-        }
-        return newState
-      })
-    },
-    async getIngredientById(id: string) {
-      const { data } = await fetcher.get<Ingredient>(`/ingredients/${id}`)
-      const ingredient = { ...data, id: data.id.toString() }
+        const ids = ingredients.map((ingredient) => ingredient.id)
+        const entities = keyBy((ingredient) => ingredient.id, ingredients)
 
-      set((state) => ({ ingredients: { ...state.ingredients, [ingredient.id]: ingredient } }))
-      return { id }
-    },
-    async getIngredients() {
-      const { data } = await fetcher.get<Ingredient[]>(`/ingredients`)
+        set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
+        return { ids }
+      },
+      createIngredient() {
+        return fetcher.post(`/ingredients`)
+      },
+      async getIngredientsByProductId(productId) {
+        const { data } = await fetcher.get<Ingredient[]>(`/products/${productId}/ingredients`)
 
-      const ingredients = data.map((ingredient) => ({
-        ...ingredient,
-        id: ingredient.id.toString(),
-      }))
+        const ingredients = data.map((ingredient) => ({
+          ...ingredient,
+          id: ingredient.id.toString(),
+        }))
 
-      const ids = ingredients.map((ingredient) => ingredient.id)
-      const entities = keyBy((ingredient) => ingredient.id, ingredients)
+        const ids = ingredients.map((ingredient) => ingredient.id)
+        const entities = keyBy((ingredient) => ingredient.id, ingredients)
 
-      set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
-      return { ids }
-    },
-    async updateIngredient(id: Ingredient['id'], params: Partial<Ingredient>) {
-      set((state) => ({
-        ...state,
-        ingredients: { ...state.ingredients, [id]: { ...state.ingredients[id], ...params } },
-      }))
-      await prepareIngredientUpdate(id, params)
-    },
-    async searchIngredients(query: string) {
-      const { data } = await fetcher.get<Ingredient[]>(`/ingredients`, { params: { q: query } })
+        set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
 
-      const ingredients = data.map((ingredient) => ({
-        ...ingredient,
-        id: ingredient.id.toString(),
-      }))
-
-      const ids = ingredients.map((ingredient) => ingredient.id)
-      const entities = keyBy((ingredient) => ingredient.id, ingredients)
-
-      set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
-      return { ids }
-    },
-    createIngredient() {
-      return fetcher.post(`/ingredients`)
-    },
-    async getIngredientsByProductId(productId) {
-      const { data } = await fetcher.get<Ingredient[]>(`/products/${productId}/ingredients`)
-
-      const ingredients = data.map((ingredient) => ({
-        ...ingredient,
-        id: ingredient.id.toString(),
-      }))
-
-      const ids = ingredients.map((ingredient) => ingredient.id)
-      const entities = keyBy((ingredient) => ingredient.id, ingredients)
-
-      set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
-
-      return { ids }
-    },
-    async updateIngredientsByProductId(productId, ingredientId) {
-      const { data } = await fetcher.patch<Ingredient[]>(`/products/${productId}/ingredients`, {
-        ingredientId,
-      })
-
-      const ingredients = data.map((ingredient) => ({
-        ...ingredient,
-        id: ingredient.id.toString(),
-      }))
-
-      const ids = ingredients.map((ingredient) => ingredient.id)
-      const entities = keyBy((ingredient) => ingredient.id, ingredients)
-
-      set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
-
-      return { ids }
-    },
-  })),
+        return { ids }
+      },
+      async updateIngredientsByProductId(productId, ingredientId) {
+        await fetcher.put<Ingredient[]>(`/products/${productId}/ingredients/${ingredientId}`, {})
+      },
+      async deleteIngredientFromProductId(productId, ingredientId) {
+        await fetcher.delete<Ingredient[]>(`/products/${productId}/ingredients/${ingredientId}`, {})
+      },
+    }),
+    'ingredient',
+  ),
 )
 
 export default useIngredientsStore

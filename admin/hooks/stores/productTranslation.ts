@@ -60,56 +60,59 @@ export type ProductTranslationStore = {
 }
 
 const useProductTranslationStore = create<ProductTranslationStore>(
-  devtools((set, get) => ({
-    productTranslations: {},
-    async getProductTranslations(productId: Product['id']) {
-      const { data } = await fetcher.get<ProductTranslation[]>(
-        `/products/${productId}/translations`,
-      )
+  devtools(
+    (set, get) => ({
+      productTranslations: {},
+      async getProductTranslations(productId: Product['id']) {
+        const { data } = await fetcher.get<ProductTranslation[]>(
+          `/products/${productId}/translations`,
+        )
 
-      const translations = data.map((translation) => ({
-        ...translation,
-        id: `${translation.productId.toString()}-${translation.languageId.toString()}`,
-      }))
-
-      const ids = translations.map((translation) => translation.id)
-      const entities = keyBy((translation) => translation.id, translations)
-
-      set((state) => ({ productTranslations: { ...state.productTranslations, ...entities } }))
-      return { ids }
-    },
-    async updateProductTranslation(
-      productId: Product['id'],
-      languageId: Language['id'],
-      params: Partial<ProductTranslation>,
-    ) {
-      const id = `${productId}-${languageId}`
-      if (!get().productTranslations[id]) {
-        set((state) => ({
-          productTranslations: { ...state.productTranslations, [id]: params as any },
+        const translations = data.map((translation) => ({
+          ...translation,
+          id: `${translation.productId.toString()}-${translation.languageId.toString()}`,
         }))
 
-        await fetcher.post<ProductTranslation[]>(`/products/${productId}/translations`, {
-          languageId,
-          ...get().productTranslations[id],
-        })
+        const ids = translations.map((translation) => translation.id)
+        const entities = keyBy((translation) => translation.id, translations)
 
-        return
-      }
+        set((state) => ({ productTranslations: { ...state.productTranslations, ...entities } }))
+        return { ids }
+      },
+      async updateProductTranslation(
+        productId: Product['id'],
+        languageId: Language['id'],
+        params: Partial<ProductTranslation>,
+      ) {
+        const id = `${productId}-${languageId}`
+        if (!get().productTranslations[id]) {
+          set((state) => ({
+            productTranslations: { ...state.productTranslations, [id]: params as any },
+          }))
 
-      set((state) => ({
-        productTranslations: {
-          ...state.productTranslations,
-          [`${productId}-${languageId}`]: {
-            ...state.productTranslations[`${productId}-${languageId}`],
-            ...params,
+          await fetcher.post<ProductTranslation[]>(`/products/${productId}/translations`, {
+            languageId,
+            ...get().productTranslations[id],
+          })
+
+          return
+        }
+
+        set((state) => ({
+          productTranslations: {
+            ...state.productTranslations,
+            [`${productId}-${languageId}`]: {
+              ...state.productTranslations[`${productId}-${languageId}`],
+              ...params,
+            },
           },
-        },
-      }))
-      await prepareProductTranslationsUpdate(productId, languageId, params)
-    },
-    async createProductTranslation() {},
-  })),
+        }))
+        await prepareProductTranslationsUpdate(productId, languageId, params)
+      },
+      async createProductTranslation() {},
+    }),
+    'product translation',
+  ),
 )
 
 export default useProductTranslationStore

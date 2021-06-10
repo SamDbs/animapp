@@ -5,8 +5,6 @@ import {
   DeleteDateColumn,
   Entity,
   JoinColumn,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -16,8 +14,8 @@ import {
 
 import Brand from './brand'
 import Image from './image'
-import Ingredient from './ingredient'
 import ProductAnalyticalConstituent from './productAnalyticalConstituent'
+import ProductIngredient from './productIngredients'
 import ProductTranslation from './productTranslation'
 
 @Entity()
@@ -46,12 +44,11 @@ export default class Product extends BaseEntity {
   )
   analyticalConstituents!: ProductAnalyticalConstituent[]
 
+  @OneToMany(() => ProductIngredient, (productIngredient) => productIngredient.product)
+  ingredients!: ProductAnalyticalConstituent[]
+
   @OneToMany(() => ProductTranslation, (translation) => translation.product)
   translations!: ProductTranslation[]
-
-  @ManyToMany(() => Ingredient, (ingredient) => ingredient.products)
-  @JoinTable()
-  ingredients!: Ingredient[]
 
   @ManyToOne(() => Brand, (brand) => brand.products, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'brandId' })

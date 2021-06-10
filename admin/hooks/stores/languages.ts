@@ -35,81 +35,84 @@ type LanguageStoreState = {
 }
 
 const useLanguagesStore = create<LanguageStoreState>(
-  devtools((set, get) => ({
-    languages: {},
-    usedLanguageIds: {},
-    registerIds(ids: Language['id'][]) {
-      set((state) => {
-        const update: Record<Language['id'], number> = ids.reduce(
-          (acc, id) => ({
-            ...acc,
-            [id]: id in state.usedLanguageIds ? state.usedLanguageIds[id] + 1 : 1,
-          }),
-          {},
-        )
+  devtools(
+    (set, get) => ({
+      languages: {},
+      usedLanguageIds: {},
+      registerIds(ids: Language['id'][]) {
+        set((state) => {
+          const update: Record<Language['id'], number> = ids.reduce(
+            (acc, id) => ({
+              ...acc,
+              [id]: id in state.usedLanguageIds ? state.usedLanguageIds[id] + 1 : 1,
+            }),
+            {},
+          )
 
-        const newState = {
+          const newState = {
+            ...state,
+            usedLanguageIds: { ...state.usedLanguageIds, ...update },
+          }
+
+          const idsToDelete = Object.entries(newState.usedLanguageIds)
+            .filter(([, value]) => value < 1)
+            .map(([key]) => key)
+
+          const finalState = {
+            ...newState,
+            languages: omit(idsToDelete, newState.languages),
+            usedLanguageIds: omit(idsToDelete, newState.usedLanguageIds),
+          }
+          return finalState
+        })
+      },
+      unregisterIds(ids: Language['id'][]) {
+        set((state) => {
+          const update: Record<Language['id'], number> = ids.reduce(
+            (acc, id) => ({
+              ...acc,
+              [id]: id in state.usedLanguageIds ? state.usedLanguageIds[id] - 1 : 0,
+            }),
+            {},
+          )
+          const newState = {
+            ...state,
+            usedLanguageIds: { ...state.usedLanguageIds, ...update },
+          }
+          return newState
+        })
+      },
+      async getLanguageById(id) {
+        const { data } = await fetcher.get<Language>(`/languages/${id}`)
+        const language = { ...data, id: data.id.toString() }
+
+        set((state) => ({ languages: { ...state.languages, [language.id]: language } }))
+        return { id }
+      },
+      async updateLanguage(id, params) {
+        set((state) => ({
           ...state,
-          usedLanguageIds: { ...state.usedLanguageIds, ...update },
-        }
+          languages: { ...state.languages, [id]: { ...state.languages[id], ...params } },
+        }))
+        await prepareIngredientUpdate(id, params)
+      },
+      async getAllLanguages() {
+        const { data } = await fetcher.get<Product[]>(`/languages`)
 
-        const idsToDelete = Object.entries(newState.usedLanguageIds)
-          .filter(([, value]) => value < 1)
-          .map(([key]) => key)
+        const languages = data.map((lang) => ({ ...lang, id: lang.id.toString() }))
 
-        const finalState = {
-          ...newState,
-          languages: omit(idsToDelete, newState.languages),
-          usedLanguageIds: omit(idsToDelete, newState.usedLanguageIds),
-        }
-        return finalState
-      })
-    },
-    unregisterIds(ids: Language['id'][]) {
-      set((state) => {
-        const update: Record<Language['id'], number> = ids.reduce(
-          (acc, id) => ({
-            ...acc,
-            [id]: id in state.usedLanguageIds ? state.usedLanguageIds[id] - 1 : 0,
-          }),
-          {},
-        )
-        const newState = {
-          ...state,
-          usedLanguageIds: { ...state.usedLanguageIds, ...update },
-        }
-        return newState
-      })
-    },
-    async getLanguageById(id) {
-      const { data } = await fetcher.get<Language>(`/languages/${id}`)
-      const language = { ...data, id: data.id.toString() }
+        const ids = languages.map((lang) => lang.id)
+        const entities = keyBy((lang) => lang.id, languages)
 
-      set((state) => ({ languages: { ...state.languages, [language.id]: language } }))
-      return { id }
-    },
-    async updateLanguage(id, params) {
-      set((state) => ({
-        ...state,
-        languages: { ...state.languages, [id]: { ...state.languages[id], ...params } },
-      }))
-      await prepareIngredientUpdate(id, params)
-    },
-    async getAllLanguages() {
-      const { data } = await fetcher.get<Product[]>(`/languages`)
-
-      const languages = data.map((lang) => ({ ...lang, id: lang.id.toString() }))
-
-      const ids = languages.map((lang) => lang.id)
-      const entities = keyBy((lang) => lang.id, languages)
-
-      set((state) => ({ ...state, languages: { ...state.languages, ...entities } }))
-      return { ids }
-    },
-    async createLanguage(params) {
-      return fetcher.post(`/languages`, params)
-    },
-  })),
+        set((state) => ({ ...state, languages: { ...state.languages, ...entities } }))
+        return { ids }
+      },
+      async createLanguage(params) {
+        return fetcher.post(`/languages`, params)
+      },
+    }),
+    'language',
+  ),
 )
 
 export default useLanguagesStore
