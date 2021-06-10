@@ -24,129 +24,135 @@ export type ConstituentStoreState = {
   updateConstituentsByProductId: (
     productId: Product['id'],
     constituentId: Constituent['id'],
-  ) => Promise<{ ids: Constituent['id'][] }>
+  ) => Promise<void>
+  deleteConstituentFromProductId: (
+    productId: Product['id'],
+    constituentId: Constituent['id'],
+  ) => Promise<void>
 }
 
 const useConstituentsStore = create<ConstituentStoreState>(
-  devtools((set) => ({
-    constituents: {},
-    usedConstituentIds: {},
-    registerIds(ids: Constituent['id'][]) {
-      set((state) => {
-        const update: Record<Constituent['id'], number> = ids.reduce(
-          (acc, id) => ({
-            ...acc,
-            [id]: id in state.usedConstituentIds ? state.usedConstituentIds[id] + 1 : 1,
-          }),
-          {},
+  devtools(
+    (set, get) => ({
+      constituents: {},
+      usedConstituentIds: {},
+      registerIds(ids: Constituent['id'][]) {
+        set((state) => {
+          const update: Record<Constituent['id'], number> = ids.reduce(
+            (acc, id) => ({
+              ...acc,
+              [id]: id in state.usedConstituentIds ? state.usedConstituentIds[id] + 1 : 1,
+            }),
+            {},
+          )
+
+          const newState = {
+            ...state,
+            usedConstituentIds: { ...state.usedConstituentIds, ...update },
+          }
+
+          const idsToDelete = Object.entries(newState.usedConstituentIds)
+            .filter(([, value]) => value < 1)
+            .map(([key]) => key)
+
+          const finalState = {
+            ...newState,
+            constituents: omit(idsToDelete, newState.constituents),
+            usedConstituentIds: omit(idsToDelete, newState.usedConstituentIds),
+          }
+          return finalState
+        })
+      },
+      unregisterIds(ids: Constituent['id'][]) {
+        set((state) => {
+          const update: Record<Constituent['id'], number> = ids.reduce(
+            (acc, id) => ({
+              ...acc,
+              [id]: id in state.usedConstituentIds ? state.usedConstituentIds[id] - 1 : 0,
+            }),
+            {},
+          )
+          const newState = {
+            ...state,
+            usedConstituentIds: { ...state.usedConstituentIds, ...update },
+          }
+          return newState
+        })
+      },
+      async getConstituentById(id: string) {
+        const { data } = await fetcher.get<Constituent>(`/analytical-constituents/${id}`)
+        const constituent = { ...data, id: data.id.toString() }
+
+        set((state) => ({ constituents: { ...state.constituents, [constituent.id]: constituent } }))
+        return { id }
+      },
+      async getConstituents() {
+        const { data } = await fetcher.get<Constituent[]>(`/analytical-constituents`)
+
+        const constituents = data.map((constituent) => ({
+          ...get().constituents[constituent.id.toString()],
+          ...constituent,
+          id: constituent.id.toString(),
+        }))
+
+        const ids = constituents.map((constituent) => constituent.id)
+        const entities = keyBy((constituent) => constituent.id, constituents)
+
+        set((state) => ({ constituents: { ...state.constituents, ...entities } }))
+        return { ids }
+      },
+      async searchConstituents(query: string) {
+        const { data } = await fetcher.get<Constituent[]>(`/analytical-constituents`, {
+          params: { q: query },
+        })
+
+        const constituents = data.map((constituent) => ({
+          ...get().constituents[constituent.id.toString()],
+          ...constituent,
+          id: constituent.id.toString(),
+        }))
+
+        const ids = constituents.map((constituent) => constituent.id)
+        const entities = keyBy((constituent) => constituent.id, constituents)
+
+        set((state) => ({ constituents: { ...state.constituents, ...entities } }))
+        return { ids }
+      },
+      createConstituent() {
+        return fetcher.post(`/analytical-constituents`)
+      },
+      async getConstituentsByProductId(productId) {
+        const { data } = await fetcher.get<Constituent[]>(
+          `/products/${productId}/analytical-constituents`,
         )
 
-        const newState = {
-          ...state,
-          usedConstituentIds: { ...state.usedConstituentIds, ...update },
-        }
+        const constituents = data.map((constituent) => ({
+          ...constituent,
+          id: constituent.id.toString(),
+        }))
 
-        const idsToDelete = Object.entries(newState.usedConstituentIds)
-          .filter(([, value]) => value < 1)
-          .map(([key]) => key)
+        const ids = constituents.map((constituent) => constituent.id)
+        const entities = keyBy((constituent) => constituent.id, constituents)
 
-        const finalState = {
-          ...newState,
-          constituents: omit(idsToDelete, newState.constituents),
-          usedConstituentIds: omit(idsToDelete, newState.usedConstituentIds),
-        }
-        return finalState
-      })
-    },
-    unregisterIds(ids: Constituent['id'][]) {
-      set((state) => {
-        const update: Record<Constituent['id'], number> = ids.reduce(
-          (acc, id) => ({
-            ...acc,
-            [id]: id in state.usedConstituentIds ? state.usedConstituentIds[id] - 1 : 0,
-          }),
+        set((state) => ({ constituents: { ...state.constituents, ...entities } }))
+
+        return { ids }
+      },
+      async updateConstituentsByProductId(productId, constituentId) {
+        await fetcher.put<Constituent[]>(
+          `/products/${productId}/analytical-constituents/${constituentId}`,
           {},
         )
-        const newState = {
-          ...state,
-          usedConstituentIds: { ...state.usedConstituentIds, ...update },
-        }
-        return newState
-      })
-    },
-    async getConstituentById(id: string) {
-      const { data } = await fetcher.get<Constituent>(`/analyticalConstituents/${id}`)
-      const constituent = { ...data, id: data.id.toString() }
-
-      set((state) => ({ constituents: { ...state.constituents, [constituent.id]: constituent } }))
-      return { id }
-    },
-    async getConstituents() {
-      const { data } = await fetcher.get<Constituent[]>(`/analyticalConstituents`)
-
-      const constituents = data.map((constituent) => ({
-        ...constituent,
-        id: constituent.id.toString(),
-      }))
-
-      const ids = constituents.map((constituent) => constituent.id)
-      const entities = keyBy((constituent) => constituent.id, constituents)
-
-      set((state) => ({ constituents: { ...state.constituents, ...entities } }))
-      return { ids }
-    },
-    async searchConstituents(query: string) {
-      const { data } = await fetcher.get<Constituent[]>(`/analyticalConstituents`, {
-        params: { q: query },
-      })
-
-      const constituents = data.map((constituent) => ({
-        ...constituent,
-        id: constituent.id.toString(),
-      }))
-
-      const ids = constituents.map((constituent) => constituent.id)
-      const entities = keyBy((constituent) => constituent.id, constituents)
-
-      set((state) => ({ constituents: { ...state.constituents, ...entities } }))
-      return { ids }
-    },
-    createConstituent() {
-      return fetcher.post(`/analyticalConstituents`)
-    },
-    async getConstituentsByProductId(productId) {
-      const { data } = await fetcher.get<Constituent[]>(`/products/${productId}/analyticalconstituents`)
-
-      const constituents = data.map((constituent) => ({
-        ...constituent,
-        id: constituent.id.toString(),
-      }))
-
-      const ids = constituents.map((constituent) => constituent.id)
-      const entities = keyBy((constituent) => constituent.id, constituents)
-
-      set((state) => ({ constituents: { ...state.constituents, ...entities } }))
-
-      return { ids }
-    },
-    async updateConstituentsByProductId(productId, constituentId) {
-      const { data } = await fetcher.patch<Constituent[]>(`/products/${productId}/analyticalconstituents`, {
-        constituentId,
-      })
-
-      const constituents = data.map((constituent) => ({
-        ...constituent,
-        id: constituent.id.toString(),
-      }))
-
-      const ids = constituents.map((constituent) => constituent.id)
-      const entities = keyBy((constituent) => constituent.id, constituents)
-
-      set((state) => ({ constituents: { ...state.constituents, ...entities } }))
-
-      return { ids }
-    },
-  })),
+      },
+      async deleteConstituentFromProductId(productId, constituentId) {
+        await fetcher.delete<Constituent[]>(
+          `/products/${productId}/analytical-constituents/${constituentId}`,
+          {},
+        )
+      },
+    }),
+    'constituent',
+  ),
 )
 
 export default useConstituentsStore

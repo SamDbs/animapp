@@ -80,64 +80,67 @@ const sendConstituentTranslationUpdate = async (
 const sendConstituentTranslationUpdateDebounced = debounce(1000, sendConstituentTranslationUpdate)
 
 const useConstituentTranslationStore = create<ConstituentTranslationStore>(
-  devtools((set, get) => ({
-    constituentTranslations: {},
-    creatingIds: [],
-    async getConstituentTranslations(constituentId: Constituent['id']) {
-      const { data } = await fetcher.get<ConstituentTranslation[]>(
-        `/analyticalConstituents/${constituentId}/translations`,
-      )
-      const translations = data.map((translation) => ({
-        ...translation,
-        id: `${translation.analyticalConstituentId.toString()}-${translation.languageId.toString()}`,
-      }))
+  devtools(
+    (set, get) => ({
+      constituentTranslations: {},
+      creatingIds: [],
+      async getConstituentTranslations(constituentId: Constituent['id']) {
+        const { data } = await fetcher.get<ConstituentTranslation[]>(
+          `/analyticalConstituents/${constituentId}/translations`,
+        )
+        const translations = data.map((translation) => ({
+          ...translation,
+          id: `${translation.analyticalConstituentId.toString()}-${translation.languageId.toString()}`,
+        }))
 
-      const ids = translations.map((translation) => translation.id)
-      const entities = keyBy((translation) => translation.id, translations)
+        const ids = translations.map((translation) => translation.id)
+        const entities = keyBy((translation) => translation.id, translations)
 
-      set((state) => ({
-        constituentTranslations: { ...state.constituentTranslations, ...entities },
-      }))
-      return { ids }
-    },
-    async updateConstituentTranslation(
-      constituentIdId: Constituent['id'],
-      languageId: Language['id'],
-      params: Partial<ConstituentTranslation>,
-    ) {
-      const id = `${constituentIdId}-${languageId}`
-      if (!get().constituentTranslations[id]) {
+        set((state) => ({
+          constituentTranslations: { ...state.constituentTranslations, ...entities },
+        }))
+        return { ids }
+      },
+      async updateConstituentTranslation(
+        constituentIdId: Constituent['id'],
+        languageId: Language['id'],
+        params: Partial<ConstituentTranslation>,
+      ) {
+        const id = `${constituentIdId}-${languageId}`
+        if (!get().constituentTranslations[id]) {
+          set((state) => ({
+            constituentTranslations: {
+              ...state.constituentTranslations,
+              [id]: { ...params, languageId, constituentIdId } as any,
+            },
+            creatingIds: [...state.creatingIds, id],
+          }))
+          await prepareConstituentTranslationsUpdate(constituentIdId, languageId, params, 'post')
+          set((state) => ({
+            constituentTranslations: {
+              ...state.constituentTranslations,
+              [id]: { ...state.constituentTranslations[id] } as any,
+            },
+            creatingIds: state.creatingIds.filter((currentId) => currentId !== id),
+          }))
+          return
+        }
+        if (get().creatingIds.includes(id)) return
         set((state) => ({
           constituentTranslations: {
             ...state.constituentTranslations,
-            [id]: { ...params, languageId, constituentIdId } as any,
+            [id]: {
+              ...state.constituentTranslations[id],
+              ...params,
+            },
           },
-          creatingIds: [...state.creatingIds, id],
         }))
-        await prepareConstituentTranslationsUpdate(constituentIdId, languageId, params, 'post')
-        set((state) => ({
-          constituentTranslations: {
-            ...state.constituentTranslations,
-            [id]: { ...state.constituentTranslations[id] } as any,
-          },
-          creatingIds: state.creatingIds.filter((currentId) => currentId !== id),
-        }))
-        return
-      }
-      if (get().creatingIds.includes(id)) return
-      set((state) => ({
-        constituentTranslations: {
-          ...state.constituentTranslations,
-          [id]: {
-            ...state.constituentTranslations[id],
-            ...params,
-          },
-        },
-      }))
-      await prepareConstituentTranslationsUpdate(constituentIdId, languageId, params, 'patch')
-    },
-    async createConstituentTranslation() {},
-  })),
+        await prepareConstituentTranslationsUpdate(constituentIdId, languageId, params, 'patch')
+      },
+      async createConstituentTranslation() {},
+    }),
+    'constituent translation',
+  ),
 )
 
 export default useConstituentTranslationStore

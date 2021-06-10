@@ -123,7 +123,7 @@ const useProductsStore = create<ProductStore>(
         return fetcher.post(`/products`, params)
       },
     }),
-    'Product store',
+    'product',
   ),
 )
 

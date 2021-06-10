@@ -71,52 +71,55 @@ const sendFaqTranslationUpdateDebounced = debounce(
 )
 
 const useFaqTranslationStore = create<FaqTranslationStore>(
-  devtools((set, get) => ({
-    faqTranslations: {},
-    async getFaqTranslations(faqId: Faq['id']) {
-      const { data } = await fetcher.get<FaqTranslation[]>(`/faq/${faqId}/translations`)
+  devtools(
+    (set, get) => ({
+      faqTranslations: {},
+      async getFaqTranslations(faqId: Faq['id']) {
+        const { data } = await fetcher.get<FaqTranslation[]>(`/faq/${faqId}/translations`)
 
-      const translations = data.map((translation) => ({
-        ...translation,
-        id: `${translation.faqId.toString()}-${translation.languageId.toString()}`,
-      }))
+        const translations = data.map((translation) => ({
+          ...translation,
+          id: `${translation.faqId.toString()}-${translation.languageId.toString()}`,
+        }))
 
-      const ids = translations.map((translation) => translation.id)
-      const entities = keyBy((translation) => translation.id, translations)
+        const ids = translations.map((translation) => translation.id)
+        const entities = keyBy((translation) => translation.id, translations)
 
-      set((state) => ({ faqTranslations: { ...state.faqTranslations, ...entities } }))
-      return { ids }
-    },
-    async updateFaqTranslation(
-      faqId: Faq['id'],
-      languageId: Language['id'],
-      params: Partial<FaqTranslation>,
-    ) {
-      const id = `${faqId}-${languageId}`
-      if (!get().faqTranslations[id]) {
+        set((state) => ({ faqTranslations: { ...state.faqTranslations, ...entities } }))
+        return { ids }
+      },
+      async updateFaqTranslation(
+        faqId: Faq['id'],
+        languageId: Language['id'],
+        params: Partial<FaqTranslation>,
+      ) {
+        const id = `${faqId}-${languageId}`
+        if (!get().faqTranslations[id]) {
+          set((state) => ({
+            faqTranslations: {
+              ...state.faqTranslations,
+              [id]: { ...params, languageId, faqId } as any,
+            },
+          }))
+
+          await prepareFaqTranslationsUpdate(faqId, languageId, params, 'post')
+          return
+        }
         set((state) => ({
           faqTranslations: {
             ...state.faqTranslations,
-            [id]: { ...params, languageId, faqId } as any,
+            [`${faqId}-${languageId}`]: {
+              ...state.faqTranslations[`${faqId}-${languageId}`],
+              ...params,
+            },
           },
         }))
-
-        await prepareFaqTranslationsUpdate(faqId, languageId, params, 'post')
-        return
-      }
-      set((state) => ({
-        faqTranslations: {
-          ...state.faqTranslations,
-          [`${faqId}-${languageId}`]: {
-            ...state.faqTranslations[`${faqId}-${languageId}`],
-            ...params,
-          },
-        },
-      }))
-      await prepareFaqTranslationsUpdate(faqId, languageId, params, 'patch')
-    },
-    async createFaqTranslation() {},
-  })),
+        await prepareFaqTranslationsUpdate(faqId, languageId, params, 'patch')
+      },
+      async createFaqTranslation() {},
+    }),
+    'faq translation',
+  ),
 )
 
 export default useFaqTranslationStore

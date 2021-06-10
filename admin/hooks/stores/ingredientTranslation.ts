@@ -82,63 +82,68 @@ const sendIngredientTranslationUpdate = async (
 const sendIngredientTranslationUpdateDebounced = debounce(1000, sendIngredientTranslationUpdate)
 
 const useIngredientTranslationStore = create<IngredientTranslationStore>(
-  devtools((set, get) => ({
-    ingredientTranslations: {},
-    creatingIds: [],
-    async getIngredientTranslations(ingredientId: Ingredient['id']) {
-      const { data } = await fetcher.get<IngredientTranslation[]>(
-        `/ingredients/${ingredientId}/translations`,
-      )
+  devtools(
+    (set, get) => ({
+      ingredientTranslations: {},
+      creatingIds: [],
+      async getIngredientTranslations(ingredientId: Ingredient['id']) {
+        const { data } = await fetcher.get<IngredientTranslation[]>(
+          `/ingredients/${ingredientId}/translations`,
+        )
 
-      const translations = data.map((translation) => ({
-        ...translation,
-        id: `${translation.ingredientId.toString()}-${translation.languageId.toString()}`,
-      }))
+        const translations = data.map((translation) => ({
+          ...translation,
+          id: `${translation.ingredientId.toString()}-${translation.languageId.toString()}`,
+        }))
 
-      const ids = translations.map((translation) => translation.id)
-      const entities = keyBy((translation) => translation.id, translations)
+        const ids = translations.map((translation) => translation.id)
+        const entities = keyBy((translation) => translation.id, translations)
 
-      set((state) => ({ ingredientTranslations: { ...state.ingredientTranslations, ...entities } }))
-      return { ids }
-    },
-    async updateIngredientTranslation(
-      ingredientId: Ingredient['id'],
-      languageId: Language['id'],
-      params: Partial<IngredientTranslation>,
-    ) {
-      const id = `${ingredientId}-${languageId}`
-      if (!get().ingredientTranslations[id]) {
+        set((state) => ({
+          ingredientTranslations: { ...state.ingredientTranslations, ...entities },
+        }))
+        return { ids }
+      },
+      async updateIngredientTranslation(
+        ingredientId: Ingredient['id'],
+        languageId: Language['id'],
+        params: Partial<IngredientTranslation>,
+      ) {
+        const id = `${ingredientId}-${languageId}`
+        if (!get().ingredientTranslations[id]) {
+          set((state) => ({
+            ingredientTranslations: {
+              ...state.ingredientTranslations,
+              [id]: { ...params, languageId, ingredientId } as any,
+            },
+            creatingIds: [...state.creatingIds, id],
+          }))
+          await prepareIngredientTranslationsUpdate(ingredientId, languageId, params, 'post')
+          set((state) => ({
+            ingredientTranslations: {
+              ...state.ingredientTranslations,
+              [id]: { ...state.ingredientTranslations[id] } as any,
+            },
+            creatingIds: state.creatingIds.filter((currentId) => currentId !== id),
+          }))
+          return
+        }
+        if (get().creatingIds.includes(id)) return
         set((state) => ({
           ingredientTranslations: {
             ...state.ingredientTranslations,
-            [id]: { ...params, languageId, ingredientId } as any,
+            [id]: {
+              ...state.ingredientTranslations[id],
+              ...params,
+            },
           },
-          creatingIds: [...state.creatingIds, id],
         }))
-        await prepareIngredientTranslationsUpdate(ingredientId, languageId, params, 'post')
-        set((state) => ({
-          ingredientTranslations: {
-            ...state.ingredientTranslations,
-            [id]: { ...state.ingredientTranslations[id] } as any,
-          },
-          creatingIds: state.creatingIds.filter((currentId) => currentId !== id),
-        }))
-        return
-      }
-      if (get().creatingIds.includes(id)) return
-      set((state) => ({
-        ingredientTranslations: {
-          ...state.ingredientTranslations,
-          [id]: {
-            ...state.ingredientTranslations[id],
-            ...params,
-          },
-        },
-      }))
-      await prepareIngredientTranslationsUpdate(ingredientId, languageId, params, 'patch')
-    },
-    async createIngredientTranslation() {},
-  })),
+        await prepareIngredientTranslationsUpdate(ingredientId, languageId, params, 'patch')
+      },
+      async createIngredientTranslation() {},
+    }),
+    'ingredient translation',
+  ),
 )
 
 export default useIngredientTranslationStore

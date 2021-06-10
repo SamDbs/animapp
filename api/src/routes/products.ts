@@ -11,20 +11,22 @@ const router = Router()
 router.get('/:id', productController.getProductById)
 router.get('/:id/image', productController.getProductImage)
 router.get('/:id/ingredients', productController.getIngredientsByProduct)
-router.get('/:id/analyticalconstituents', productController.getACByProduct)
+router.get('/:id/analytical-constituents', productController.getACByProduct)
 
 router.use(authAdmin)
 router.get('/', productController.getAllProducts)
 router.post('/', productController.createProduct)
 router.patch('/:id', productController.patchProduct)
 router.delete('/:id', productController.deleteProduct)
-router.patch('/:id/ingredients', productController.updateProductIngredients)
 router.put('/:id/image', upload.single('image'), productController.setProductImage)
 
+// CRUD ingredients
+router.put('/:id/ingredients/:ingredientId', productController.upsertProductIngredient)
+router.delete('/:id/ingredients/:ingredientId', productController.deleteProductIngredient)
+
 // CRUD AC
-router.post('/:id/analyticalconstituents/:idAC', productController.createProductACQuantity)
-router.patch('/:id/analyticalconstituents/:idAC', productController.patchACByProduct)
-router.delete('/:id/analyticalconstituents/:idAC', productController.deleteProductACQuantity)
+router.put('/:id/analytical-constituents/:idAC', productController.createProductACQuantity)
+router.delete('/:id/analytical-constituents/:idAC', productController.deleteProductACQuantity)
 
 // CRUD translations
 router.post('/:id/translations', productController.createProductTranslation)

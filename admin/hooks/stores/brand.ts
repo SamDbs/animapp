@@ -35,97 +35,100 @@ const sendBrandCombinedUpdateDebounce = debounce(
 )
 
 const useBrandStore = create<BrandStore>(
-  devtools((set) => ({
-    brands: {},
-    usedBrandIds: {},
-    registerIds(ids: Brand['id'][]) {
-      set((state) => {
-        const update: Record<Brand['id'], number> = ids.reduce(
-          (acc, id) => ({
-            ...acc,
-            [id]: id in state.usedBrandIds ? state.usedBrandIds[id] + 1 : 1,
-          }),
-          {},
-        )
+  devtools(
+    (set) => ({
+      brands: {},
+      usedBrandIds: {},
+      registerIds(ids: Brand['id'][]) {
+        set((state) => {
+          const update: Record<Brand['id'], number> = ids.reduce(
+            (acc, id) => ({
+              ...acc,
+              [id]: id in state.usedBrandIds ? state.usedBrandIds[id] + 1 : 1,
+            }),
+            {},
+          )
 
-        const newState = {
+          const newState = {
+            ...state,
+            usedBrandIds: { ...state.usedBrandIds, ...update },
+          }
+
+          const idsToDelete = Object.entries(newState.usedBrandIds)
+            .filter(([, value]) => value < 1)
+            .map(([key]) => key)
+
+          const finalState = {
+            ...newState,
+            brands: omit(idsToDelete, newState.brands),
+            usedBrandIds: omit(idsToDelete, newState.usedBrandIds),
+          }
+          return finalState
+        })
+      },
+      unregisterIds(ids: Brand['id'][]) {
+        set((state) => {
+          const update: Record<Brand['id'], number> = ids.reduce(
+            (acc, id) => ({
+              ...acc,
+              [id]: id in state.usedBrandIds ? state.usedBrandIds[id] - 1 : 0,
+            }),
+            {},
+          )
+          const newState = {
+            ...state,
+            usedBrandIds: { ...state.usedBrandIds, ...update },
+          }
+          return newState
+        })
+      },
+      async getBrandById(id: string) {
+        const { data } = await fetcher.get<Brand>(`/brands/${id}`)
+        const brand = { ...data, id: data.id.toString() }
+
+        set((state) => ({ brands: { ...state.brands, [brand.id]: brand } }))
+        return { id }
+      },
+      async getBrands() {
+        const { data } = await fetcher.get<Brand[]>(`/brands`)
+
+        const brands = data.map((brand) => ({
+          ...brand,
+          id: brand.id.toString(),
+        }))
+
+        const ids = brands.map((brand) => brand.id)
+        const entities = keyBy((brand) => brand.id, brands)
+
+        set((state) => ({ brands: { ...state.brands, ...entities } }))
+        return { ids }
+      },
+      async updateBrand(id: Brand['id'], params: Partial<Brand>) {
+        set((state) => ({
           ...state,
-          usedBrandIds: { ...state.usedBrandIds, ...update },
-        }
+          brands: { ...state.brands, [id]: { ...state.brands[id], ...params } },
+        }))
+        await prepareBrandUpdate(id, params)
+      },
+      async searchBrands(query: string) {
+        const { data } = await fetcher.get<Brand[]>(`/brands`, { params: { q: query } })
 
-        const idsToDelete = Object.entries(newState.usedBrandIds)
-          .filter(([, value]) => value < 1)
-          .map(([key]) => key)
+        const brands = data.map((brand) => ({
+          ...brand,
+          id: brand.id.toString(),
+        }))
 
-        const finalState = {
-          ...newState,
-          brands: omit(idsToDelete, newState.brands),
-          usedBrandIds: omit(idsToDelete, newState.usedBrandIds),
-        }
-        return finalState
-      })
-    },
-    unregisterIds(ids: Brand['id'][]) {
-      set((state) => {
-        const update: Record<Brand['id'], number> = ids.reduce(
-          (acc, id) => ({
-            ...acc,
-            [id]: id in state.usedBrandIds ? state.usedBrandIds[id] - 1 : 0,
-          }),
-          {},
-        )
-        const newState = {
-          ...state,
-          usedBrandIds: { ...state.usedBrandIds, ...update },
-        }
-        return newState
-      })
-    },
-    async getBrandById(id: string) {
-      const { data } = await fetcher.get<Brand>(`/brands/${id}`)
-      const brand = { ...data, id: data.id.toString() }
+        const ids = brands.map((brand) => brand.id)
+        const entities = keyBy((brand) => brand.id, brands)
 
-      set((state) => ({ brands: { ...state.brands, [brand.id]: brand } }))
-      return { id }
-    },
-    async getBrands() {
-      const { data } = await fetcher.get<Brand[]>(`/brands`)
-
-      const brands = data.map((brand) => ({
-        ...brand,
-        id: brand.id.toString(),
-      }))
-
-      const ids = brands.map((brand) => brand.id)
-      const entities = keyBy((brand) => brand.id, brands)
-
-      set((state) => ({ brands: { ...state.brands, ...entities } }))
-      return { ids }
-    },
-    async updateBrand(id: Brand['id'], params: Partial<Brand>) {
-      set((state) => ({
-        ...state,
-        brands: { ...state.brands, [id]: { ...state.brands[id], ...params } },
-      }))
-      await prepareBrandUpdate(id, params)
-    },
-    async searchBrands(query: string) {
-      const { data } = await fetcher.get<Brand[]>(`/brands`, { params: { q: query } })
-
-      const brands = data.map((brand) => ({
-        ...brand,
-        id: brand.id.toString(),
-      }))
-
-      const ids = brands.map((brand) => brand.id)
-      const entities = keyBy((brand) => brand.id, brands)
-
-      set((state) => ({ brands: { ...state.brands, ...entities } }))
-      return { ids }
-    },
-    createBrand(params: { name: string }) {
-      return fetcher.post(`/brands`, params)
-    },
-  })),
+        set((state) => ({ brands: { ...state.brands, ...entities } }))
+        return { ids }
+      },
+      createBrand(params: { name: string }) {
+        return fetcher.post(`/brands`, params)
+      },
+    }),
+    'brand',
+  ),
 )
 export default useBrandStore
