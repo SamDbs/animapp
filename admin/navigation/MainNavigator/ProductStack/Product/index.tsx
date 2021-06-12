@@ -3,14 +3,9 @@ import FieldTranslatable from '@components/FieldTranslatable'
 import FieldWithLabel from '@components/FieldWithLabel'
 import ManyToMany from '@components/ManyToMany'
 import { PageHeader } from '@components/Themed'
-import useConstituentsStore, {
-  Constituent as ConstituentEntity,
-  ConstituentStoreState,
-} from '@hooks/stores/constituent'
-import useIngredientStore, {
-  Ingredient as IngredientEntity,
-  IngredientStore,
-} from '@hooks/stores/ingredient'
+import UploadSingleImage from '@components/UploadSingleImage'
+import useConstituentsStore from '@hooks/stores/constituent'
+import useIngredientStore from '@hooks/stores/ingredient'
 import useProductsStore, { Product as ProductEntity } from '@hooks/stores/product'
 import useProductTranslationStore, {
   ProductTranslation,
@@ -61,13 +56,13 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
           <>
             <View
               style={{
-                height: 400,
+                height: 450,
                 width: 400,
                 alignItems: 'center',
               }}>
               <Image
                 source={{
-                  uri: 'https://cdn.stocksnap.io/img-thumbs/960w/vintage-red_8QKIFL9ZUI.jpg',
+                  uri: product.image || 'http://placekitten.com/400/400',
                 }}
                 style={{
                   height: 400 - 20,
@@ -76,7 +71,14 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
                   borderRadius: 5,
                   overflow: 'hidden',
                   resizeMode: 'contain',
+                  opacity: product.image ? 1 : 0.6,
                 }}
+              />
+              <UploadSingleImage
+                useOwnerStore={useProductsStore}
+                ownerId={product.id}
+                updateItemImageSelector={(store) => store.locallySetProductImage}
+                uploadLinkCreator={(productId) => `/products/${productId}/image`}
               />
             </View>
             <View>
@@ -112,7 +114,7 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
         <Text style={{ fontSize: 18 }}>Attached ingredients</Text>
         {isLoading && !product && <ActivityIndicator />}
         {product && (
-          <ManyToMany<ProductEntity, IngredientEntity, IngredientStore>
+          <ManyToMany
             useOwnedStore={useIngredientStore}
             ownerEntityId={product.id}
             ownedItemsGetterSelector={(state) => state.getIngredientsByProductId}
@@ -131,7 +133,7 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
         <Text style={{ fontSize: 18 }}>Attached Analytical Constituent</Text>
         {isLoading && !product && <ActivityIndicator />}
         {product && (
-          <ManyToMany<ProductEntity, ConstituentEntity, ConstituentStoreState>
+          <ManyToMany
             useOwnedStore={useConstituentsStore}
             ownerEntityId={product.id}
             ownedItemsGetterSelector={(state) => state.getConstituentsByProductId}

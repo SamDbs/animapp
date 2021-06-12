@@ -36,11 +36,12 @@ export type ProductStore = {
   updateProduct: (id: Product['id'], params: Partial<Product>) => Promise<void>
   searchProducts: (text: Product['name']) => Promise<{ ids: Product['id'][] }>
   createProduct: (params: { barCode: string; name: string; type: string }) => Promise<unknown>
+  locallySetProductImage: (productId: Product['id'], image: string) => void
 }
 
 const useProductsStore = create<ProductStore>(
   devtools(
-    (set) => ({
+    (set, get) => ({
       products: {},
       usedProductIds: {},
       registerIds(ids: Product['id'][]) {
@@ -121,6 +122,12 @@ const useProductsStore = create<ProductStore>(
       },
       createProduct(params: { barCode: string; name: string; type: string }) {
         return fetcher.post(`/products`, params)
+      },
+      locallySetProductImage(productId: Product['id'], image: string) {
+        if (!get().products[productId]) return
+        set((state) => ({
+          products: { ...state.products, [productId]: { ...state.products[productId], image } },
+        }))
       },
     }),
     'product',

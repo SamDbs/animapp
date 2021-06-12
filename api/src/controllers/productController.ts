@@ -92,7 +92,8 @@ export const setProductImage: RequestHandler = async (req, res) => {
   img.type = req.file.mimetype
 
   await img.save()
-  res.status(200).json(img)
+  const { image, ...otherFields } = img
+  res.status(200).json(otherFields)
 }
 
 export const getProductImage: RequestHandler = async (req, res) => {
