@@ -20,6 +20,9 @@ router.patch('/:id', productController.patchProduct)
 router.delete('/:id', productController.deleteProduct)
 router.put('/:id/image', upload.single('image'), productController.setProductImage)
 
+router.get('/:id/brand', productController.getBrandByProductIdx)
+router.put('/:id/brand', productController.updateBrandInProductIdx)
+
 // CRUD ingredients
 router.put('/:id/ingredients/:ingredientId', productController.upsertProductIngredient)
 router.delete('/:id/ingredients/:ingredientId', productController.deleteProductIngredient)

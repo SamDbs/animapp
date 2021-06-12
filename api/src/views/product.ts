@@ -14,6 +14,7 @@ export function viewProduct(product: Product, language: Language['id'] | undefin
     barCode: product.barCode,
     image: product?.image?.url,
     brand: product.brand?.name,
+    brandId: product.brand?.id,
     description: translation?.description ?? 'This product is not translated yet',
   }
   return productClient
