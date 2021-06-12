@@ -65,11 +65,11 @@ const sendConstituentTranslationUpdate = async (
   await Promise.all(
     Object.keys(combinedConstituentTranslationsUpdate).map((key) =>
       method === 'post'
-        ? fetcher(`/analyticalConstituents/${constituentId}/translations`, {
+        ? fetcher(`/analytical-constituents/${constituentId}/translations`, {
             method,
             data: { languageId: key, ...combinedConstituentTranslationsUpdate[key] },
           })
-        : fetcher(`/analyticalConstituents/${constituentId}/translations/${key}`, {
+        : fetcher(`/analytical-constituents/${constituentId}/translations/${key}`, {
             method,
             data: combinedConstituentTranslationsUpdate[key],
           }),
@@ -86,7 +86,7 @@ const useConstituentTranslationStore = create<ConstituentTranslationStore>(
       creatingIds: [],
       async getConstituentTranslations(constituentId: Constituent['id']) {
         const { data } = await fetcher.get<ConstituentTranslation[]>(
-          `/analyticalConstituents/${constituentId}/translations`,
+          `/analytical-constituents/${constituentId}/translations`,
         )
         const translations = data.map((translation) => ({
           ...translation,

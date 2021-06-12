@@ -49,8 +49,8 @@ export type PageHeaderProps = ThemeProps & DefaultView['props']
 
 export function PageHeader(props: PageHeaderProps) {
   return (
-    <View style={{ marginBottom: 16 }}>
+    <DefaultView style={{ marginBottom: 16 }}>
       <Text style={{ fontSize: 22 }}>{props.children}</Text>
-    </View>
+    </DefaultView>
   )
 }

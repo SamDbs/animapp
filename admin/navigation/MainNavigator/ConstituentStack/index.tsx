@@ -9,7 +9,10 @@ const Stack = createStackNavigator<ConstituentStackParamList>()
 
 export default function IngredientStack() {
   return (
-    <Stack.Navigator initialRouteName="Constituents" screenOptions={{ animationEnabled: true }}>
+    <Stack.Navigator
+      headerMode="none"
+      initialRouteName="Constituents"
+      screenOptions={{ animationEnabled: true }}>
       <Stack.Screen name="Constituents" component={Constituents} />
       <Stack.Screen name="Constituent" component={Constituent} />
     </Stack.Navigator>
