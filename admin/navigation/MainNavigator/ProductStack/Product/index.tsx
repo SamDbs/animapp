@@ -2,7 +2,9 @@ import Card from '@components/Card'
 import FieldTranslatable from '@components/FieldTranslatable'
 import FieldWithLabel from '@components/FieldWithLabel'
 import ManyToMany from '@components/ManyToMany'
+import OneToMany from '@components/OneToMany'
 import { PageHeader } from '@components/Themed'
+import useBrandStore from '@hooks/stores/brand'
 import useConstituentsStore, {
   Constituent as ConstituentEntity,
   ConstituentStoreState,
@@ -80,6 +82,16 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
               />
             </View>
             <View>
+              <OneToMany
+                brandsSelectorCreator={(ids) => (state) => ids.map((id) => state.brands[id])}
+                getBrandsSelector={(state) => state.getBrandByProductId}
+                productId={product.id}
+                searchBrandsSelector={(state) => state.searchBrands}
+                useBrandStore={useBrandStore}
+                useProductsStore={useProductsStore}
+                registerOwnedIdsSelector={(state) => state.registerIds}
+                unregisterOwnedIdsSelector={(state) => state.unregisterIds}
+              />
               <FieldWithLabel
                 label="Name"
                 value={product.name}

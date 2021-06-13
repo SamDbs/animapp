@@ -1,10 +1,11 @@
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
 import useProductsStore from '@hooks/stores/product'
+import useBrandStore from '@hooks/stores/brand'
 import React, { useState } from 'react'
 import { Button, Text } from 'react-native'
 
-const initialState = { type: '', name: '', barCode: '', brandId: 3 }
+const initialState = { type: '', name: '', barCode: '', brandId: '' }
 
 export default function ProductCreator({ style }: any) {
   const [product, setProduct] = useState({ ...initialState })
@@ -27,6 +28,11 @@ export default function ProductCreator({ style }: any) {
   return (
     <Card style={style}>
       <Text style={{ fontSize: 18, marginBottom: 16 }}>Create a product</Text>
+      <FieldWithLabel
+        label="Brand"
+        value={product.brandId.toString()}
+        onChangeValue={(val) => setProduct((current) => ({ ...current, name: val }))}
+      />
       <FieldWithLabel
         label="Name"
         value={product.name}

@@ -1,6 +1,7 @@
 import { debounce, keyBy, omit } from 'lodash/fp'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
+import { Product } from '@hooks/stores/product'
 
 import { fetcher } from '.'
 
@@ -16,6 +17,7 @@ export type BrandStore = {
   unregisterIds: (ids: Brand['id'][]) => void
   getBrands: () => Promise<{ ids: Brand['id'][] }>
   getBrandById: (id: Brand['id']) => Promise<{ id: Brand['id'] }>
+  getBrandByProductId: (id: Product['id']) => Promise<{ id: Brand['id'] }>
   updateBrand: (id: Brand['id'], params: Partial<Brand>) => Promise<void>
   searchBrands: (query: string) => Promise<{ ids: Brand['id'][] }>
   createBrand: (params: { name: string }) => Promise<unknown>
@@ -88,6 +90,14 @@ const useBrandStore = create<BrandStore>(
 
         set((state) => ({ brands: { ...state.brands, [brand.id]: brand } }))
         return { id }
+      },
+      async getBrandByProductId(productId: string) {
+        console.log(productId)
+        const { data } = await fetcher.get<Brand>(`/products/${productId}/brand`)
+        const brand = { ...data, id: data.id.toString() }
+
+        set((state) => ({ brands: { ...state.brands, [brand.id]: brand } }))
+        return { id: brand.id }
       },
       async getBrands() {
         const { data } = await fetcher.get<Brand[]>(`/brands`)
