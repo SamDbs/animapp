@@ -1,8 +1,8 @@
+import useCachedResources from '@hooks/useCachedResources'
+import Uploady from '@rpldy/uploady'
 import { StatusBar } from 'expo-status-bar'
 import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-
-import useCachedResources from '@hooks/useCachedResources'
 
 import RootNavigator from './navigation'
 
@@ -13,10 +13,12 @@ export default function App() {
     return null
   } else {
     return (
-      <SafeAreaProvider>
-        <RootNavigator />
-        <StatusBar />
-      </SafeAreaProvider>
+      <Uploady>
+        <SafeAreaProvider>
+          <RootNavigator />
+          <StatusBar />
+        </SafeAreaProvider>
+      </Uploady>
     )
   }
 }
