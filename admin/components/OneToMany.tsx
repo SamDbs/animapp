@@ -1,84 +1,171 @@
+import type { Brand } from '@hooks/stores/brand'
+import type { Product } from '@hooks/stores/product'
 import useSearchableList from '@hooks/useSearchableList'
-import { Link } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
 import type { UseStore, StateSelector } from 'zustand'
 
-import { Brand } from '@hooks/stores/brand'
+import SubItem from './SubItem'
 
-export default function OneToMany({
-  brandsSelectorCreator,
-  getBrandsSelector,
-  productId,
-  searchBrandsSelector,
-  useBrandStore,
-  useProductsStore,
-  registerOwnedIdsSelector,
-  unregisterOwnedIdsSelector,
-}) {
-  const [id, setId] = useState<OwnedItem['id']>()
+type Props<
+  OwnerEntity extends Brand,
+  OwnerStateShape extends object,
+  OwnedEntity extends Product,
+  OwnedStoreShape extends object,
+> = {
+  getOwnerByOwnedIdSelect: StateSelector<
+    OwnerStateShape,
+    (ownedId: OwnedEntity['id']) => Promise<{ id: OwnerEntity['id'] }>
+  >
+  getOwnersSelector: StateSelector<OwnerStateShape, () => Promise<{ ids: string[] }>>
+  ownedId: OwnedEntity['id']
+  ownerEntityLinkCreator: (item: Partial<OwnerEntity>) => string
+  ownerSelectorCreator: (
+    id: OwnerEntity['id'],
+  ) => StateSelector<OwnerStateShape, Partial<OwnerEntity>>
+  ownersSelectorCreator: (
+    ids: OwnerEntity['id'][],
+  ) => StateSelector<OwnerStateShape, Partial<OwnerEntity>[]>
+  registerOwnerIdsSelector: StateSelector<OwnerStateShape, (ids: OwnerEntity['id'][]) => void>
+  searchOwnersSelector: StateSelector<
+    OwnerStateShape,
+    (query: string) => Promise<{ ids: OwnerEntity['id'][] }>
+  >
+  unregisterOwnerIdsSelector: StateSelector<OwnerStateShape, (ids: OwnerEntity['id'][]) => void>
+  updateOwnerInOwnedSelector: StateSelector<
+    OwnedStoreShape,
+    (ownedId: OwnedEntity['id'], ownerId: OwnerEntity['id']) => Promise<void>
+  >
+  useOwnedStore: UseStore<OwnedStoreShape>
+  useOwnerStore: UseStore<
+    OwnerStateShape & {
+      registerIds: (ids: string[]) => void
+      unregisterIds: (ids: string[]) => void
+    }
+  >
+}
+
+export default function OneToMany<
+  OwnerEntity extends Brand,
+  OwnerStateShape extends object,
+  OwnedEntity extends Product,
+  OwnedStoreShape extends object,
+>({
+  getOwnerByOwnedIdSelect,
+  getOwnersSelector,
+  ownedId,
+  ownerEntityLinkCreator,
+  ownerSelectorCreator,
+  ownersSelectorCreator,
+  registerOwnerIdsSelector,
+  searchOwnersSelector,
+  unregisterOwnerIdsSelector,
+  updateOwnerInOwnedSelector,
+  useOwnedStore,
+  useOwnerStore,
+}: Props<OwnerEntity, OwnerStateShape, OwnedEntity, OwnedStoreShape>) {
+  const [id, setId] = useState<OwnerEntity['id']>()
   const [isLoading, setIsLoading] = useState(false)
-
+  const [editing, setEditing] = useState(false)
   const {
-    isLoading: isLoadingOwnedItems,
-    items: ownedItems,
-    noResult: noResultOwnedItems,
-    searchDebounced: searchOwnedItems,
-  } = useSearchableList(
-    useBrandStore,
-    getBrandsSelector,
-    searchBrandsSelector,
-    brandsSelectorCreator,
+    isLoading: isLoadingOwnerItems,
+    items: ownerItems,
+    noResult: noResultOwnerItems,
+    searchDebounced: searchOwnerItems,
+  } = useSearchableList<OwnerStateShape, OwnerEntity>(
+    useOwnerStore,
+    getOwnersSelector,
+    searchOwnersSelector,
+    ownersSelectorCreator,
   )
 
-  const getBrandByProductId = useBrandStore((state) => state.getBrandByProductId)
-  const updateProductBrand = useProductsStore((state) => state.updateProductBrand)
-  const registerOwnedIds = useBrandStore(registerOwnedIdsSelector)
-  const unregisterOwnedIds = useBrandStore(unregisterOwnedIdsSelector)
+  const getOwnerByOwnedId = useOwnerStore(getOwnerByOwnedIdSelect)
+  const updateOwnerInOwned = useOwnedStore(updateOwnerInOwnedSelector)
+  const registerOwnedIds = useOwnerStore(registerOwnerIdsSelector)
+  const unregisterOwnedIds = useOwnerStore(unregisterOwnerIdsSelector)
 
   useEffect(() => {
     async function init() {
       setIsLoading(true)
-      const { id } = await getBrandByProductId(productId)
+      const { id } = await getOwnerByOwnedId(ownedId)
       setId(id)
       setIsLoading(false)
     }
-    if (productId) init()
-  }, [productId])
+    init()
+  }, [ownedId])
 
   useEffect(() => {
+    if (!id) return
     registerOwnedIds([id])
     return () => unregisterOwnedIds([id])
   }, [id])
 
-  const updateOwned = async (brandId: Brand['id']) => {
-    await updateProductBrand(productId, brandId)
-    setId(brandId)
+  const updateOwned = async (ownerId: OwnerEntity['id']) => {
+    await updateOwnerInOwned(ownedId, ownerId)
+    setId(ownerId)
   }
 
-  const brand = useBrandStore((state) => state.brands[id])
+  const owner = useOwnerStore(useCallback(id ? ownerSelectorCreator(id) : () => null, [id]))
 
-  if (isLoading || !brand) return <ActivityIndicator />
+  if (isLoading || !owner) return <ActivityIndicator />
 
   return (
     <View>
-      <Text>{brand.name}</Text>
       <View
         style={{
-          marginTop: 8,
+          marginTop: 16,
           borderColor: '#ccc',
           borderWidth: 1,
           borderRadius: 3,
           overflow: 'hidden',
         }}>
-        {isLoadingOwnedItems && <ActivityIndicator />}
-        {!noResultOwnedItems &&
-          ownedItems
-            .filter((item) => id !== (item.id as string))
-            .map((item, i) => {
-              return <Text>item.name</Text>
-            })}
+        <SubItem<OwnerEntity>
+          even
+          key={owner.id}
+          entityLinkCreator={ownerEntityLinkCreator}
+          item={owner}
+        />
       </View>
+      {editing && (
+        <>
+          <Text style={{ marginTop: 16 }}>Link new items</Text>
+          <TextInput
+            style={{
+              borderColor: '#ccc',
+              borderWidth: 1,
+              borderRadius: 3,
+              height: 30,
+              paddingHorizontal: 8,
+              marginVertical: 8,
+            }}
+            onChangeText={searchOwnerItems}
+            placeholder="Search"
+          />
+          <View
+            style={{
+              marginTop: 16,
+              borderColor: '#ccc',
+              borderWidth: 1,
+              borderRadius: 3,
+              overflow: 'hidden',
+            }}>
+            {isLoadingOwnerItems && <ActivityIndicator />}
+            {!noResultOwnerItems &&
+              ownerItems
+                .filter((item) => id !== item.id)
+                .map((item, i) => (
+                  <SubItem<OwnerEntity>
+                    even
+                    key={item.id}
+                    entityLinkCreator={ownerEntityLinkCreator}
+                    item={item}>
+                    <Button title="Replace" onPress={() => updateOwned(item.id as string)} />
+                  </SubItem>
+                ))}
+          </View>
+        </>
+      )}
+      <Button title={editing ? 'Close' : 'Edit'} onPress={() => setEditing((x) => !x)} />
     </View>
   )
 }

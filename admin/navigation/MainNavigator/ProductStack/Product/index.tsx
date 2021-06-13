@@ -4,7 +4,7 @@ import FieldWithLabel from '@components/FieldWithLabel'
 import ManyToMany from '@components/ManyToMany'
 import OneToMany from '@components/OneToMany'
 import { PageHeader } from '@components/Themed'
-import useBrandStore from '@hooks/stores/brand'
+import useBrandStore, { Brand, BrandStore } from '@hooks/stores/brand'
 import useConstituentsStore, {
   Constituent as ConstituentEntity,
   ConstituentStoreState,
@@ -13,7 +13,7 @@ import useIngredientStore, {
   Ingredient as IngredientEntity,
   IngredientStore,
 } from '@hooks/stores/ingredient'
-import useProductsStore, { Product as ProductEntity } from '@hooks/stores/product'
+import useProductsStore, { Product as ProductEntity, ProductStore } from '@hooks/stores/product'
 import useProductTranslationStore, {
   ProductTranslation,
   ProductTranslationStore,
@@ -82,15 +82,19 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
               />
             </View>
             <View>
-              <OneToMany
-                brandsSelectorCreator={(ids) => (state) => ids.map((id) => state.brands[id])}
-                getBrandsSelector={(state) => state.getBrandByProductId}
-                productId={product.id}
-                searchBrandsSelector={(state) => state.searchBrands}
-                useBrandStore={useBrandStore}
-                useProductsStore={useProductsStore}
-                registerOwnedIdsSelector={(state) => state.registerIds}
-                unregisterOwnedIdsSelector={(state) => state.unregisterIds}
+              <OneToMany<Brand, BrandStore, ProductEntity, ProductStore>
+                getOwnerByOwnedIdSelect={(state) => state.getBrandByProductId}
+                getOwnersSelector={(state) => state.getBrands}
+                ownedId={product.id}
+                ownerEntityLinkCreator={(brand) => `/brands/${brand.id}`}
+                ownerSelectorCreator={(id) => (state) => state.brands[id]}
+                ownersSelectorCreator={(ids) => (state) => ids.map((id) => state.brands[id])}
+                registerOwnerIdsSelector={(state) => state.registerIds}
+                searchOwnersSelector={(state) => state.searchBrands}
+                unregisterOwnerIdsSelector={(state) => state.unregisterIds}
+                updateOwnerInOwnedSelector={(state) => state.updateProductBrand}
+                useOwnedStore={useProductsStore}
+                useOwnerStore={useBrandStore}
               />
               <FieldWithLabel
                 label="Name"
