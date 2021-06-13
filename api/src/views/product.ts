@@ -12,7 +12,7 @@ export function viewProduct(product: Product, language: Language['id'] | undefin
     name: product.name,
     type: product.type,
     barCode: product.barCode,
-    image: product?.image?.url,
+    image: product?.image?.url ?? 'https://via.placeholder.com/400',
     brand: product.brand?.name,
     brandId: product.brand?.id,
     description: translation?.description ?? 'This product is not translated yet',

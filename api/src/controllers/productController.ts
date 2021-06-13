@@ -30,7 +30,6 @@ export const getAllProducts: RequestHandler = async (req, res) => {
       { name: new FindOperator('ilike', `%${req.query.q}%`) },
     ]
 
-    console.log('okokkkk')
     const products = await Product.find({
       relations: ['translations'],
       order: { id: 'ASC' },

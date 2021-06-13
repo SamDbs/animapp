@@ -64,7 +64,7 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
               }}>
               <Image
                 source={{
-                  uri: product.image || 'http://placekitten.com/400/400',
+                  uri: product.image,
                 }}
                 style={{
                   height: 400 - 20,
