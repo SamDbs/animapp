@@ -4,6 +4,8 @@ import { devtools } from 'zustand/middleware'
 
 import { fetcher } from './index'
 
+import { Brand } from '@hooks/stores/brand'
+
 export type Product = {
   id: string
   name: string
@@ -11,6 +13,7 @@ export type Product = {
   image: string
   barCode: string
   description: string
+  brand: string
 }
 
 let combinedProductUpdate = {}
@@ -32,6 +35,7 @@ export type ProductStore = {
   registerIds: (ids: Product['id'][]) => void
   unregisterIds: (ids: Product['id'][]) => void
   getProductById: (id: Product['id']) => Promise<{ id: Product['id'] }>
+  updateProductBrand: (id: Product['id'], brandId: Brand['id']) => Promise<void>
   getProducts: () => Promise<{ ids: Product['id'][] }>
   updateProduct: (id: Product['id'], params: Partial<Product>) => Promise<void>
   searchProducts: (text: Product['name']) => Promise<{ ids: Product['id'][] }>
@@ -108,6 +112,13 @@ const useProductsStore = create<ProductStore>(
           products: { ...state.products, [id]: { ...state.products[id], ...params } },
         }))
         await prepareProductUpdate(id, params)
+      },
+      async updateProductBrand(id: Product['id'], brandId: Brand['id']) {
+        set((state) => ({
+          ...state,
+          products: { ...state.products, [id]: { ...state.products[id], brandId } },
+        }))
+        return fetcher.put(`/products/${id}/brand`, { brandId })
       },
       async searchProducts(text: string) {
         const { data } = await fetcher.get<Product[]>(`/products`, { params: { q: text } })

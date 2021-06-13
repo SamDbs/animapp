@@ -2,11 +2,13 @@ import Card from '@components/Card'
 import FieldTranslatable from '@components/FieldTranslatable'
 import FieldWithLabel from '@components/FieldWithLabel'
 import ManyToMany from '@components/ManyToMany'
+import OneToMany from '@components/OneToMany'
 import { PageHeader } from '@components/Themed'
 import UploadSingleImage from '@components/UploadSingleImage'
+import useBrandStore, { Brand, BrandStore } from '@hooks/stores/brand'
 import useConstituentsStore from '@hooks/stores/constituent'
 import useIngredientStore from '@hooks/stores/ingredient'
-import useProductsStore, { Product as ProductEntity } from '@hooks/stores/product'
+import useProductsStore, { Product as ProductEntity, ProductStore } from '@hooks/stores/product'
 import useProductTranslationStore, {
   ProductTranslation,
   ProductTranslationStore,
@@ -82,6 +84,20 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
               />
             </View>
             <View>
+              <OneToMany<Brand, BrandStore, ProductEntity, ProductStore>
+                getOwnerByOwnedIdSelect={(state) => state.getBrandByProductId}
+                getOwnersSelector={(state) => state.getBrands}
+                ownedId={product.id}
+                ownerEntityLinkCreator={(brand) => `/brands/${brand.id}`}
+                ownerSelectorCreator={(id) => (state) => state.brands[id]}
+                ownersSelectorCreator={(ids) => (state) => ids.map((id) => state.brands[id])}
+                registerOwnerIdsSelector={(state) => state.registerIds}
+                searchOwnersSelector={(state) => state.searchBrands}
+                unregisterOwnerIdsSelector={(state) => state.unregisterIds}
+                updateOwnerInOwnedSelector={(state) => state.updateProductBrand}
+                useOwnedStore={useProductsStore}
+                useOwnerStore={useBrandStore}
+              />
               <FieldWithLabel
                 label="Name"
                 value={product.name}

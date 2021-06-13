@@ -66,8 +66,23 @@ export const getProductById: RequestHandler = async (req, res) => {
   res.json(viewProduct(product, language?.toString().toUpperCase()))
 }
 
+export const getBrandByProductIdx: RequestHandler = async (req, res) => {
+  const product = await Product.createQueryBuilder('product')
+    .where('product.id = :id', { id: req.params.id })
+    .leftJoinAndSelect('product.brand', 'bd')
+    .getOneOrFail()
+
+  res.json(product.brand)
+}
+
+export const updateBrandInProductIdx: RequestHandler = async (req, res) => {
+  await Product.update(req.params.id, { brandId: req.body.brandId })
+  res.sendStatus(204)
+}
+
 export const createProduct: RequestHandler = async (req, res) => {
   if (!req.body.name) throw new MissingParamError('A product needs a name')
+  if (!req.body.brandId) throw new MissingParamError('A product needs a brand')
 
   const product = Product.create(req.body as Product)
   await product.save()

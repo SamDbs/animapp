@@ -2,35 +2,11 @@ import { Constituent } from '@hooks/stores/constituent'
 import { Ingredient } from '@hooks/stores/ingredient'
 import { Product } from '@hooks/stores/product'
 import useSearchableList from '@hooks/useSearchableList'
-import { Link } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
 import type { UseStore, StateSelector } from 'zustand'
 
-type SubItemProps<OwnedItem extends Ingredient | Constituent> = {
-  children?: JSX.Element | false
-  item: Partial<OwnedItem>
-  entityLinkCreator: (entity: Partial<OwnedItem>) => string
-  even: boolean
-}
-
-function SubItem<OwnedItem extends Ingredient | Constituent>(props: SubItemProps<OwnedItem>) {
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 8,
-        backgroundColor: props.even ? '#f5f5f5' : '#fff',
-        alignItems: 'center',
-      }}>
-      <Link to={props.entityLinkCreator(props.item)}>
-        <Text>{props.item.name}</Text>
-      </Link>
-      {props.children && <View>{props.children}</View>}
-    </View>
-  )
-}
+import SubItem from './SubItem'
 
 type Props<
   OwnerItem extends Product,
@@ -90,7 +66,6 @@ export default function ManyToMany<
   ownedEntityLinkCreator,
 }: Props<OwnerItem, OwnedItem, StoreShape, RelationParams>) {
   const [ids, setIds] = useState<OwnedItem['id'][]>([])
-  console.log('ids', ids)
   const [isLoading, setIsLoading] = useState(false)
   const getOwnedByOwnerId = useOwnedStore(ownedItemsGetterSelector)
   const upsertOwnedToOwner = useOwnedStore(ownedItemsUpdaterSelector)
