@@ -6,14 +6,8 @@ import OneToMany from '@components/OneToMany'
 import { PageHeader } from '@components/Themed'
 import UploadSingleImage from '@components/UploadSingleImage'
 import useBrandStore, { Brand, BrandStore } from '@hooks/stores/brand'
-import useConstituentsStore, {
-  Constituent as ConstituentEntity,
-  ConstituentStoreState,
-} from '@hooks/stores/constituent'
-import useIngredientStore, {
-  Ingredient as IngredientEntity,
-  IngredientStore,
-} from '@hooks/stores/ingredient'
+import useConstituentsStore from '@hooks/stores/constituent'
+import useIngredientStore from '@hooks/stores/ingredient'
 import useProductsStore, { Product as ProductEntity, ProductStore } from '@hooks/stores/product'
 import useProductTranslationStore, {
   ProductTranslation,

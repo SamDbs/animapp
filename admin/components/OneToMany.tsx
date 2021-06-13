@@ -167,7 +167,7 @@ export default function OneToMany<
                 .filter((item) => id !== item.id)
                 .map((item, i) => (
                   <SubItem<OwnerEntity>
-                    even
+                    even={i % 2 === 0}
                     key={item.id}
                     entityLinkCreator={ownerEntityLinkCreator}
                     item={item}>
