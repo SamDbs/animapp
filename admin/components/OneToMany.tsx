@@ -140,7 +140,7 @@ export default function OneToMany<
       )}
       {editing && (
         <>
-          <Text style={{ marginTop: 16 }}>Link new items</Text>
+          <Text style={{ marginTop: 16 }}>Link new item</Text>
           <TextInput
             style={{
               borderColor: '#ccc',
