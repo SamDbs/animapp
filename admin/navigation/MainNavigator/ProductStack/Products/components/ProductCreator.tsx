@@ -10,7 +10,7 @@ import SubItem from '@components/SubItem'
 
 const initialState = { type: '', name: '', barCode: '', brandId: '' }
 
-export default function ProductCreator({ style }: any) {
+export default function ProductCreator({ style }: { style?: View['props']['style'] }) {
   const [product, setProduct] = useState({ ...initialState })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -57,6 +57,7 @@ export default function ProductCreator({ style }: any) {
           <SubItem<Brand> even entityLinkCreator={(id) => 'osef'} item={brand} />
         </View>
       )}
+      <Text>Select a brand</Text>
       <OneToMany<Brand, BrandStore, Product, ProductStore>
         getOwnerByOwnedIdSelect={(state) => state.getBrandByProductId}
         getOwnersSelector={(state) => state.getBrands}

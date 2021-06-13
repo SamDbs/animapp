@@ -5,7 +5,7 @@ import { Link } from '@react-navigation/native'
 import React from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
-export default function ProductList({ style }: { style: View['props']['style'] }) {
+export default function ProductList({ style }: { style?: View['props']['style'] }) {
   const {
     isLoading,
     items: products,

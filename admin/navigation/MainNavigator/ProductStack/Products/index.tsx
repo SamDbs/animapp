@@ -9,8 +9,8 @@ export default function Products() {
   return (
     <ScrollView style={{ flex: 1, padding: 16 }}>
       <PageHeader>Products dashboard</PageHeader>
-      <ProductsList style={{ marginBottom: 16 }} />
-      <ProductCreator />
+      <ProductCreator style={{ marginBottom: 16 }} />
+      <ProductsList />
     </ScrollView>
   )
 }
