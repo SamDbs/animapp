@@ -18,7 +18,7 @@ type Props<
     (ownedId: OwnedEntity['id']) => Promise<{ id: OwnerEntity['id'] }>
   >
   getOwnersSelector: StateSelector<OwnerStateShape, () => Promise<{ ids: string[] }>>
-  ownedId: OwnedEntity['id']
+  ownedId?: OwnedEntity['id']
   ownerEntityLinkCreator: (item: Partial<OwnerEntity>) => string
   ownerSelectorCreator: (
     id: OwnerEntity['id'],
@@ -31,6 +31,7 @@ type Props<
     OwnerStateShape,
     (query: string) => Promise<{ ids: OwnerEntity['id'][] }>
   >
+  setOwnerId?: (ownerId: OwnerEntity['id']) => void
   unregisterOwnerIdsSelector: StateSelector<OwnerStateShape, (ids: OwnerEntity['id'][]) => void>
   updateOwnerInOwnedSelector: StateSelector<
     OwnedStoreShape,
@@ -59,6 +60,7 @@ export default function OneToMany<
   ownersSelectorCreator,
   registerOwnerIdsSelector,
   searchOwnersSelector,
+  setOwnerId,
   unregisterOwnerIdsSelector,
   updateOwnerInOwnedSelector,
   useOwnedStore,
@@ -66,7 +68,7 @@ export default function OneToMany<
 }: Props<OwnerEntity, OwnerStateShape, OwnedEntity, OwnedStoreShape>) {
   const [id, setId] = useState<OwnerEntity['id']>()
   const [isLoading, setIsLoading] = useState(false)
-  const [editing, setEditing] = useState(false)
+  const [editing, setEditing] = useState(Boolean(!ownedId))
   const {
     isLoading: isLoadingOwnerItems,
     items: ownerItems,
@@ -86,6 +88,7 @@ export default function OneToMany<
 
   useEffect(() => {
     async function init() {
+      if (!ownedId) return
       setIsLoading(true)
       const { id } = await getOwnerByOwnedId(ownedId)
       setId(id)
@@ -101,31 +104,40 @@ export default function OneToMany<
   }, [id])
 
   const updateOwned = async (ownerId: OwnerEntity['id']) => {
+    if (!ownedId) {
+      if (setOwnerId) {
+        setOwnerId(ownerId)
+        setEditing(false)
+      }
+      return
+    }
     await updateOwnerInOwned(ownedId, ownerId)
     setId(ownerId)
   }
 
   const owner = useOwnerStore(useCallback(id ? ownerSelectorCreator(id) : () => null, [id]))
 
-  if (isLoading || !owner) return <ActivityIndicator />
+  if (isLoading) return <ActivityIndicator />
 
   return (
     <View>
-      <View
-        style={{
-          marginTop: 16,
-          borderColor: '#ccc',
-          borderWidth: 1,
-          borderRadius: 3,
-          overflow: 'hidden',
-        }}>
-        <SubItem<OwnerEntity>
-          even
-          key={owner.id}
-          entityLinkCreator={ownerEntityLinkCreator}
-          item={owner}
-        />
-      </View>
+      {owner && (
+        <View
+          style={{
+            marginTop: 16,
+            borderColor: '#ccc',
+            borderWidth: 1,
+            borderRadius: 3,
+            overflow: 'hidden',
+          }}>
+          <SubItem<OwnerEntity>
+            even
+            key={owner.id}
+            entityLinkCreator={ownerEntityLinkCreator}
+            item={owner}
+          />
+        </View>
+      )}
       {editing && (
         <>
           <Text style={{ marginTop: 16 }}>Link new items</Text>

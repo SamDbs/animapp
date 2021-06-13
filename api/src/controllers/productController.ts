@@ -82,6 +82,7 @@ export const updateBrandInProductIdx: RequestHandler = async (req, res) => {
 
 export const createProduct: RequestHandler = async (req, res) => {
   if (!req.body.name) throw new MissingParamError('A product needs a name')
+  if (!req.body.brandId) throw new MissingParamError('A product needs a brand')
 
   const product = Product.create(req.body as Product)
   await product.save()
