@@ -171,7 +171,7 @@ export default function OneToMany<
                     key={item.id}
                     entityLinkCreator={ownerEntityLinkCreator}
                     item={item}>
-                    <Button title="Select" onPress={() => updateOwned(item.id as rstring)} />
+                    <Button title="Select" onPress={() => updateOwned(item.id as string)} />
                   </SubItem>
                 ))}
           </View>
