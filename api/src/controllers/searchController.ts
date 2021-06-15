@@ -41,6 +41,7 @@ export const searchAll: RequestHandler = async (req, res) => {
 }
 export const searchByIngredients: RequestHandler = async (req, res) => {
   const { language, q } = req.query
+  console.log(language)
   if (typeof q !== 'string') {
     throw new NotFoundError()
   }
@@ -55,7 +56,7 @@ export const searchByIngredients: RequestHandler = async (req, res) => {
       return {
         ingredientSearched: mot,
         ingredientFound: ingredient
-          ? viewIngredient(ingredient.ingredient, language?.toString())
+          ? viewIngredient(ingredient.ingredient, language?.toString().toUpperCase())
           : null,
       }
     }),
