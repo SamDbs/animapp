@@ -10,8 +10,13 @@ import { viewIngredient } from '../views/ingredient'
 
 export const searchAll: RequestHandler = async (req, res) => {
   const { language, q } = req.query
+  const filterByStatus: { published?: boolean } = {}
+  if (!res.locals.admin) {
+    filterByStatus.published = true
+  }
+
   const products = await Product.find({
-    where: { name: ILike(`%${q}%`) },
+    where: { name: ILike(`%${q}%`), ...filterByStatus },
     relations: ['translations', 'brand'],
   })
 
@@ -19,12 +24,19 @@ export const searchAll: RequestHandler = async (req, res) => {
     where: { name: ILike(`%${q}%`) },
     relations: ['products', 'products.translations', 'products.brand'],
   })
+  const productsFromBrand = brands
+    .map((brand) => brand.products)
+    .flat()
+    .filter((product) => {
+      if (products.map((pro) => pro.id).includes(product.id)) return false
+      if (!res.locals.admin) {
+        return product.published
+      }
+      return true
+    })
 
   res.json({
-    products: viewProducts(
-      [...brands.map((brand) => brand.products).flat(), ...products],
-      language?.toString().toUpperCase(),
-    ),
+    products: viewProducts([...productsFromBrand, ...products], language?.toString().toUpperCase()),
   })
 }
 export const searchByIngredients: RequestHandler = async (req, res) => {
