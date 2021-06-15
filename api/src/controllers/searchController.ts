@@ -60,8 +60,7 @@ export const parseQueryToWordArray = (q: string): string[] => {
     return []
   }
   for (const match of matches) {
-    console.log('match', match[1])
-    const val = match[1].trim()
+    const val = match?.[1]?.trim()
     if (val) tableauMots.push(val)
   }
   return tableauMots
