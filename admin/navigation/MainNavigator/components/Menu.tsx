@@ -13,6 +13,7 @@ export default function Menu() {
       <MenuItem title="Languages" to="/languages" />
       <MenuItem title="FAQ" to="/faq" />
       <MenuItem title="Contacts" to="/contacts" />
+      <MenuItem title="Dev tools" to="/dev" />
     </View>
   )
 }

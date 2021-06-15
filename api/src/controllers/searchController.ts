@@ -55,12 +55,14 @@ export const parseQueryToWordArray = (q: string): string[] => {
   const queryDeleteParenthesis = q?.replace(/\([^\)]*\)/gms, '')
   const formatQuery = queryDeleteParenthesis?.replace('\n', ',')
   const tableauMots = []
-  const matches = formatQuery?.matchAll(/([a-zA-Z\s]+),?/gms)
+  const matches = formatQuery?.matchAll(/([a-zA-Z\s-]+)/gms)
   if (!matches) {
     return []
   }
   for (const match of matches) {
-    tableauMots.push(match[1].trim())
+    console.log('match', match[1])
+    const val = match[1].trim()
+    if (val) tableauMots.push(val)
   }
   return tableauMots
 }
