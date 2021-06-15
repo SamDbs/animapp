@@ -41,7 +41,6 @@ export const searchAll: RequestHandler = async (req, res) => {
 }
 export const searchByIngredients: RequestHandler = async (req, res) => {
   const { language, q } = req.query
-  console.log(language)
   if (typeof q !== 'string') {
     throw new NotFoundError()
   }
