@@ -45,6 +45,7 @@ export type IngredientStore = {
     productId: Product['id'],
     ingredientId: Ingredient['id'],
   ) => Promise<void>
+  guessIngredients: (query: string) => Promise<{ ids: Ingredient['id'][] }>
 }
 
 const useIngredientsStore = create<IngredientStore>(
@@ -160,6 +161,25 @@ const useIngredientsStore = create<IngredientStore>(
       },
       async deleteIngredientFromProductId(productId, ingredientId) {
         await fetcher.delete<Ingredient[]>(`/products/${productId}/ingredients/${ingredientId}`, {})
+      },
+      async guessIngredients(query: string) {
+        const { data } = await fetcher.get<
+          { ingredientSearched: string; ingredientFound: Ingredient }[]
+        >('/search/ingredients', { params: { q: query } })
+
+        const ingredients = data
+          .filter((item) => item.ingredientFound)
+          .map((item) => item.ingredientFound)
+          .map((ingredient) => ({
+            ...ingredient,
+            id: ingredient.id.toString(),
+          }))
+
+        const ids = ingredients.map((ingredient) => ingredient.id)
+        const entities = keyBy((ingredient) => ingredient.id, ingredients)
+
+        set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
+        return { ids }
       },
     }),
     'ingredient',

@@ -44,6 +44,11 @@ export default {
               Brand: 'brands/:id',
             },
           },
+          DevStack: {
+            screens: {
+              Dev: 'dev',
+            },
+          },
         },
       },
       NotFound: '*',
