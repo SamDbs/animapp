@@ -10,6 +10,7 @@ export type Product = {
   id: string
   name: string
   type: string
+  published: boolean
   image: string
   barCode: string
   description: string

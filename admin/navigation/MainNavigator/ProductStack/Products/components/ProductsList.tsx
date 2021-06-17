@@ -68,6 +68,7 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
                 justifyContent: 'space-between',
               }}>
               <Text>{product.name}</Text>
+              <Text>{product.published ? 'publié' : 'pas publié'}</Text>
               <Link to={`/products/${product.id}`}>
                 <Text style={{ cursor: 'pointer' }}>edit</Text>
               </Link>
