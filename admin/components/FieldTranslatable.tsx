@@ -12,7 +12,7 @@ import { Text, TextInput, View } from 'react-native'
 import type { StateSelector, UseStore } from 'zustand'
 
 type Props<
-  Item extends Product | Ingredient | Faq,
+  Item extends Product | Ingredient | Faq | Constituent,
   ItemTranslation extends
     | ProductTranslation
     | IngredientTranslation
@@ -122,7 +122,7 @@ export default function FieldTranslatable<
                 <Text style={{ marginVertical: 8, fontWeight: 'bold' }}>{language.name}</Text>
                 {fieldsToTranslate.map(([field, label]) => {
                   return (
-                    <View key={field} style={{ paddingVertical: 8 }}>
+                    <View key={field as string} style={{ paddingVertical: 8 }}>
                       <View style={{ alignItems: 'center', flex: 1, flexDirection: 'row' }}>
                         <View style={{ width: 100 }}>
                           <Text>{label}</Text>
