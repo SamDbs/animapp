@@ -32,8 +32,7 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
     return
   }
   const ingredients = await Ingredient.createQueryBuilder('ingredient')
-    .leftJoinAndSelect('ingredient.translations', 'it')
-    .where("it.languageId = 'EN'")
+    .leftJoinAndSelect('ingredient.translations', 'it', "it.languageId = 'EN'")
     .orderBy('it.name', 'ASC')
     .getMany()
 
