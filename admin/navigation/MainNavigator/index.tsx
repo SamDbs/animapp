@@ -6,6 +6,7 @@ import { MainTabParamList } from '../../types'
 import BrandStack from './BrandStack'
 import ConstituentStack from './ConstituentStack'
 import Contacts from './Contacts'
+import DevStack from './DevStack'
 import FaqStack from './FaqStack'
 import IngredientStack from './IngredientStack'
 import LanguageStack from './LanguageStack'
@@ -26,6 +27,7 @@ export default function TabNavigator() {
         <BottomTab.Screen name="ProductStack" component={ProductStack} />
         <BottomTab.Screen name="BrandStack" component={BrandStack} />
         <BottomTab.Screen name="ConstituentStack" component={ConstituentStack} />
+        <BottomTab.Screen name="DevStack" component={DevStack} />
       </BottomTab.Navigator>
     </View>
   )

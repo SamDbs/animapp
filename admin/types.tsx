@@ -21,7 +21,7 @@ export type MainTabParamList = {
   LanguageStack: undefined
   ProductStack: undefined
   ConstituentStack: undefined
-
+  DevStack: undefined
 }
 
 export type ProductStackParamList = {
@@ -42,6 +42,10 @@ export type IngredientStackParamList = {
 export type FaqStackParamList = {
   Faqs: undefined
   Faq: { id: string }
+}
+
+export type DevStackParamList = {
+  Dev: undefined
 }
 
 export type BrandStackParamList = {
