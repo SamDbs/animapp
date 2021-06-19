@@ -19,6 +19,7 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
         { description: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
         { review: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
       ],
+      order: { name: 'ASC' },
     })
     const ingredientIds = translations.map((translation) => translation.ingredientId)
     const where: FindManyOptions<Ingredient>['where'] = { id: In(ingredientIds) }
@@ -30,10 +31,12 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
     res.json(viewIngredients(ingredients, req.params.lang?.toString()))
     return
   }
-  const ingredients = await Ingredient.find({
-    relations: ['translations'],
-    order: { id: 'ASC' },
-  })
+  const ingredients = await Ingredient.createQueryBuilder('ingredient')
+    .leftJoinAndSelect('ingredient.translations', 'it')
+    .where("it.languageId = 'EN'")
+    .orderBy('it.name', 'ASC')
+    .getMany()
+
   res.json(viewIngredients(ingredients, req.query.lang?.toString()))
 }
 
