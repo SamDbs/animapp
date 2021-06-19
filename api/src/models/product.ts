@@ -35,6 +35,9 @@ export default class Product extends BaseEntity {
   @Column()
   barCode!: string
 
+  @Column({ default: false })
+  published!: boolean
+
   @Column()
   brandId!: number
 

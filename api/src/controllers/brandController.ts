@@ -29,12 +29,12 @@ export const getAllBrands: RequestHandler = async (req, res) => {
   if (req.query.q) {
     const brands = await Brand.find({
       where: [{ name: new FindOperator('ilike', `%${req.query.q}%`) }],
-      order: { id: 'ASC' },
+      order: { name: 'ASC' },
     })
     res.json(brands)
     return
   }
-  const brands = await Brand.find()
+  const brands = await Brand.find({ order: { name: 'ASC' } })
   res.json(brands)
 }
 

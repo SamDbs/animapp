@@ -67,7 +67,18 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
                 flexDirection: 'row',
                 justifyContent: 'space-between',
               }}>
-              <Text>{product.name}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View
+                  style={{
+                    marginRight: 8,
+                    borderRadius: 10,
+                    borderWidth: 10,
+                    borderColor: product.published ? '#00ff11' : '#ffff00',
+                  }}
+                />
+
+                <Text>{product.name}</Text>
+              </View>
               <Link to={`/products/${product.id}`}>
                 <Text style={{ cursor: 'pointer' }}>edit</Text>
               </Link>

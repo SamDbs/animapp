@@ -32,17 +32,16 @@ export const getAllProducts: RequestHandler = async (req, res) => {
 
     const products = await Product.find({
       relations: ['translations'],
-      order: { id: 'ASC' },
+      order: { name: 'ASC' },
       where,
     })
-    console.log('okokkkk 2')
     res.json(viewProducts(products, req.params.lang?.toString()))
     return
   }
 
   const products = await Product.find({
     relations: ['translations'],
-    order: { id: 'ASC' },
+    order: { name: 'ASC' },
   })
   res.json(viewProducts(products, req.query.lang?.toString()))
 }

@@ -15,7 +15,7 @@ import useProductTranslationStore, {
 } from '@hooks/stores/productTranslation'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native'
+import { ActivityIndicator, Image, ScrollView, Switch, Text, View } from 'react-native'
 
 import { ProductStackParamList } from '../../../../types'
 
@@ -113,6 +113,19 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
                 value={product.barCode}
                 onChangeValue={(val) => updateProduct(product.id, { barCode: val })}
               />
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  marginBottom: 16,
+                }}>
+                <Text>Published</Text>
+                <Switch
+                  style={{ marginLeft: 16 }}
+                  value={product.published}
+                  onValueChange={(value) => updateProduct(product.id, { published: value })}
+                />
+              </View>
               <FieldTranslatable<ProductEntity, ProductTranslation, ProductTranslationStore>
                 fields={{ description: 'Description' }}
                 baseEntityId={product.id}

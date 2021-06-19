@@ -17,6 +17,7 @@ import analyticalConstituents from './routes/analyticalConstituents'
 import authentication from './routes/authentication'
 import admin from './routes/admin'
 import { errorHandler } from './middleware/errorHandler'
+import { isConnected } from './middleware/admin'
 
 const PORT = ((process.env.PORT as unknown) as number) || 8080
 const HOST = '0.0.0.0'
@@ -42,6 +43,7 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
+app.use(isConnected)
 
 app.use((req, res, next) => {
   console.log('req:', req.method, req.path, req.query)
