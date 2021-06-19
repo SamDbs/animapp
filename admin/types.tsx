@@ -57,11 +57,3 @@ export type ConstituentStackParamList = {
   Constituents: undefined
   Constituent: { id: string }
 }
-
-export type TabOneParamList = {
-  TabOneScreen: undefined
-}
-
-export type TabTwoParamList = {
-  TabTwoScreen: undefined
-}

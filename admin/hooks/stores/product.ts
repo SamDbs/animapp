@@ -5,6 +5,7 @@ import { devtools } from 'zustand/middleware'
 import { fetcher } from './index'
 
 import { Brand } from '@hooks/stores/brand'
+import { PaginationDetails } from '@hooks/useSearchableList'
 
 export type Product = {
   id: string
@@ -37,9 +38,11 @@ export type ProductStore = {
   unregisterIds: (ids: Product['id'][]) => void
   getProductById: (id: Product['id']) => Promise<{ id: Product['id'] }>
   updateProductBrand: (id: Product['id'], brandId: Brand['id']) => Promise<void>
-  getProducts: () => Promise<{ ids: Product['id'][] }>
   updateProduct: (id: Product['id'], params: Partial<Product>) => Promise<void>
-  searchProducts: (text: Product['name']) => Promise<{ ids: Product['id'][] }>
+  searchProducts: (
+    text: Product['name'],
+    page?: number,
+  ) => Promise<{ pagination: PaginationDetails; ids: Product['id'][] }>
   createProduct: (params: { barCode: string; name: string; type: string }) => Promise<unknown>
   locallySetProductImage: (productId: Product['id'], image: string) => void
 }
@@ -96,17 +99,6 @@ const useProductsStore = create<ProductStore>(
         set((state) => ({ products: { ...state.products, [product.id]: product } }))
         return { id }
       },
-      async getProducts() {
-        const { data } = await fetcher.get<Product[]>(`/products`)
-
-        const products = data.map((product) => ({ ...product, id: product.id.toString() }))
-
-        const ids = products.map((product) => product.id)
-        const entities = keyBy((product) => product.id, products)
-
-        set((state) => ({ products: { ...state.products, ...entities } }))
-        return { ids }
-      },
       async updateProduct(id: Product['id'], params: Partial<Product>) {
         set((state) => ({
           ...state,
@@ -121,16 +113,21 @@ const useProductsStore = create<ProductStore>(
         }))
         return fetcher.put(`/products/${id}/brand`, { brandId })
       },
-      async searchProducts(text: string) {
-        const { data } = await fetcher.get<Product[]>(`/products`, { params: { q: text } })
+      async searchProducts(text: string, page = 0) {
+        const { data } = await fetcher.get<{ pagination: PaginationDetails; products: Product[] }>(
+          `/products`,
+          {
+            params: { q: text, page },
+          },
+        )
 
-        const products = data.map((product) => ({ ...product, id: product.id.toString() }))
+        const products = data.products.map((product) => ({ ...product, id: product.id.toString() }))
 
         const ids = products.map((product) => product.id)
         const entities = keyBy((product) => product.id, products)
 
         set((state) => ({ products: { ...state.products, ...entities } }))
-        return { ids }
+        return { pagination: data.pagination, ids }
       },
       createProduct(params: { barCode: string; name: string; type: string }) {
         return fetcher.post(`/products`, params)

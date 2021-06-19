@@ -18,7 +18,13 @@ import { MissingParamError } from '../middleware/errorHandler'
 import Ingredient from '../models/ingredient'
 import ProductIngredient from '../models/productIngredients'
 
+const limit = 5
+
 export const getAllProducts: RequestHandler = async (req, res) => {
+  const desiredPage = parseInt(req.query?.page?.toString() ?? '0')
+  const page = desiredPage < 0 ? 0 : desiredPage
+  const offset = limit * page
+
   if (req.query.q) {
     const translations = await ProductTranslation.find({
       where: { description: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
@@ -30,20 +36,31 @@ export const getAllProducts: RequestHandler = async (req, res) => {
       { name: new FindOperator('ilike', `%${req.query.q}%`) },
     ]
 
-    const products = await Product.find({
+    const [products, count] = await Product.findAndCount({
       relations: ['translations'],
       order: { name: 'ASC' },
       where,
+      take: limit,
+      skip: offset,
     })
-    res.json(viewProducts(products, req.params.lang?.toString()))
+    res.json({
+      pagination: { count, limit, offset, page },
+      products: viewProducts(products, req.params.lang?.toString()),
+    })
     return
   }
 
-  const products = await Product.find({
+  const [products, count] = await Product.findAndCount({
     relations: ['translations'],
     order: { name: 'ASC' },
+    take: limit,
+    skip: offset,
   })
-  res.json(viewProducts(products, req.query.lang?.toString()))
+
+  res.json({
+    pagination: { count, limit, offset, page },
+    products: viewProducts(products, req.params.lang?.toString()),
+  })
 }
 
 export const getProductById: RequestHandler = async (req, res) => {

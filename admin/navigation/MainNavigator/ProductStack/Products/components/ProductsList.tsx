@@ -1,4 +1,5 @@
 import Card from '@components/Card'
+import Pagination from '@components/Pagination'
 import useProductsStore, { ProductStore, Product } from '@hooks/stores/product'
 import useSearchableList from '@hooks/useSearchableList'
 import { Link } from '@react-navigation/native'
@@ -7,13 +8,14 @@ import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
 export default function ProductList({ style }: { style?: View['props']['style'] }) {
   const {
+    changePage,
     isLoading,
     items: products,
     noResult,
+    pagination,
     searchDebounced,
   } = useSearchableList<ProductStore, Product>(
     useProductsStore,
-    (state) => state.getProducts,
     (state) => state.searchProducts,
     (ids) => (state) => ids.map((id) => state.products[id]),
   )
@@ -49,7 +51,6 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
           borderRadius: 3,
           overflow: 'hidden',
         }}>
-        {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
         {noResult && (
           <View style={{ padding: 8 }}>
             <Text>No result.</Text>
@@ -86,6 +87,8 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
           )
         })}
       </View>
+      <ActivityIndicator style={{ margin: 8 }} color={isLoading ? undefined : 'transparent'} />
+      <Pagination onChangePage={changePage} pagination={pagination} />
     </Card>
   )
 }

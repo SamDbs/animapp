@@ -1,6 +1,6 @@
 entity: Product
 items:
-  product{1..5}:
+  product{1..150}:
     name: '{{commerce.productName}}'
     type: '{{commerce.product}}'
     ingredients:
