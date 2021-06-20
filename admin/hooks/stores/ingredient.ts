@@ -33,7 +33,6 @@ export type IngredientStore = {
   registerIds: (ids: Ingredient['id'][]) => void
   unregisterIds: (ids: Ingredient['id'][]) => void
   getIngredientById: (id: Ingredient['id']) => Promise<{ id: Ingredient['id'] }>
-  getIngredients: () => Promise<{ ids: Ingredient['id'][] }>
   updateIngredient: (id: Ingredient['id'], params: Partial<Ingredient>) => Promise<void>
   searchIngredients: (
     query: string,
@@ -106,20 +105,6 @@ const useIngredientsStore = create<IngredientStore>(
 
         set((state) => ({ ingredients: { ...state.ingredients, [ingredient.id]: ingredient } }))
         return { id }
-      },
-      async getIngredients() {
-        const { data } = await fetcher.get<Ingredient[]>(`/ingredients`)
-
-        const ingredients = data.map((ingredient) => ({
-          ...ingredient,
-          id: ingredient.id.toString(),
-        }))
-
-        const ids = ingredients.map((ingredient) => ingredient.id)
-        const entities = keyBy((ingredient) => ingredient.id, ingredients)
-
-        set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
-        return { ids }
       },
       async updateIngredient(id: Ingredient['id'], params: Partial<Ingredient>) {
         set((state) => ({
