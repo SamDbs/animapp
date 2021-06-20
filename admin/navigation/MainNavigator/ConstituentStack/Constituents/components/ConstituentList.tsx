@@ -1,51 +1,24 @@
 import Card from '@components/Card'
-import useConstituentsStore from '@hooks/stores/constituent'
+import Pagination from '@components/Pagination'
+import useConstituentsStore, { ConstituentStoreState, Constituent } from '@hooks/stores/constituent'
+import useSearchableList from '@hooks/useSearchableList'
 import { Link } from '@react-navigation/native'
-import { debounce } from 'lodash/fp'
-import React, { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
 export default function ConstituentList({ style }: { style: View['props']['style'] }) {
-  const [ids, setConstituentIds] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [registerIds, unregisterIds, getConstituents, searchConstituents] = useConstituentsStore(
-    (state) => [
-      state.registerIds,
-      state.unregisterIds,
-      state.getConstituents,
-      state.searchConstituents,
-    ],
+  const {
+    changePage,
+    isLoading,
+    items: constituents,
+    noResult,
+    pagination,
+    searchDebounced,
+  } = useSearchableList<ConstituentStoreState, Constituent>(
+    useConstituentsStore,
+    (state) => state.searchConstituents,
+    (ids) => (state) => ids.map((id) => state.constituents[id]),
   )
-  const constituents = useConstituentsStore(
-    useCallback((state) => ids.map((id) => state.constituents[id]), [ids]),
-  )
-
-  useEffect(() => {
-    registerIds(ids)
-    return () => unregisterIds(ids)
-  }, [ids])
-
-  const searchDebounced = useCallback(
-    debounce(500, async (text: string) => {
-      setIsLoading(true)
-      const { ids } = await searchConstituents(text)
-      setConstituentIds(ids)
-      setIsLoading(false)
-    }),
-    [],
-  )
-
-  useEffect(() => {
-    async function fn() {
-      setIsLoading(true)
-      const { ids } = await getConstituents()
-      setConstituentIds(ids)
-      setIsLoading(false)
-    }
-    fn()
-  }, [])
-
-  const noResult = !constituents.length
 
   return (
     <Card style={style}>
@@ -78,7 +51,6 @@ export default function ConstituentList({ style }: { style: View['props']['style
           borderRadius: 3,
           overflow: 'hidden',
         }}>
-        {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
         {noResult && (
           <View style={{ padding: 8 }}>
             <Text>No result.</Text>
@@ -105,6 +77,8 @@ export default function ConstituentList({ style }: { style: View['props']['style
           )
         })}
       </View>
+      <ActivityIndicator style={{ margin: 8 }} color={isLoading ? undefined : 'transparent'} />
+      <Pagination onChangePage={changePage} pagination={pagination} />
     </Card>
   )
 }

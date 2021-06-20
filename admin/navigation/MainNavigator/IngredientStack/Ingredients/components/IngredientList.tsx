@@ -50,7 +50,6 @@ export default function IngredientList({ style }: { style?: View['props']['style
           borderRadius: 3,
           overflow: 'hidden',
         }}>
-        {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
         {noResult && (
           <View style={{ padding: 8 }}>
             <Text>No result.</Text>
@@ -79,6 +78,7 @@ export default function IngredientList({ style }: { style?: View['props']['style
           )
         })}
       </View>
+      <ActivityIndicator style={{ margin: 8 }} color={isLoading ? undefined : 'transparent'} />
       <Pagination onChangePage={changePage} pagination={pagination} />
     </Card>
   )

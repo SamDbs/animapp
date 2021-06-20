@@ -1,44 +1,23 @@
 import Card from '@components/Card'
-import useContactsStore from '@hooks/stores/contact'
-import { debounce } from 'lodash/fp'
-import React, { useCallback, useEffect, useState } from 'react'
+import Pagination from '@components/Pagination'
+import useContactsStore, { ContactStoreState, Contact } from '@hooks/stores/contact'
+import useSearchableList from '@hooks/useSearchableList'
+import React from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
-export default function ContactList({ isLoading, style }: any) {
-  const [ids, setContactIds] = useState<string[]>([])
-  const [registerIds, unregisterIds, getContacts, searchContacts] = useContactsStore((state) => [
-    state.registerIds,
-    state.unregisterIds,
-    state.getContacts,
-    state.searchContacts,
-  ])
-
-  useEffect(() => {
-    registerIds(ids)
-    return () => unregisterIds(ids)
-  }, [ids])
-
-  const contacts = useContactsStore(
-    useCallback((state) => ids.map((id) => state.contacts[id]), [ids]),
+export default function ContactList({ style }: { style?: View['props']['style'] }) {
+  const {
+    changePage,
+    isLoading,
+    items: contacts,
+    noResult,
+    pagination,
+    searchDebounced,
+  } = useSearchableList<ContactStoreState, Contact>(
+    useContactsStore,
+    (state) => state.searchContacts,
+    (ids) => (state) => ids.map((id) => state.contacts[id]),
   )
-
-  const searchDebounced = useCallback(
-    debounce(500, async (text: string) => {
-      const { ids } = await searchContacts(text)
-      setContactIds(ids)
-    }),
-    [],
-  )
-
-  useEffect(() => {
-    async function fn() {
-      const { ids } = await getContacts()
-      setContactIds(ids)
-    }
-    fn()
-  }, [])
-
-  const noResult = !contacts.length
 
   return (
     <Card style={style}>
@@ -71,7 +50,6 @@ export default function ContactList({ isLoading, style }: any) {
           borderRadius: 3,
           overflow: 'hidden',
         }}>
-        {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
         {noResult && (
           <View style={{ padding: 8 }}>
             <Text>No result.</Text>
@@ -93,6 +71,8 @@ export default function ContactList({ isLoading, style }: any) {
           )
         })}
       </View>
+      <ActivityIndicator style={{ margin: 8 }} color={isLoading ? undefined : 'transparent'} />
+      <Pagination onChangePage={changePage} pagination={pagination} />
     </Card>
   )
 }

@@ -1,47 +1,24 @@
 import Card from '@components/Card'
-import useFaqStore from '@hooks/stores/faq'
+import Pagination from '@components/Pagination'
+import useFaqStore, { FaqStoreState, Faq } from '@hooks/stores/faq'
+import useSearchableList from '@hooks/useSearchableList'
 import { Link } from '@react-navigation/native'
-import { debounce } from 'lodash/fp'
-import React, { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
 export default function FaqList({ style }: { style: View['props']['style'] }) {
-  const [ids, setFaqIds] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [registerIds, unregisterIds, getFaqs, searchFaqs] = useFaqStore((state) => [
-    state.registerIds,
-    state.unregisterIds,
-    state.getFaqs,
-    state.searchFaqs,
-  ])
-  const faqs = useFaqStore(useCallback((state) => ids.map((id) => state.faqs[id]), [ids]))
-
-  useEffect(() => {
-    registerIds(ids)
-    return () => unregisterIds(ids)
-  }, [ids])
-
-  const searchDebounced = useCallback(
-    debounce(500, async (text: string) => {
-      setIsLoading(true)
-      const { ids } = await searchFaqs(text)
-      setFaqIds(ids)
-      setIsLoading(false)
-    }),
-    [],
+  const {
+    changePage,
+    isLoading,
+    items: faqs,
+    noResult,
+    pagination,
+    searchDebounced,
+  } = useSearchableList<FaqStoreState, Faq>(
+    useFaqStore,
+    (state) => state.searchFaqs,
+    (ids) => (state) => ids.map((id) => state.faqs[id]),
   )
-
-  useEffect(() => {
-    async function fn() {
-      setIsLoading(true)
-      const { ids } = await getFaqs()
-      setFaqIds(ids)
-      setIsLoading(false)
-    }
-    fn()
-  }, [])
-
-  const noResult = !faqs.length
 
   return (
     <Card style={style}>
@@ -74,7 +51,6 @@ export default function FaqList({ style }: { style: View['props']['style'] }) {
           borderRadius: 3,
           overflow: 'hidden',
         }}>
-        {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
         {noResult && (
           <View style={{ padding: 8 }}>
             <Text>No result.</Text>
@@ -101,6 +77,8 @@ export default function FaqList({ style }: { style: View['props']['style'] }) {
           )
         })}
       </View>
+      <ActivityIndicator style={{ margin: 8 }} color={isLoading ? undefined : 'transparent'} />
+      <Pagination onChangePage={changePage} pagination={pagination} />
     </Card>
   )
 }
