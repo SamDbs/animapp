@@ -1,11 +1,10 @@
+import { Brand } from '@hooks/stores/brand'
+import { PaginationDetails } from '@hooks/useSearchableList'
 import { debounce, keyBy, omit } from 'lodash/fp'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
 
 import { fetcher } from './index'
-
-import { Brand } from '@hooks/stores/brand'
-import { PaginationDetails } from '@hooks/useSearchableList'
 
 export type Product = {
   id: string
@@ -41,7 +40,8 @@ export type ProductStore = {
   updateProduct: (id: Product['id'], params: Partial<Product>) => Promise<void>
   searchProducts: (
     text: Product['name'],
-    page?: number,
+    page: number,
+    filters?: object,
   ) => Promise<{ pagination: PaginationDetails; ids: Product['id'][] }>
   createProduct: (params: { barCode: string; name: string; type: string }) => Promise<unknown>
   locallySetProductImage: (productId: Product['id'], image: string) => void
@@ -113,11 +113,11 @@ const useProductsStore = create<ProductStore>(
         }))
         return fetcher.put(`/products/${id}/brand`, { brandId })
       },
-      async searchProducts(text: string, page = 0) {
+      async searchProducts(text: string, page = 0, filters = {}) {
         const { data } = await fetcher.get<{ pagination: PaginationDetails; products: Product[] }>(
           `/products`,
           {
-            params: { q: text, page },
+            params: { q: text, page, ...filters },
           },
         )
 

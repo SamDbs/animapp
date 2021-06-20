@@ -1,5 +1,5 @@
 import { FindManyOptions, FindOperator, In } from 'typeorm'
-import { RequestHandler } from 'express'
+import { Request, RequestHandler } from 'express'
 
 import {
   viewProduct,
@@ -18,32 +18,33 @@ import { MissingParamError } from '../middleware/errorHandler'
 import Ingredient from '../models/ingredient'
 import ProductIngredient from '../models/productIngredients'
 
-const limit = 5
+const limit = 10
 
-// const allowedProductFilterKeys: (keyof Product)[] = ['published']
-// function GetAllowedProductFilters(key: string): key is keyof Product {
-//   return allowedProductFilterKeys.includes(key as keyof Product)
-// }
+const allowedProductFilterKeys: (keyof Product)[] = ['published']
+function GetAllowedProductFilters(key: string): key is keyof Product {
+  return allowedProductFilterKeys.includes(key as keyof Product)
+}
 
-// function getFilters(query: Request['query']): FindManyOptions<Product> | undefined {
-//   const where: FindManyOptions<Product>['where'] = {}
-//   const options: FindManyOptions<Product> = { where }
+function makeWhereFilter(query: Request['query']): FindManyOptions<Product>['where'] {
+  const where: FindManyOptions<Product>['where'] = {}
 
-//   Object.entries(query).forEach(([key, value]) => {
-//     if (key && GetAllowedProductFilters(key)) {
-//       where[key] = value
-//     }
-//   })
+  Object.entries(query).forEach(([key, value]) => {
+    if (key && GetAllowedProductFilters(key)) {
+      where[key] = value
+    }
+  })
 
-//   if (!Object.keys(where).length) return
+  if (!Object.keys(where).length) return {}
 
-//   return options
-// }
+  return where
+}
 
 export const getAllProducts: RequestHandler = async (req, res) => {
   const desiredPage = parseInt(req.query?.page?.toString() ?? '0')
   const page = desiredPage < 0 ? 0 : desiredPage
   const offset = limit * page
+
+  const filters = makeWhereFilter(req.query) as any
 
   if (req.query.q) {
     const translations = await ProductTranslation.find({
@@ -52,8 +53,8 @@ export const getAllProducts: RequestHandler = async (req, res) => {
 
     const productIds = translations.map((translation) => translation.productId)
     const where: FindManyOptions<Product>['where'] = [
-      { id: In(productIds) },
-      { name: new FindOperator('ilike', `%${req.query.q}%`) },
+      { id: In(productIds), ...filters },
+      { name: new FindOperator('ilike', `%${req.query.q}%`), ...filters },
     ]
 
     const [products, count] = await Product.findAndCount({
@@ -71,6 +72,7 @@ export const getAllProducts: RequestHandler = async (req, res) => {
   }
 
   const [products, count] = await Product.findAndCount({
+    where: filters,
     relations: ['translations'],
     order: { name: 'ASC' },
     take: limit,

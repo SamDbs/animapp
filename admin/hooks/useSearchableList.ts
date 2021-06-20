@@ -10,7 +10,11 @@ export default function useSearchableList<StoreShape extends object, EntityShape
   >,
   searchItemsSelector: StateSelector<
     StoreShape,
-    (str: string, page?: number) => Promise<{ pagination?: PaginationDetails; ids: string[] }>
+    (
+      str: string,
+      page: number,
+      filters?: object,
+    ) => Promise<{ pagination: PaginationDetails; ids: string[] }>
   >,
   ownedItemsSelectorCreator: (ids: string[]) => StateSelector<StoreShape, Partial<EntityShape>[]>,
 ) {
@@ -22,6 +26,7 @@ export default function useSearchableList<StoreShape extends object, EntityShape
   const searchItemsFn = useStore(searchItemsSelector)
   const items = useStore(useCallback(ownedItemsSelectorCreator(ids), [ids]))
   const [search, setSearch] = useState('')
+  const [filters, setFilters] = useState({})
 
   useEffect(() => {
     registerIds(ids)
@@ -38,15 +43,16 @@ export default function useSearchableList<StoreShape extends object, EntityShape
   useEffect(() => {
     async function fn() {
       setIsLoading(true)
-      const { ids, pagination } = await searchItemsFn(search, page)
+      const { ids, pagination } = await searchItemsFn(search, page, filters)
       setItemIds(ids)
       pagination && setPagination(pagination)
       setIsLoading(false)
     }
     fn()
-  }, [page, search])
+  }, [filters, page, search])
 
   const noResult = !items.length
+
   return {
     changePage: setPage,
     isLoading,
@@ -54,5 +60,6 @@ export default function useSearchableList<StoreShape extends object, EntityShape
     noResult,
     pagination,
     searchDebounced,
+    setFilters,
   }
 }

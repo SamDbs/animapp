@@ -3,8 +3,8 @@ import Pagination from '@components/Pagination'
 import useProductsStore, { ProductStore, Product } from '@hooks/stores/product'
 import useSearchableList from '@hooks/useSearchableList'
 import { Link } from '@react-navigation/native'
-import React from 'react'
-import { Text, TextInput, View, ActivityIndicator } from 'react-native'
+import React, { SetStateAction, useCallback, useState } from 'react'
+import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
 
 export default function ProductList({ style }: { style?: View['props']['style'] }) {
   const {
@@ -14,11 +14,22 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
     noResult,
     pagination,
     searchDebounced,
+    setFilters,
   } = useSearchableList<ProductStore, Product>(
     useProductsStore,
     (state) => state.searchProducts,
     (ids) => (state) => ids.map((id) => state.products[id]),
   )
+
+  const [filterPublished, setFilterPublished] = useState<'all' | 'published' | 'draft'>()
+
+  const changeFilterPublished = useCallback((cb: any) => {
+    const newValue = cb(setFilterPublished)
+    if (newValue === 'draft' || newValue === 'published')
+      setFilters({ published: newValue === 'published' ? 1 : 0 })
+    else setFilters({})
+    setFilterPublished(newValue)
+  }, [])
 
   return (
     <Card style={style}>
@@ -26,9 +37,77 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
       <View
         style={{
           flexDirection: 'row',
-          justifyContent: 'flex-end',
+          justifyContent: 'space-between',
           paddingVertical: 0,
+          alignItems: 'center',
         }}>
+        <View style={{ flexDirection: 'row' }}>
+          <Pressable
+            style={{
+              alignItems: 'center',
+              backgroundColor: filterPublished === 'all' ? '#eee' : 'transparent',
+              borderColor: '#ccc',
+              borderWidth: 1,
+              cursor: 'pointer',
+              justifyContent: 'center',
+            }}
+            onPress={() =>
+              changeFilterPublished((current: any) => (current !== 'all' ? 'all' : undefined))
+            }>
+            <View
+              style={{
+                margin: 8,
+                borderRadius: 10,
+                borderWidth: 10,
+                borderColor: '#ccc',
+              }}
+            />
+          </Pressable>
+          <Pressable
+            style={{
+              alignItems: 'center',
+              backgroundColor: filterPublished === 'published' ? '#eee' : 'transparent',
+              borderColor: '#ccc',
+              borderWidth: 1,
+              cursor: 'pointer',
+              justifyContent: 'center',
+            }}
+            onPress={() =>
+              changeFilterPublished((current: any) =>
+                current !== 'published' ? 'published' : undefined,
+              )
+            }>
+            <View
+              style={{
+                margin: 8,
+                borderRadius: 10,
+                borderWidth: 10,
+                borderColor: '#00ff11',
+              }}
+            />
+          </Pressable>
+          <Pressable
+            style={{
+              alignItems: 'center',
+              backgroundColor: filterPublished === 'draft' ? '#eee' : 'transparent',
+              borderColor: '#ccc',
+              borderWidth: 1,
+              cursor: 'pointer',
+              justifyContent: 'center',
+            }}
+            onPress={() =>
+              changeFilterPublished((current: any) => (current !== 'draft' ? 'draft' : undefined))
+            }>
+            <View
+              style={{
+                margin: 8,
+                borderRadius: 10,
+                borderWidth: 10,
+                borderColor: '#ffff00',
+              }}
+            />
+          </Pressable>
+        </View>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={{ marginRight: 8 }}>Search</Text>
           <TextInput
