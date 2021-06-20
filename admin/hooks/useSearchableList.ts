@@ -47,7 +47,6 @@ export default function useSearchableList<StoreShape extends object, EntityShape
   }, [page, search])
 
   const noResult = !items.length
-
   return {
     changePage: setPage,
     isLoading,

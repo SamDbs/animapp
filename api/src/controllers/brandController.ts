@@ -2,7 +2,9 @@ import { FindOperator } from 'typeorm'
 import { RequestHandler } from 'express'
 
 import Brand from '../models/brand'
-import { ConflictError } from '../middleware/errorHandler'
+import { ConflictError, MissingParamError } from '../middleware/errorHandler'
+
+const limit = 5
 
 // const allowedBrandFilterKeys: (keyof Brand)[] = ['id', 'name']
 // function GetAllowedBrandFilters(key: string): key is keyof Brand {
@@ -26,16 +28,26 @@ import { ConflictError } from '../middleware/errorHandler'
 // }
 
 export const getAllBrands: RequestHandler = async (req, res) => {
+  const desiredPage = parseInt(req.query?.page?.toString() ?? '0')
+  const page = desiredPage < 0 ? 0 : desiredPage
+  const offset = limit * page
+
   if (req.query.q) {
-    const brands = await Brand.find({
+    const [brands, count] = await Brand.findAndCount({
       where: [{ name: new FindOperator('ilike', `%${req.query.q}%`) }],
       order: { name: 'ASC' },
+      take: limit,
+      skip: offset,
     })
-    res.json(brands)
+    res.json({ pagination: { count, limit, offset, page }, brands })
     return
   }
-  const brands = await Brand.find({ order: { name: 'ASC' } })
-  res.json(brands)
+  const [brands, count] = await Brand.findAndCount({
+    order: { name: 'ASC' },
+    take: limit,
+    skip: offset,
+  })
+  res.json({ pagination: { count, limit, offset, page }, brands })
 }
 
 export const getBrandById: RequestHandler = async (req, res) => {
@@ -46,6 +58,10 @@ export const getBrandById: RequestHandler = async (req, res) => {
 
 export const createBrand: RequestHandler = async (req, res) => {
   const brand = Brand.create(req.body as Brand)
+  if (req.body.name.length < 1) {
+    console.log('error', req.body.name.length)
+    throw new MissingParamError()
+  }
   await brand.save()
   res.status(201).json(brand)
 }

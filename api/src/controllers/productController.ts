@@ -20,6 +20,26 @@ import ProductIngredient from '../models/productIngredients'
 
 const limit = 5
 
+// const allowedProductFilterKeys: (keyof Product)[] = ['published']
+// function GetAllowedProductFilters(key: string): key is keyof Product {
+//   return allowedProductFilterKeys.includes(key as keyof Product)
+// }
+
+// function getFilters(query: Request['query']): FindManyOptions<Product> | undefined {
+//   const where: FindManyOptions<Product>['where'] = {}
+//   const options: FindManyOptions<Product> = { where }
+
+//   Object.entries(query).forEach(([key, value]) => {
+//     if (key && GetAllowedProductFilters(key)) {
+//       where[key] = value
+//     }
+//   })
+
+//   if (!Object.keys(where).length) return
+
+//   return options
+// }
+
 export const getAllProducts: RequestHandler = async (req, res) => {
   const desiredPage = parseInt(req.query?.page?.toString() ?? '0')
   const page = desiredPage < 0 ? 0 : desiredPage

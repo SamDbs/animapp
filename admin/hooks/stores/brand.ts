@@ -4,6 +4,7 @@ import { devtools } from 'zustand/middleware'
 import { Product } from '@hooks/stores/product'
 
 import { fetcher } from '.'
+import { PaginationDetails } from '@hooks/useSearchableList'
 
 export type Brand = {
   id: string
@@ -19,7 +20,10 @@ export type BrandStore = {
   getBrandById: (id: Brand['id']) => Promise<{ id: Brand['id'] }>
   getBrandByProductId: (id: Product['id']) => Promise<{ id: Brand['id'] }>
   updateBrand: (id: Brand['id'], params: Partial<Brand>) => Promise<void>
-  searchBrands: (query: string) => Promise<{ ids: Brand['id'][] }>
+  searchBrands: (
+    text: Brand['name'],
+    page?: number,
+  ) => Promise<{ pagination: PaginationDetails; ids: Brand['id'][] }>
   createBrand: (params: { name: string }) => Promise<unknown>
 }
 
@@ -120,10 +124,13 @@ const useBrandStore = create<BrandStore>(
         }))
         await prepareBrandUpdate(id, params)
       },
-      async searchBrands(query: string) {
-        const { data } = await fetcher.get<Brand[]>(`/brands`, { params: { q: query } })
+      async searchBrands(text: string, page = 0) {
+        const { data } = await fetcher.get<{ pagination: PaginationDetails; brands: Brand[] }>(
+          `/brands`,
+          { params: { q: text, page } },
+        )
 
-        const brands = data.map((brand) => ({
+        const brands = data.brands.map((brand) => ({
           ...brand,
           id: brand.id.toString(),
         }))
@@ -132,7 +139,7 @@ const useBrandStore = create<BrandStore>(
         const entities = keyBy((brand) => brand.id, brands)
 
         set((state) => ({ brands: { ...state.brands, ...entities } }))
-        return { ids }
+        return { pagination: data.pagination, ids }
       },
       createBrand(params: { name: string }) {
         return fetcher.post(`/brands`, params)

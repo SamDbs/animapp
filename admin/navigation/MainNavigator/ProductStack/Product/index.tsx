@@ -86,7 +86,6 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             <View>
               <OneToMany<Brand, BrandStore, ProductEntity, ProductStore>
                 getOwnerByOwnedIdSelect={(state) => state.getBrandByProductId}
-                getOwnersSelector={(state) => state.getBrands}
                 ownedId={product.id}
                 ownerEntityLinkCreator={(brand) => `/brands/${brand.id}`}
                 ownerSelectorCreator={(id) => (state) => state.brands[id]}
@@ -152,7 +151,6 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.ingredients[id])}
             registerOwnedIdsSelector={(state) => state.registerIds}
             unregisterOwnedIdsSelector={(state) => state.unregisterIds}
-            getItemsSelector={(state) => state.getIngredients}
             searchItemsSelector={(state) => state.searchIngredients}
             ownedEntityLinkCreator={(item) => `/ingredients/${item.id}`}
           />

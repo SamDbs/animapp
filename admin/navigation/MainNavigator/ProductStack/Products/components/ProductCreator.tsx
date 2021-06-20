@@ -60,7 +60,6 @@ export default function ProductCreator({ style }: { style?: View['props']['style
       <Text>Select a brand</Text>
       <OneToMany<Brand, BrandStore, Product, ProductStore>
         getOwnerByOwnedIdSelect={(state) => state.getBrandByProductId}
-        getOwnersSelector={(state) => state.getBrands}
         ownerEntityLinkCreator={(brand) => `/brands/${brand.id}`}
         ownerSelectorCreator={(id) => (state) => state.brands[id]}
         ownersSelectorCreator={(ids) => (state) => ids.map((id) => state.brands[id])}

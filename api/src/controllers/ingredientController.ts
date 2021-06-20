@@ -11,7 +11,13 @@ import {
   viewIngredientTranslations,
 } from '../views/ingredient'
 
+const limit = 5
+
 export const getAllIngredients: RequestHandler = async (req, res) => {
+  const desiredPage = parseInt(req.query?.page?.toString() ?? '0')
+  const page = desiredPage < 0 ? 0 : desiredPage
+  const offset = limit * page
+
   if (req.query.q) {
     const translations = await IngredientTranslation.find({
       where: [
@@ -27,6 +33,8 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
       relations: ['translations'],
       order: { id: 'ASC' },
       where,
+      take: limit,
+      skip: offset,
     })
     res.json(viewIngredients(ingredients, req.params.lang?.toString()))
     return
@@ -34,7 +42,8 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
   const ingredients = await Ingredient.createQueryBuilder('ingredient')
     .leftJoinAndSelect('ingredient.translations', 'it', "it.languageId = 'EN'")
     .orderBy('it.name', 'ASC')
-    .getMany()
+    .offset()
+    .limit.getMany()
 
   res.json(viewIngredients(ingredients, req.query.lang?.toString()))
 }

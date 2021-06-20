@@ -1,6 +1,6 @@
 import type { Brand } from '@hooks/stores/brand'
 import type { Product } from '@hooks/stores/product'
-import useSearchableList from '@hooks/useSearchableList'
+import useSearchableList, { PaginationDetails } from '@hooks/useSearchableList'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
 import type { UseStore, StateSelector } from 'zustand'
@@ -17,7 +17,6 @@ type Props<
     OwnerStateShape,
     (ownedId: OwnedEntity['id']) => Promise<{ id: OwnerEntity['id'] }>
   >
-  getOwnersSelector: StateSelector<OwnerStateShape, () => Promise<{ ids: string[] }>>
   ownedId?: OwnedEntity['id']
   ownerEntityLinkCreator: (item: Partial<OwnerEntity>) => string
   ownerSelectorCreator: (
@@ -29,7 +28,10 @@ type Props<
   registerOwnerIdsSelector: StateSelector<OwnerStateShape, (ids: OwnerEntity['id'][]) => void>
   searchOwnersSelector: StateSelector<
     OwnerStateShape,
-    (query: string) => Promise<{ ids: OwnerEntity['id'][] }>
+    (
+      query: string,
+      page?: number,
+    ) => Promise<{ pagination: PaginationDetails; ids: OwnerEntity['id'][] }>
   >
   setOwnerId?: (ownerId: OwnerEntity['id']) => void
   unregisterOwnerIdsSelector: StateSelector<OwnerStateShape, (ids: OwnerEntity['id'][]) => void>
@@ -53,7 +55,6 @@ export default function OneToMany<
   OwnedStoreShape extends object,
 >({
   getOwnerByOwnedIdSelect,
-  getOwnersSelector,
   ownedId,
   ownerEntityLinkCreator,
   ownerSelectorCreator,
@@ -76,7 +77,6 @@ export default function OneToMany<
     searchDebounced: searchOwnerItems,
   } = useSearchableList<OwnerStateShape, OwnerEntity>(
     useOwnerStore,
-    getOwnersSelector,
     searchOwnersSelector,
     ownersSelectorCreator,
   )
