@@ -1,6 +1,6 @@
 import { Text } from '@components/Themed'
 import React from 'react'
-import { View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 
 import IngredientCreator from './components/IngredientCreator'
 import IngredientsList from './components/IngredientList'
@@ -15,10 +15,10 @@ function Header() {
 
 export default function Ingredients() {
   return (
-    <View style={{ flex: 1, padding: 16 }}>
+    <ScrollView style={{ flex: 1, padding: 16 }}>
       <Header />
       <IngredientsList style={{ marginBottom: 16 }} />
       <IngredientCreator />
-    </View>
+    </ScrollView>
   )
 }

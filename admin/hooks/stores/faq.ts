@@ -1,3 +1,4 @@
+import { PaginationDetails } from '@hooks/useSearchableList'
 import { keyBy, omit } from 'lodash/fp'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
@@ -16,8 +17,10 @@ export type FaqStoreState = {
   registerIds: (ids: Faq['id'][]) => void
   unregisterIds: (ids: Faq['id'][]) => void
   getFaqById: (id: Faq['id']) => Promise<{ id: Faq['id'] }>
-  getFaqs: () => Promise<{ ids: Faq['id'][] }>
-  searchFaqs: (query: string) => Promise<{ ids: Faq['id'][] }>
+  searchFaqs: (
+    query: string,
+    page?: number,
+  ) => Promise<{ ids: Faq['id'][]; pagination: PaginationDetails }>
   createFaq: () => Promise<unknown>
 }
 
@@ -76,10 +79,12 @@ const useFaqStore = create<FaqStoreState>(
         set((state) => ({ faqs: { ...state.faqs, [faq.id]: faq } }))
         return { id }
       },
-      async getFaqs() {
-        const { data } = await fetcher.get<Faq[]>(`/faq`)
+      async searchFaqs(query: string, page = 0) {
+        const { data } = await fetcher.get<{ faqs: Faq[]; pagination: PaginationDetails }>(`/faq`, {
+          params: { q: query, page },
+        })
 
-        const faqs = data.map((faq) => ({
+        const faqs = data.faqs.map((faq) => ({
           ...faq,
           id: faq.id.toString(),
         }))
@@ -88,21 +93,7 @@ const useFaqStore = create<FaqStoreState>(
         const entities = keyBy((faq) => faq.id, faqs)
 
         set((state) => ({ faqs: { ...state.faqs, ...entities } }))
-        return { ids }
-      },
-      async searchFaqs(query: string) {
-        const { data } = await fetcher.get<Faq[]>(`/faq`, { params: { q: query } })
-
-        const faqs = data.map((faq) => ({
-          ...faq,
-          id: faq.id.toString(),
-        }))
-
-        const ids = faqs.map((faq) => faq.id)
-        const entities = keyBy((faq) => faq.id, faqs)
-
-        set((state) => ({ faqs: { ...state.faqs, ...entities } }))
-        return { ids }
+        return { ids, pagination: data.pagination }
       },
       createFaq() {
         return fetcher.post(`/faq`)

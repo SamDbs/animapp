@@ -1,7 +1,7 @@
 import { Constituent } from '@hooks/stores/constituent'
 import { Ingredient } from '@hooks/stores/ingredient'
 import { Product } from '@hooks/stores/product'
-import useSearchableList from '@hooks/useSearchableList'
+import useSearchableList, { PaginationDetails } from '@hooks/useSearchableList'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
 import type { UseStore, StateSelector } from 'zustand'
@@ -38,8 +38,10 @@ type Props<
   unregisterOwnedIdsSelector: StateSelector<StoreShape, (ids: OwnedItem['id'][]) => void>
   relationParams?: RelationParams
 
-  getItemsSelector: StateSelector<StoreShape, () => Promise<{ ids: string[] }>>
-  searchItemsSelector: StateSelector<StoreShape, (str: string) => Promise<{ ids: string[] }>>
+  searchItemsSelector: StateSelector<
+    StoreShape,
+    (str: string, page?: number) => Promise<{ pagination: PaginationDetails; ids: string[] }>
+  >
   ownedEntityLinkCreator: (item: Partial<OwnedItem>) => string
 }
 
@@ -60,7 +62,6 @@ export default function ManyToMany<
   ownedItemsSelectorCreator,
   registerOwnedIdsSelector,
   unregisterOwnedIdsSelector,
-  getItemsSelector,
   searchItemsSelector,
   relationParams,
   ownedEntityLinkCreator,
@@ -82,7 +83,6 @@ export default function ManyToMany<
     searchDebounced: searchOwnedItems,
   } = useSearchableList<StoreShape, OwnedItem>(
     useOwnedStore,
-    getItemsSelector,
     searchItemsSelector,
     ownedItemsSelectorCreator,
   )

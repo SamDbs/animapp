@@ -30,7 +30,13 @@ import { viewFaq, viewFaqs, viewFaqTranslation, viewFaqWithTranslations } from '
 //   return whereFaq
 // }
 
+const limit = 5
+
 export const getAllFaq: RequestHandler = async (req, res) => {
+  const desiredPage = parseInt(req.query?.page?.toString() ?? '0')
+  const page = desiredPage < 0 ? 0 : desiredPage
+  const offset = limit * page
+
   if (req.query.q) {
     const translations = await FaqTranslation.find({
       where: [
@@ -40,16 +46,29 @@ export const getAllFaq: RequestHandler = async (req, res) => {
     })
     const faqIds = translations.map((translation) => translation.faqId)
     const where: FindManyOptions<Faq>['where'] = { id: In(faqIds) }
-    const faqs = await Faq.find({
+    const [faqs, count] = await Faq.findAndCount({
       relations: ['translations'],
       order: { id: 'ASC' },
       where,
+      take: limit,
+      skip: offset,
     })
-    res.json(viewFaqs(faqs, req.params.lang?.toString()))
+    res.json({
+      faqs: viewFaqs(faqs, req.params.lang?.toString()),
+      pagination: { count, limit, offset, page },
+    })
     return
   }
-  const faqs = await Faq.find({ relations: ['translations'], order: { id: 'ASC' } })
-  res.json(viewFaqs(faqs, req.params.lang?.toString()))
+  const [faqs, count] = await Faq.findAndCount({
+    relations: ['translations'],
+    order: { id: 'ASC' },
+    take: limit,
+    skip: offset,
+  })
+  res.json({
+    faqs: viewFaqs(faqs, req.params.lang?.toString()),
+    pagination: { count, limit, offset, page },
+  })
 }
 
 export const getFaqById: RequestHandler = async (req, res) => {

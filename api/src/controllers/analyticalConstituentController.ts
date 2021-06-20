@@ -10,8 +10,13 @@ import {
   viewAnalyticalTranslation,
 } from '../views/analyticalConstituent'
 
+const limit = 5
 // Return all analytical constituent that exist in database according to the language sent in params
 export const getAllAnalyticalConstituents: RequestHandler = async (req, res) => {
+  const desiredPage = parseInt(req.query?.page?.toString() ?? '0')
+  const page = desiredPage < 0 ? 0 : desiredPage
+  const offset = limit * page
+
   if (req.query.q) {
     const translations = await ConstituentTranslation.find({
       where: [
@@ -22,28 +27,34 @@ export const getAllAnalyticalConstituents: RequestHandler = async (req, res) => 
     const constituentIds = translations.map((translation) => translation.analyticalConstituentId)
     const where: FindManyOptions<AnalyticalConstituent>['where'] = { id: In(constituentIds) }
 
-    const analyticalConstituents = await AnalyticalConstituent.find({
+    const [analyticalConstituents, count] = await AnalyticalConstituent.findAndCount({
       relations: ['translations'],
       order: { id: 'ASC' },
       where,
+      take: limit,
+      skip: offset,
     })
-    res.json(
-      viewAnalyticalConstituentsClient(
+    res.json({
+      constituents: viewAnalyticalConstituentsClient(
         analyticalConstituents,
         req.params.lang?.toString().toUpperCase(),
       ),
-    )
+      pagination: { count, limit, offset, page },
+    })
   }
-  const analyticalConstituents = await AnalyticalConstituent.find({
+  const [analyticalConstituents, count] = await AnalyticalConstituent.findAndCount({
     relations: ['translations'],
     order: { id: 'ASC' },
+    take: limit,
+    skip: offset,
   })
-  res.json(
-    viewAnalyticalConstituentsClient(
+  res.json({
+    constituents: viewAnalyticalConstituentsClient(
       analyticalConstituents,
       req.params.lang?.toString().toUpperCase(),
     ),
-  )
+    pagination: { count, limit, offset, page },
+  })
 }
 
 export const createAnalyticalConstituent: RequestHandler = async (req, res) => {

@@ -1,3 +1,4 @@
+import { PaginationDetails } from '@hooks/useSearchableList'
 import { keyBy, omit } from 'lodash/fp'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
@@ -17,8 +18,10 @@ export type ConstituentStoreState = {
   registerIds: (ids: Constituent['id'][]) => void
   unregisterIds: (ids: Constituent['id'][]) => void
   getConstituentById: (id: Constituent['id']) => Promise<{ id: Constituent['id'] }>
-  getConstituents: () => Promise<{ ids: Constituent['id'][] }>
-  searchConstituents: (query: string) => Promise<{ ids: Constituent['id'][] }>
+  searchConstituents: (
+    query: string,
+    page?: number,
+  ) => Promise<{ ids: Constituent['id'][]; pagination: PaginationDetails }>
   createConstituent: () => Promise<unknown>
   getConstituentsByProductId: (productId: Product['id']) => Promise<{ ids: Constituent['id'][] }>
   updateConstituentsByProductId: (
@@ -86,27 +89,15 @@ const useConstituentsStore = create<ConstituentStoreState>(
         set((state) => ({ constituents: { ...state.constituents, [constituent.id]: constituent } }))
         return { id }
       },
-      async getConstituents() {
-        const { data } = await fetcher.get<Constituent[]>(`/analytical-constituents`)
-
-        const constituents = data.map((constituent) => ({
-          ...get().constituents[constituent.id.toString()],
-          ...constituent,
-          id: constituent.id.toString(),
-        }))
-
-        const ids = constituents.map((constituent) => constituent.id)
-        const entities = keyBy((constituent) => constituent.id, constituents)
-
-        set((state) => ({ constituents: { ...state.constituents, ...entities } }))
-        return { ids }
-      },
-      async searchConstituents(query: string) {
-        const { data } = await fetcher.get<Constituent[]>(`/analytical-constituents`, {
-          params: { q: query },
+      async searchConstituents(query: string, page = 0) {
+        const { data } = await fetcher.get<{
+          constituents: Constituent[]
+          pagination: PaginationDetails
+        }>(`/analytical-constituents`, {
+          params: { q: query, page },
         })
 
-        const constituents = data.map((constituent) => ({
+        const constituents = data.constituents.map((constituent) => ({
           ...get().constituents[constituent.id.toString()],
           ...constituent,
           id: constituent.id.toString(),
@@ -116,7 +107,7 @@ const useConstituentsStore = create<ConstituentStoreState>(
         const entities = keyBy((constituent) => constituent.id, constituents)
 
         set((state) => ({ constituents: { ...state.constituents, ...entities } }))
-        return { ids }
+        return { ids, pagination: data.pagination }
       },
       createConstituent() {
         return fetcher.post(`/analytical-constituents`)

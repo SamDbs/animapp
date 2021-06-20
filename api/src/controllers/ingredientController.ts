@@ -11,7 +11,13 @@ import {
   viewIngredientTranslations,
 } from '../views/ingredient'
 
+const limit = 5
+
 export const getAllIngredients: RequestHandler = async (req, res) => {
+  const desiredPage = parseInt(req.query?.page?.toString() ?? '0')
+  const page = desiredPage < 0 ? 0 : desiredPage
+  const offset = limit * page
+
   if (req.query.q) {
     const translations = await IngredientTranslation.find({
       where: [
@@ -23,21 +29,30 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
     })
     const ingredientIds = translations.map((translation) => translation.ingredientId)
     const where: FindManyOptions<Ingredient>['where'] = { id: In(ingredientIds) }
-    const ingredients = await Ingredient.find({
+    const [ingredients, count] = await Ingredient.findAndCount({
       relations: ['translations'],
       order: { id: 'ASC' },
       where,
+      take: limit,
+      skip: offset,
     })
-    res.json(viewIngredients(ingredients, req.params.lang?.toString()))
+    res.json({
+      pagination: { count, limit, offset, page },
+      ingredients: viewIngredients(ingredients, req.params.lang?.toString()),
+    })
     return
   }
-  const ingredients = await Ingredient.createQueryBuilder('ingredient')
-    .leftJoinAndSelect('ingredient.translations', 'it')
-    .where("it.languageId = 'EN'")
+  const [ingredients, count] = await Ingredient.createQueryBuilder('ingredient')
+    .leftJoinAndSelect('ingredient.translations', 'it', "it.languageId = 'EN'")
     .orderBy('it.name', 'ASC')
-    .getMany()
+    .offset(offset)
+    .limit(limit)
+    .getManyAndCount()
 
-  res.json(viewIngredients(ingredients, req.query.lang?.toString()))
+  res.json({
+    pagination: { count, limit, offset, page },
+    ingredients: viewIngredients(ingredients, req.query.lang?.toString()),
+  })
 }
 
 export const createIngredient: RequestHandler = async (req, res) => {

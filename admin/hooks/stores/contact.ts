@@ -1,3 +1,4 @@
+import { PaginationDetails } from '@hooks/useSearchableList'
 import { keyBy, map, omit } from 'lodash'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
@@ -16,8 +17,10 @@ export type ContactStoreState = {
   usedContactIds: Record<Contact['id'], number>
   registerIds: (ids: Contact['id'][]) => void
   unregisterIds: (ids: Contact['id'][]) => void
-  getContacts: () => Promise<{ ids: Contact['id'][] }>
-  searchContacts: (query: string) => Promise<{ ids: Contact['id'][] }>
+  searchContacts: (
+    query: string,
+    page?: number,
+  ) => Promise<{ pagination: PaginationDetails; ids: Contact['id'][] }>
 }
 
 const useContactsStore = create<ContactStoreState>(
@@ -65,29 +68,21 @@ const useContactsStore = create<ContactStoreState>(
           return newState
         })
       },
-      async getContacts() {
-        const { data } = await fetcher.get<Contact[]>(`/contacts`)
+      async searchContacts(query: string, page = 0) {
+        const { data } = await fetcher.get<{ pagination: PaginationDetails; contacts: Contact[] }>(
+          `/contacts`,
+          {
+            params: { q: query, page },
+          },
+        )
 
-        const contacts = data.map((contact) => ({ ...contact, id: contact.id.toString() }))
-
-        const ids = map(contacts, (contact) => contact.id)
-        const entities = keyBy(contacts, (contact) => contact.id)
-
-        set((state) => ({ contacts: { ...state.contacts, ...entities } }))
-        return { ids }
-      },
-      async searchContacts(query: string) {
-        const { data } = await fetcher.get<Contact[]>(`/contacts`, {
-          params: { q: query },
-        })
-
-        const contacts = data.map((contact) => ({ ...contact, id: contact.id.toString() }))
+        const contacts = data.contacts.map((contact) => ({ ...contact, id: contact.id.toString() }))
 
         const ids = map(contacts, (contact) => contact.id)
         const entities = keyBy(contacts, (contact) => contact.id)
 
         set((state) => ({ contacts: { ...state.contacts, ...entities } }))
-        return { ids }
+        return { ids, pagination: data.pagination }
       },
     }),
     'contact',

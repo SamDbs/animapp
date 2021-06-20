@@ -1,3 +1,4 @@
+import { PaginationDetails } from '@hooks/useSearchableList'
 import { debounce, keyBy, omit } from 'lodash/fp'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
@@ -32,9 +33,11 @@ export type IngredientStore = {
   registerIds: (ids: Ingredient['id'][]) => void
   unregisterIds: (ids: Ingredient['id'][]) => void
   getIngredientById: (id: Ingredient['id']) => Promise<{ id: Ingredient['id'] }>
-  getIngredients: () => Promise<{ ids: Ingredient['id'][] }>
   updateIngredient: (id: Ingredient['id'], params: Partial<Ingredient>) => Promise<void>
-  searchIngredients: (query: string) => Promise<{ ids: Ingredient['id'][] }>
+  searchIngredients: (
+    query: string,
+    page?: number,
+  ) => Promise<{ pagination: PaginationDetails; ids: Ingredient['id'][] }>
   createIngredient: () => Promise<unknown>
   getIngredientsByProductId: (productId: Product['id']) => Promise<{ ids: Ingredient['id'][] }>
   updateIngredientsByProductId: (
@@ -103,20 +106,6 @@ const useIngredientsStore = create<IngredientStore>(
         set((state) => ({ ingredients: { ...state.ingredients, [ingredient.id]: ingredient } }))
         return { id }
       },
-      async getIngredients() {
-        const { data } = await fetcher.get<Ingredient[]>(`/ingredients`)
-
-        const ingredients = data.map((ingredient) => ({
-          ...ingredient,
-          id: ingredient.id.toString(),
-        }))
-
-        const ids = ingredients.map((ingredient) => ingredient.id)
-        const entities = keyBy((ingredient) => ingredient.id, ingredients)
-
-        set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
-        return { ids }
-      },
       async updateIngredient(id: Ingredient['id'], params: Partial<Ingredient>) {
         set((state) => ({
           ...state,
@@ -124,10 +113,15 @@ const useIngredientsStore = create<IngredientStore>(
         }))
         await prepareIngredientUpdate(id, params)
       },
-      async searchIngredients(query: string) {
-        const { data } = await fetcher.get<Ingredient[]>(`/ingredients`, { params: { q: query } })
+      async searchIngredients(query: string, page = 0) {
+        const { data } = await fetcher.get<{
+          pagination: PaginationDetails
+          ingredients: Ingredient[]
+        }>(`/ingredients`, {
+          params: { q: query, page },
+        })
 
-        const ingredients = data.map((ingredient) => ({
+        const ingredients = data.ingredients.map((ingredient) => ({
           ...ingredient,
           id: ingredient.id.toString(),
         }))
@@ -136,7 +130,7 @@ const useIngredientsStore = create<IngredientStore>(
         const entities = keyBy((ingredient) => ingredient.id, ingredients)
 
         set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
-        return { ids }
+        return { pagination: data.pagination, ids }
       },
       createIngredient() {
         return fetcher.post(`/ingredients`)

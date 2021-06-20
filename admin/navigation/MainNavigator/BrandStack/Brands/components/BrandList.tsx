@@ -1,47 +1,24 @@
 import Card from '@components/Card'
-import useBrandStore from '@hooks/stores/brand'
+import Pagination from '@components/Pagination'
+import useBrandStore, { BrandStore, Brand } from '@hooks/stores/brand'
+import useSearchableList from '@hooks/useSearchableList'
 import { Link } from '@react-navigation/native'
-import { debounce } from 'lodash/fp'
-import React, { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 
-export default function BrandList({ style }: { style: View['props']['style'] }) {
-  const [ids, setBrandIds] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [registerIds, unregisterIds, getBrands, searchBrands] = useBrandStore((state) => [
-    state.registerIds,
-    state.unregisterIds,
-    state.getBrands,
-    state.searchBrands,
-  ])
-  const brands = useBrandStore(useCallback((state) => ids.map((id) => state.brands[id]), [ids]))
-
-  useEffect(() => {
-    registerIds(ids)
-    return () => unregisterIds(ids)
-  }, [ids])
-
-  const searchDebounced = useCallback(
-    debounce(500, async (text: string) => {
-      setIsLoading(true)
-      const { ids } = await searchBrands(text)
-      setBrandIds(ids)
-      setIsLoading(false)
-    }),
-    [],
+export default function BrandList({ style }: { style?: View['props']['style'] }) {
+  const {
+    changePage,
+    isLoading,
+    items: brands,
+    noResult,
+    pagination,
+    searchDebounced,
+  } = useSearchableList<BrandStore, Brand>(
+    useBrandStore,
+    (state) => state.searchBrands,
+    (ids) => (state) => ids.map((id) => state.brands[id]),
   )
-
-  useEffect(() => {
-    async function fn() {
-      setIsLoading(true)
-      const { ids } = await getBrands()
-      setBrandIds(ids)
-      setIsLoading(false)
-    }
-    fn()
-  }, [])
-
-  const noResult = !brands.length
 
   return (
     <Card style={style}>
@@ -69,6 +46,7 @@ export default function BrandList({ style }: { style: View['props']['style'] }) 
       <View
         style={{
           marginTop: 16,
+          marginBottom: 8,
           borderColor: '#ccc',
           borderWidth: 1,
           borderRadius: 3,
@@ -80,7 +58,7 @@ export default function BrandList({ style }: { style: View['props']['style'] }) 
             <Text>No result.</Text>
           </View>
         )}
-        {brands.filter(Boolean).map((brand, i: number) => {
+        {brands.filter(Boolean).map((brand: any, i: number) => {
           return (
             <View
               key={brand.id}
@@ -100,6 +78,7 @@ export default function BrandList({ style }: { style: View['props']['style'] }) 
           )
         })}
       </View>
+      <Pagination onChangePage={changePage} pagination={pagination} />
     </Card>
   )
 }
