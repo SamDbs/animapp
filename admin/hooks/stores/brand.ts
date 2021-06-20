@@ -1,10 +1,10 @@
+import { Product } from '@hooks/stores/product'
+import { PaginationDetails } from '@hooks/useSearchableList'
 import { debounce, keyBy, omit } from 'lodash/fp'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { Product } from '@hooks/stores/product'
 
 import { fetcher } from '.'
-import { PaginationDetails } from '@hooks/useSearchableList'
 
 export type Brand = {
   id: string
@@ -16,7 +16,6 @@ export type BrandStore = {
   usedBrandIds: Record<Brand['id'], number>
   registerIds: (ids: Brand['id'][]) => void
   unregisterIds: (ids: Brand['id'][]) => void
-  getBrands: () => Promise<{ ids: Brand['id'][] }>
   getBrandById: (id: Brand['id']) => Promise<{ id: Brand['id'] }>
   getBrandByProductId: (id: Product['id']) => Promise<{ id: Brand['id'] }>
   updateBrand: (id: Brand['id'], params: Partial<Brand>) => Promise<void>
@@ -102,20 +101,6 @@ const useBrandStore = create<BrandStore>(
 
         set((state) => ({ brands: { ...state.brands, [brand.id]: brand } }))
         return { id: brand.id }
-      },
-      async getBrands() {
-        const { data } = await fetcher.get<Brand[]>(`/brands`)
-
-        const brands = data.map((brand) => ({
-          ...brand,
-          id: brand.id.toString(),
-        }))
-
-        const ids = brands.map((brand) => brand.id)
-        const entities = keyBy((brand) => brand.id, brands)
-
-        set((state) => ({ brands: { ...state.brands, ...entities } }))
-        return { ids }
       },
       async updateBrand(id: Brand['id'], params: Partial<Brand>) {
         set((state) => ({
