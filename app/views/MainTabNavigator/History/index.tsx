@@ -21,8 +21,6 @@ function Product(props: {
   if (error) return null
   if (!product) return <Text>Loading</Text>
 
-  console.log('product', product)
-
   return (
     <ProductCard
       product={product}
