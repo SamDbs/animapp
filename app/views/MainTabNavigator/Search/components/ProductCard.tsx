@@ -12,7 +12,6 @@ type Props = {
 }
 
 export default function ProductCard(props: Props): JSX.Element {
-  console.log('props.product.image', props.product.image)
   return (
     <Card style={{ height: 80, marginVertical: 5 }}>
       <TouchableWithoutFeedback style={style.result} onPress={props.onPress}>

@@ -37,7 +37,6 @@ const IngredientModalContext = createContext<{ ingredientId: number | null; open
 function ProductHeader({ product }: { product: any }) {
   const dimensions = useWindowDimensions()
   const { width } = dimensions
-  console.log('product.image', product.image)
   return (
     <Card style={{ flexDirection: 'row' }}>
       <View
