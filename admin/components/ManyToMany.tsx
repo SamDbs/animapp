@@ -15,7 +15,6 @@ type Props<
     registerIds: (ids: string[]) => void
     unregisterIds: (ids: string[]) => void
   },
-  RelationParams extends object = object,
 > = {
   ownerEntityId: OwnerItem['id']
   useOwnedStore: UseStore<StoreShape>
@@ -25,7 +24,7 @@ type Props<
   >
   ownedItemsUpdaterSelector: StateSelector<
     StoreShape,
-    (ownerId: OwnerItem['id'], ownedId: OwnedItem['id']) => Promise<void>
+    (ownerId: OwnerItem['id'], ownedId: OwnedItem['id'], params?: string) => Promise<void>
   >
   ownedItemsDeletorSelector: StateSelector<
     StoreShape,
@@ -36,7 +35,7 @@ type Props<
   ) => StateSelector<StoreShape, Partial<OwnedItem>[]>
   registerOwnedIdsSelector: StateSelector<StoreShape, (ids: OwnedItem['id'][]) => void>
   unregisterOwnedIdsSelector: StateSelector<StoreShape, (ids: OwnedItem['id'][]) => void>
-  relationParams?: RelationParams
+  relationParams?: boolean
 
   searchItemsSelector: StateSelector<
     StoreShape,
@@ -52,7 +51,6 @@ export default function ManyToMany<
     registerIds: (ids: string[]) => void
     unregisterIds: (ids: string[]) => void
   },
-  RelationParams extends object = object,
 >({
   ownerEntityId,
   useOwnedStore,
@@ -65,7 +63,7 @@ export default function ManyToMany<
   searchItemsSelector,
   relationParams,
   ownedEntityLinkCreator,
-}: Props<OwnerItem, OwnedItem, StoreShape, RelationParams>) {
+}: Props<OwnerItem, OwnedItem, StoreShape>) {
   const [ids, setIds] = useState<OwnedItem['id'][]>([])
   const [isLoading, setIsLoading] = useState(false)
   const getOwnedByOwnerId = useOwnedStore(ownedItemsGetterSelector)
@@ -170,6 +168,18 @@ export default function ManyToMany<
                       entityLinkCreator={ownedEntityLinkCreator}
                       item={item}
                       even={i % 2 === 0}>
+                      {relationParams && (
+                        <TextInput
+                          style={{
+                            padding: 8,
+                            borderColor: '#ccc',
+                            borderWidth: 1,
+                            borderRadius: 3,
+                            flex: 1,
+                            marginRight: 8,
+                          }}
+                        />
+                      )}
                       <Button title="Link" onPress={() => updateOwned(item.id as string)} />
                     </SubItem>
                   )

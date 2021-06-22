@@ -166,6 +166,7 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             ownerEntityId={product.id}
             ownedItemsGetterSelector={(state) => state.getConstituentsByProductId}
             ownedItemsUpdaterSelector={(state) => state.updateConstituentsByProductId}
+            relationParams
             ownedItemsDeletorSelector={(state) => state.deleteConstituentFromProductId}
             ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.constituents[id])}
             registerOwnedIdsSelector={(state) => state.registerIds}

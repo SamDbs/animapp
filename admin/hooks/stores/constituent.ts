@@ -27,6 +27,7 @@ export type ConstituentStoreState = {
   updateConstituentsByProductId: (
     productId: Product['id'],
     constituentId: Constituent['id'],
+    params?: string,
   ) => Promise<void>
   deleteConstituentFromProductId: (
     productId: Product['id'],
@@ -129,10 +130,10 @@ const useConstituentsStore = create<ConstituentStoreState>(
 
         return { ids }
       },
-      async updateConstituentsByProductId(productId, constituentId) {
+      async updateConstituentsByProductId(productId, constituentId, param = '') {
         await fetcher.put<Constituent[]>(
           `/products/${productId}/analytical-constituents/${constituentId}`,
-          {},
+          { quantity: param },
         )
       },
       async deleteConstituentFromProductId(productId, constituentId) {
