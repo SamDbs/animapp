@@ -74,6 +74,7 @@ export default function ManyToMany<
   const registerOwnedIds = useOwnedStore(registerOwnedIdsSelector)
   const unregisterOwnedIds = useOwnedStore(unregisterOwnedIdsSelector)
   const [editing, setEditing] = useState(false)
+  const [relation, setRelation] = useState<Record<string, string>>({})
   const {
     isLoading: isLoadingOwnedItems,
     items: ownedItems,
@@ -101,7 +102,7 @@ export default function ManyToMany<
   }, [ids])
 
   const updateOwned = async (ownedId: OwnedItem['id']) => {
-    await upsertOwnedToOwner(ownerEntityId, ownedId)
+    await upsertOwnedToOwner(ownerEntityId, ownedId, relation[ownedId as string])
     setIds((ids) => [...ids, ownedId])
   }
 
@@ -128,6 +129,9 @@ export default function ManyToMany<
             entityLinkCreator={ownedEntityLinkCreator}
             item={item}
             even={i % 2 === 0}>
+            {relationParams && (
+              <Text style={{ marginRight: 8 }}>{relation[item.id as string]}</Text>
+            )}
             {editing && (
               <Button title="Unlink" onPress={() => deleteOwned(item.id as string)} color="#c00" />
             )}
@@ -170,6 +174,9 @@ export default function ManyToMany<
                       even={i % 2 === 0}>
                       {relationParams && (
                         <TextInput
+                          onChangeText={(text) => {
+                            setRelation({ [item.id as string]: text })
+                          }}
                           style={{
                             padding: 8,
                             borderColor: '#ccc',

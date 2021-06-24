@@ -5,6 +5,8 @@ import { devtools } from 'zustand/middleware'
 
 import { fetcher } from './index'
 import { Product } from './product'
+import type { ProductConstituent } from './productConstituent'
+import useProductConstituentsStore from './productConstituent'
 
 export type Constituent = {
   id: string
@@ -114,15 +116,22 @@ const useConstituentsStore = create<ConstituentStoreState>(
         return fetcher.post(`/analytical-constituents`)
       },
       async getConstituentsByProductId(productId) {
-        const { data } = await fetcher.get<Constituent[]>(
-          `/products/${productId}/analytical-constituents`,
-        )
+        const { data } = await fetcher.get<{
+          analyticalConstituents: Constituent[]
+          relations: ProductConstituent[]
+        }>(`/products/${productId}/analytical-constituents`)
 
-        const constituents = data.map((constituent) => ({
+        const constituents = data.analyticalConstituents.map((constituent) => ({
           ...constituent,
           id: constituent.id.toString(),
         }))
-
+        const relations = data.relations.map((relation) => ({
+          ...relation,
+          id: `${relation.productId.toString()}-${relation.constituentId.toString()}`,
+        }))
+        useProductConstituentsStore.setState({
+          productConstituents: keyBy((relation) => relation.id, relations),
+        })
         const ids = constituents.map((constituent) => constituent.id)
         const entities = keyBy((constituent) => constituent.id, constituents)
 
@@ -135,6 +144,16 @@ const useConstituentsStore = create<ConstituentStoreState>(
           `/products/${productId}/analytical-constituents/${constituentId}`,
           { quantity: param },
         )
+        useProductConstituentsStore.setState((state) => ({
+          productConstituents: {
+            ...state.productConstituents,
+            [`${productId.toString()}-${constituentId.toString()}`]: {
+              constituentId,
+              productId,
+              quantity: param,
+            },
+          },
+        }))
       },
       async deleteConstituentFromProductId(productId, constituentId) {
         await fetcher.delete<Constituent[]>(

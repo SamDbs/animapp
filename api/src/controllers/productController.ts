@@ -206,14 +206,18 @@ export const getACByProduct: RequestHandler = async (req, res) => {
     .leftJoinAndSelect('a.analyticalConstituent', 'analyticalConstituent')
     .leftJoinAndSelect('analyticalConstituent.translations', 'translations')
     .getMany()
-
   const { language } = req.query
-  res.json(
-    viewAnalyticalConstituentsClient(
+  res.json({
+    analyticalConstituents: viewAnalyticalConstituentsClient(
       relations.map((x) => x.analyticalConstituent),
       language?.toString().toUpperCase(),
     ),
-  )
+    relations: relations.map((x) => ({
+      productId: x.productId,
+      constituentId: x.analyticalConstituentId,
+      quantity: x.quantity,
+    })),
+  })
 }
 
 export const deleteProductACQuantity: RequestHandler = async (req, res) => {
