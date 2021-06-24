@@ -6,6 +6,7 @@ import { MainTabParamList } from '../../types'
 import Colors from '../../constants/Colors'
 import useColorScheme from '../../hooks/useColorScheme'
 
+import Analysis from './Analysis'
 import FrequentQuestions from './FrequentQuestions'
 import History from './History'
 import Scan from './Scan'
@@ -32,6 +33,14 @@ export default function MainTabNavigator(): JSX.Element {
         options={{
           tabBarIcon: createTabBarIcon('scan'),
           title: 'Scan',
+        }}
+      />
+      <BottomTab.Screen
+        name="Analysis"
+        component={Analysis}
+        options={{
+          tabBarIcon: createTabBarIcon('document-text'),
+          title: 'Analysis',
         }}
       />
       <BottomTab.Screen

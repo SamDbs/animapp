@@ -5,10 +5,11 @@ export type RootStackParamList = {
 }
 
 export type MainTabParamList = {
+  Analysis: undefined
+  FrequentQuestions: undefined
+  History: undefined
   Scan: undefined
   Search: undefined
-  History: undefined
-  FrequentQuestions: undefined
 }
 
 export type SearchStackParamList = {
