@@ -175,7 +175,7 @@ export default function ManyToMany<
                       {relationParams && (
                         <TextInput
                           onChangeText={(text) => {
-                            setRelation({ [item.id as string]: text })
+                            setRelation((state) => ({ ...state, [item.id as string]: text }))
                           }}
                           style={{
                             padding: 8,
