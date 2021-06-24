@@ -7,7 +7,7 @@ import { AntDesign, Card, Text } from '../../../components/Themed'
 const CARD_SIZE = 80
 
 type Props = {
-  product: { id: number; name: string; brand: string; photo: string }
+  product: { id: number; name: string; brand: string; image: string }
   onPress?: (() => void) | undefined
 }
 
@@ -18,7 +18,7 @@ export default function ProductCard(props: Props): JSX.Element {
         <View style={{ flexDirection: 'row' }}>
           <View>
             <Image
-              source={{ uri: props.product.photo }}
+              source={{ uri: props.product.image }}
               style={{
                 height: CARD_SIZE,
                 width: CARD_SIZE,

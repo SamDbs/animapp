@@ -28,7 +28,7 @@ type ThemeProps = {
   lightColor?: string
   darkColor?: string
 }
-type TextProps = ThemeProps & DefaultText['props'] & { secondary?: boolean }
+export type TextProps = ThemeProps & DefaultText['props'] & { secondary?: boolean }
 type ViewProps = ThemeProps & DefaultView['props']
 type SafeAreaPageProps = ThemeProps & SafeAreaViewProps & { noContext?: boolean }
 
