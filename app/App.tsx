@@ -3,11 +3,14 @@ import React from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { SWRConfig, SWRConfiguration } from 'swr'
 
+import Colors from './constants/Colors'
 import ProductHistoryContext from './hooks/ProductHistoryContext'
 import useCachedResources from './hooks/useCachedResources'
 import useColorScheme from './hooks/useColorScheme'
 import useProductHistoryContextValue from './hooks/useProductsHistory'
 import Navigation from './views'
+
+// http://10.0.2.2:8080 for android to localhost
 
 const swrConfig: SWRConfiguration = {
   fetcher: async (resource, init) => {
@@ -25,6 +28,7 @@ const swrConfig: SWRConfiguration = {
     }
   },
 }
+
 export default function App(): JSX.Element | null {
   const isLoadingComplete = useCachedResources()
   const colorScheme = useColorScheme()
@@ -34,7 +38,7 @@ export default function App(): JSX.Element | null {
     return null
   } else {
     return (
-      <SafeAreaProvider>
+      <SafeAreaProvider style={{ backgroundColor: Colors[colorScheme].background }}>
         <SWRConfig value={swrConfig}>
           <ProductHistoryContext.Provider value={historyContextValue}>
             <Navigation colorScheme={colorScheme} />

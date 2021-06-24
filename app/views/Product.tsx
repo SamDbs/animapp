@@ -2,7 +2,6 @@ import { ScrollView } from 'react-native-gesture-handler'
 import { StackScreenProps } from '@react-navigation/stack'
 import {
   Image,
-  StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
   useWindowDimensions,
@@ -39,7 +38,7 @@ function ProductHeader({ product }: { product: any }) {
   const dimensions = useWindowDimensions()
   const { width } = dimensions
   return (
-    <Card style={{ flexDirection: 'row', height: width * 0.4 }}>
+    <Card style={{ flexDirection: 'row' }}>
       <View
         style={{
           height: width * 0.4,
@@ -47,9 +46,7 @@ function ProductHeader({ product }: { product: any }) {
           alignItems: 'center',
         }}>
         <Image
-          source={{
-            uri: product.photo,
-          }}
+          source={{ uri: product.image }}
           style={{
             height: width * 0.4 - IMG_MARGIN,
             width: width * 0.4 - IMG_MARGIN,
@@ -196,7 +193,7 @@ function ModalIngredient({ ingredient }: { ingredient: any }) {
           <Text>{ingredient.description}</Text>
           <Text>{ingredient.review}</Text>
           <Image
-            source={{ uri: ingredient.photo }}
+            source={{ uri: ingredient.image }}
             style={{
               height: CARD_SIZE,
               width: CARD_SIZE,
@@ -214,7 +211,7 @@ function ModalIngredient({ ingredient }: { ingredient: any }) {
 function ProductView(props: Props): JSX.Element {
   const { data: product } = useSWR(`/products/${props.route.params.productId}`)
   const { data: ingredients } = useSWR(`/products/${props.route.params.productId}/ingredients`)
-  const { data: ACs } = useSWR(`/products/${props.route.params.productId}/analyticalConstituents`)
+  const { data: ACs } = useSWR(`/products/${props.route.params.productId}/analytical-constituents`)
   const { viewProduct } = useContext(ProductHistoryContext)
   const modal = useContext(IngredientModalContext)
 

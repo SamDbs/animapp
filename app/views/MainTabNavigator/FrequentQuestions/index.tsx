@@ -7,9 +7,11 @@ import { SafeAreaPage, Title } from '../../components/Themed'
 import FaqItem, { FaqItemType } from './components/FaqItem'
 
 export default function FrequentQuestions(): JSX.Element {
-  const { data: faqs, error } = useSWR(`/faq`)
-  const isLoading = !faqs && !error
+  const { data, error } = useSWR(`/faq`)
+  const isLoading = !data?.faqs && !error
   const [openItem, setOpenItem] = useState<number | null>(null)
+
+  const faqs = data?.faqs ?? []
 
   return (
     <SafeAreaPage>
