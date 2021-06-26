@@ -6,7 +6,7 @@ import React from 'react'
 import { Text, View } from 'react-native'
 
 type Props<OwnedItem extends Brand | Ingredient | Constituent> = {
-  children?: JSX.Element | false
+  children?: View['props']['children']
   item: Partial<OwnedItem>
   entityLinkCreator: (entity: Partial<OwnedItem>) => string
   even: boolean
@@ -27,7 +27,7 @@ export default function SubItem<OwnedItem extends Brand | Ingredient | Constitue
       <Link to={props.entityLinkCreator(props.item)}>
         <Text>{props.item.name}</Text>
       </Link>
-      {props.children && <View>{props.children}</View>}
+      {props.children && <View style={{ flexDirection: 'row' }}>{props.children}</View>}
     </View>
   )
 }

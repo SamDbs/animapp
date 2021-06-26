@@ -95,7 +95,6 @@ const useBrandStore = create<BrandStore>(
         return { id }
       },
       async getBrandByProductId(productId: string) {
-        console.log('getBrandByProductId productId', productId)
         const { data } = await fetcher.get<Brand>(`/products/${productId}/brand`)
         const brand = { ...data, id: data.id.toString() }
 

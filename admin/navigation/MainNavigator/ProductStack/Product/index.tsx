@@ -166,13 +166,14 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             ownerEntityId={product.id}
             ownedItemsGetterSelector={(state) => state.getConstituentsByProductId}
             ownedItemsUpdaterSelector={(state) => state.updateConstituentsByProductId}
+            relationParams
             ownedItemsDeletorSelector={(state) => state.deleteConstituentFromProductId}
             ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.constituents[id])}
             registerOwnedIdsSelector={(state) => state.registerIds}
             unregisterOwnedIdsSelector={(state) => state.unregisterIds}
-            getItemsSelector={(state) => state.getConstituents}
             searchItemsSelector={(state) => state.searchConstituents}
             ownedEntityLinkCreator={(item) => `/constituents/${item.id}`}
+            ownedItemsRelationGetterSelector={(state) => state.productConstituents}
           />
         )}
       </Card>
