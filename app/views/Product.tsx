@@ -118,12 +118,18 @@ function Row(props: JSX.Element['props']) {
 
 function AnalyticalConstituents({
   route: {
-    params: { ACs },
+    params: { ACs, productId },
   },
 }: {
-  route: { params: { ACs: AnalyticalConstituent[] } }
+  route: {
+    params: {
+      ACs: { analyticalConstituents: AnalyticalConstituent[]; relations: any[] }
+      productId: number
+    }
+  }
 }) {
-  if (ACs.length === 0) return <ContentView style={{ paddingHorizontal: 10, flex: 1 }} />
+  if (ACs.analyticalConstituents.length === 0)
+    return <ContentView style={{ paddingHorizontal: 10, flex: 1 }} />
 
   return (
     <ContentView style={{ paddingHorizontal: 10, flex: 1 }}>
@@ -131,12 +137,17 @@ function AnalyticalConstituents({
         <Text style={{ fontWeight: 'bold' }}>Element</Text>
         <Text style={{ fontWeight: 'bold' }}>Nutrition value</Text>
       </Row>
-      {ACs.map((AC, i) => (
-        <Row key={AC.id} last={i === ACs.length - 1}>
-          <Text>{AC.name}</Text>
-          <Text>{AC.quantity ? AC.quantity : '-'}%</Text>
-        </Row>
-      ))}
+      {ACs.analyticalConstituents.map((AC, i) => {
+        const foundRelation = ACs.relations.find(
+          (rel) => rel.constituentId === AC.id && rel.productId == productId,
+        )
+        return (
+          <Row key={AC.id} last={i === ACs.analyticalConstituents.length - 1}>
+            <Text>{AC.name}</Text>
+            <Text>{foundRelation && foundRelation.quantity ? foundRelation.quantity : '-'}</Text>
+          </Row>
+        )
+      })}
     </ContentView>
   )
 }
@@ -146,9 +157,11 @@ const DetailsTabNavigator = createMaterialTopTabNavigator()
 function ProductDetails({
   ACs,
   ingredients,
+  productId,
 }: {
-  ACs: AnalyticalConstituent[]
+  ACs: { analyticalConstituents: AnalyticalConstituent[]; relations: any[] }
   ingredients: any[]
+  productId: number
 }) {
   return (
     <Card style={{ marginTop: 0, flex: 1 }}>
@@ -161,7 +174,7 @@ function ProductDetails({
         <DetailsTabNavigator.Screen
           component={AnalyticalConstituents}
           name="Constituents"
-          initialParams={{ ACs }}
+          initialParams={{ ACs, productId }}
         />
       </DetailsTabNavigator.Navigator>
     </Card>
@@ -227,7 +240,11 @@ function ProductView(props: Props): JSX.Element {
   return (
     <SafeAreaPage noContext>
       <ProductHeader product={product} />
-      <ProductDetails ACs={ACs} ingredients={ingredients} />
+      <ProductDetails
+        productId={props.route.params.productId}
+        ACs={ACs}
+        ingredients={ingredients}
+      />
       {modal.ingredientId && (
         <ModalIngredient
           ingredient={ingredients.find(({ id }: any) => id === modal.ingredientId)}
