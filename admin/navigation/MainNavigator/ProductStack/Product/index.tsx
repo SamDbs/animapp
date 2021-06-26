@@ -171,9 +171,9 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.constituents[id])}
             registerOwnedIdsSelector={(state) => state.registerIds}
             unregisterOwnedIdsSelector={(state) => state.unregisterIds}
-            getItemsSelector={(state) => state.getConstituents}
             searchItemsSelector={(state) => state.searchConstituents}
             ownedEntityLinkCreator={(item) => `/constituents/${item.id}`}
+            ownedItemsRelationGetterSelector={(state) => state.productConstituents}
           />
         )}
       </Card>

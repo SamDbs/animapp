@@ -42,6 +42,7 @@ type Props<
     (str: string, page?: number) => Promise<{ pagination: PaginationDetails; ids: string[] }>
   >
   ownedEntityLinkCreator: (item: Partial<OwnedItem>) => string
+  ownedItemsRelationGetterSelector?: StateSelector<any, any>
 }
 
 export default function ManyToMany<
@@ -63,6 +64,7 @@ export default function ManyToMany<
   searchItemsSelector,
   relationParams,
   ownedEntityLinkCreator,
+  ownedItemsRelationGetterSelector,
 }: Props<OwnerItem, OwnedItem, StoreShape>) {
   const [ids, setIds] = useState<OwnedItem['id'][]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -75,6 +77,9 @@ export default function ManyToMany<
   const unregisterOwnedIds = useOwnedStore(unregisterOwnedIdsSelector)
   const [editing, setEditing] = useState(false)
   const [relation, setRelation] = useState<Record<string, string>>({})
+  const relations = useOwnedStore(
+    ownedItemsRelationGetterSelector ? ownedItemsRelationGetterSelector : () => null,
+  )
   const {
     isLoading: isLoadingOwnedItems,
     items: ownedItems,
@@ -110,7 +115,6 @@ export default function ManyToMany<
     await deleteOwnedFromOwner(ownerEntityId, ownedId)
     setIds((ids) => ids.filter((x) => x !== ownedId))
   }
-
   if (isLoading) return <ActivityIndicator />
 
   return (
@@ -130,7 +134,9 @@ export default function ManyToMany<
             item={item}
             even={i % 2 === 0}>
             {relationParams && (
-              <Text style={{ marginRight: 8 }}>{relation[item.id as string]}</Text>
+              <Text style={{ marginRight: 8 }}>
+                {relations[`${ownerEntityId}-${item.id}`].quantity}
+              </Text>
             )}
             {editing && (
               <Button title="Unlink" onPress={() => deleteOwned(item.id as string)} color="#c00" />

@@ -5,8 +5,6 @@ import { devtools } from 'zustand/middleware'
 
 import { fetcher } from './index'
 import { Product } from './product'
-import type { ProductConstituent } from './productConstituent'
-import useProductConstituentsStore from './productConstituent'
 
 export type Constituent = {
   id: string
@@ -14,9 +12,16 @@ export type Constituent = {
   description: string
 }
 
+export type ProductConstituent = {
+  productId: string
+  constituentId: string
+  quantity: string
+}
+
 export type ConstituentStoreState = {
   constituents: Record<Constituent['id'], Constituent>
   usedConstituentIds: Record<Constituent['id'], number>
+  productConstituents: Record<string, Partial<ProductConstituent>>
   registerIds: (ids: Constituent['id'][]) => void
   unregisterIds: (ids: Constituent['id'][]) => void
   getConstituentById: (id: Constituent['id']) => Promise<{ id: Constituent['id'] }>
@@ -42,6 +47,7 @@ const useConstituentsStore = create<ConstituentStoreState>(
     (set, get) => ({
       constituents: {},
       usedConstituentIds: {},
+      productConstituents: {},
       registerIds(ids: Constituent['id'][]) {
         set((state) => {
           const update: Record<Constituent['id'], number> = ids.reduce(
@@ -129,13 +135,15 @@ const useConstituentsStore = create<ConstituentStoreState>(
           ...relation,
           id: `${relation.productId.toString()}-${relation.constituentId.toString()}`,
         }))
-        useProductConstituentsStore.setState({
-          productConstituents: keyBy((relation) => relation.id, relations),
-        })
+
         const ids = constituents.map((constituent) => constituent.id)
         const entities = keyBy((constituent) => constituent.id, constituents)
 
-        set((state) => ({ constituents: { ...state.constituents, ...entities } }))
+        set((state) => ({
+          ...state,
+          productConstituents: keyBy((relation) => relation.id, relations),
+          constituents: { ...state.constituents, ...entities },
+        }))
 
         return { ids }
       },
@@ -144,7 +152,8 @@ const useConstituentsStore = create<ConstituentStoreState>(
           `/products/${productId}/analytical-constituents/${constituentId}`,
           { quantity: param },
         )
-        useProductConstituentsStore.setState((state) => ({
+        set((state) => ({
+          ...state,
           productConstituents: {
             ...state.productConstituents,
             [`${productId.toString()}-${constituentId.toString()}`]: {
