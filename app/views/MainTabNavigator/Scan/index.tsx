@@ -31,7 +31,6 @@ export default function ScanProduct({ navigation }: Props): JSX.Element {
   const { data, error } = useSWR(code ? `/scan/${code}` : null)
 
   function onBarCodeScanned(barcode: BarCodeEvent) {
-    console.log('barcode', barcode)
     setCode(barcode.data)
   }
 

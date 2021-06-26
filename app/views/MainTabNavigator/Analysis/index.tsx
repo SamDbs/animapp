@@ -97,7 +97,6 @@ export default function Analysis({ navigation }: Props): JSX.Element {
               ingredient={ingredient}
               onPress={(ingredient) => {
                 setModalContent(ingredient)
-                console.log('ingredient', ingredient)
                 setIsModal(true)
               }}
             />
