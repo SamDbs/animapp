@@ -1,23 +1,33 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import { Button, Image, StyleSheet, View } from 'react-native'
+import {
+  Button,
+  Image,
+  Modal,
+  StyleSheet,
+  TouchableWithoutFeedback as T,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { ScrollView, TextInput, TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import React, { useCallback, useState } from 'react'
 
 import { MainTabParamList } from '../../../types'
-import { AntDesign, Card, SafeAreaPage, Text, Title } from '../../components/Themed'
+import { AntDesign, Card, SafeAreaPage, Text, Title, useThemeColor } from '../../components/Themed'
 
 type Props = BottomTabScreenProps<MainTabParamList, 'History'>
 
 type IngredientCardProps = {
   ingredient: { id: string; name: string; image: string }
-  onPress?: () => void
+  onPress?: (ingredient: IngredientCardProps['ingredient']) => void
 }
 
 const CARD_SIZE = 80
 export function IngredientCard(props: IngredientCardProps): JSX.Element {
   return (
     <Card style={{ height: 80, marginVertical: 5, marginTop: 8 }}>
-      <TouchableWithoutFeedback style={style.result} onPress={props.onPress}>
+      <TouchableWithoutFeedback
+        style={style.result}
+        onPress={() => props?.onPress?.(props.ingredient)}>
         <View style={{ flexDirection: 'row' }}>
           <View>
             <Image
@@ -52,6 +62,10 @@ export function IngredientCard(props: IngredientCardProps): JSX.Element {
 export default function Analysis({ navigation }: Props): JSX.Element {
   const [searchBox, setSearchBox] = useState('')
   const [data, setData] = useState<any>()
+  const [isModal, setIsModal] = useState(false)
+  const [modalContent, setModalContent] = useState<any>(null)
+
+  const backgroundColorCard = useThemeColor({}, 'card')
 
   const search = useCallback(async () => {
     const request = await fetch(`http://10.0.2.2:8080/search/ingredients?q=${searchBox}`)
@@ -60,6 +74,7 @@ export default function Analysis({ navigation }: Props): JSX.Element {
   }, [searchBox])
 
   const ingredients = data && data?.map((x: any) => x.ingredientFound)?.filter(Boolean)
+
   return (
     <SafeAreaPage>
       <Title>Ingredients analysis</Title>
@@ -67,17 +82,48 @@ export default function Analysis({ navigation }: Props): JSX.Element {
         <TextInput
           multiline
           numberOfLines={10}
-          style={{ backgroundColor: 'white' }}
+          style={{ backgroundColor: 'white', margin: 10 }}
           textAlignVertical="top"
           onChangeText={setSearchBox}
           value={searchBox}
         />
-        <Button onPress={() => search()} title="Search" />
+        <View style={{ marginHorizontal: 8 }}>
+          <Button onPress={() => search()} title="Search" />
+        </View>
         {ingredients &&
           ingredients.map((ingredient: any) => (
-            <IngredientCard key={ingredient.id} ingredient={ingredient} />
+            <IngredientCard
+              key={ingredient.id}
+              ingredient={ingredient}
+              onPress={(ingredient) => {
+                setModalContent(ingredient)
+                console.log('ingredient', ingredient)
+                setIsModal(true)
+              }}
+            />
           ))}
       </ScrollView>
+      <Modal
+        animationType="fade"
+        onRequestClose={() => setIsModal(false)}
+        transparent
+        visible={isModal}>
+        <TouchableOpacity style={style.modal} activeOpacity={0.5} onPress={() => setIsModal(false)}>
+          <T>
+            {modalContent && (
+              <View style={[style.modalContent, { backgroundColor: backgroundColorCard }]}>
+                <Text selectable style={style.modalText}>
+                  Name : {modalContent.name}
+                </Text>
+                <Text selectable style={style.modalText}>
+                  Description : {modalContent.description}
+                </Text>
+                <Text selectable>Review : {modalContent.review}</Text>
+              </View>
+            )}
+          </T>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaPage>
   )
 }
@@ -87,5 +133,18 @@ const style = StyleSheet.create({
   result: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  modal: {
+    alignItems: 'stretch',
+    backgroundColor: 'rgba(100,100,100,0.5)',
+    height: '100%',
+    justifyContent: 'center',
+    padding: 16,
+  },
+  modalContent: {
+    padding: 16,
+  },
+  modalText: {
+    marginBottom: 16,
   },
 })
