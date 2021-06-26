@@ -15,7 +15,6 @@ type Props<
     registerIds: (ids: string[]) => void
     unregisterIds: (ids: string[]) => void
   },
-  RelationParams extends object = object,
 > = {
   ownerEntityId: OwnerItem['id']
   useOwnedStore: UseStore<StoreShape>
@@ -25,7 +24,7 @@ type Props<
   >
   ownedItemsUpdaterSelector: StateSelector<
     StoreShape,
-    (ownerId: OwnerItem['id'], ownedId: OwnedItem['id']) => Promise<void>
+    (ownerId: OwnerItem['id'], ownedId: OwnedItem['id'], params?: string) => Promise<void>
   >
   ownedItemsDeletorSelector: StateSelector<
     StoreShape,
@@ -36,13 +35,14 @@ type Props<
   ) => StateSelector<StoreShape, Partial<OwnedItem>[]>
   registerOwnedIdsSelector: StateSelector<StoreShape, (ids: OwnedItem['id'][]) => void>
   unregisterOwnedIdsSelector: StateSelector<StoreShape, (ids: OwnedItem['id'][]) => void>
-  relationParams?: RelationParams
+  relationParams?: boolean
 
   searchItemsSelector: StateSelector<
     StoreShape,
     (str: string, page?: number) => Promise<{ pagination: PaginationDetails; ids: string[] }>
   >
   ownedEntityLinkCreator: (item: Partial<OwnedItem>) => string
+  ownedItemsRelationGetterSelector?: StateSelector<any, any>
 }
 
 export default function ManyToMany<
@@ -52,7 +52,6 @@ export default function ManyToMany<
     registerIds: (ids: string[]) => void
     unregisterIds: (ids: string[]) => void
   },
-  RelationParams extends object = object,
 >({
   ownerEntityId,
   useOwnedStore,
@@ -65,7 +64,8 @@ export default function ManyToMany<
   searchItemsSelector,
   relationParams,
   ownedEntityLinkCreator,
-}: Props<OwnerItem, OwnedItem, StoreShape, RelationParams>) {
+  ownedItemsRelationGetterSelector,
+}: Props<OwnerItem, OwnedItem, StoreShape>) {
   const [ids, setIds] = useState<OwnedItem['id'][]>([])
   const [isLoading, setIsLoading] = useState(false)
   const getOwnedByOwnerId = useOwnedStore(ownedItemsGetterSelector)
@@ -76,6 +76,10 @@ export default function ManyToMany<
   const registerOwnedIds = useOwnedStore(registerOwnedIdsSelector)
   const unregisterOwnedIds = useOwnedStore(unregisterOwnedIdsSelector)
   const [editing, setEditing] = useState(false)
+  const [relation, setRelation] = useState<Record<string, string>>({})
+  const relations = useOwnedStore(
+    ownedItemsRelationGetterSelector ? ownedItemsRelationGetterSelector : () => null,
+  )
   const {
     isLoading: isLoadingOwnedItems,
     items: ownedItems,
@@ -103,7 +107,7 @@ export default function ManyToMany<
   }, [ids])
 
   const updateOwned = async (ownedId: OwnedItem['id']) => {
-    await upsertOwnedToOwner(ownerEntityId, ownedId)
+    await upsertOwnedToOwner(ownerEntityId, ownedId, relation[ownedId as string])
     setIds((ids) => [...ids, ownedId])
   }
 
@@ -111,7 +115,6 @@ export default function ManyToMany<
     await deleteOwnedFromOwner(ownerEntityId, ownedId)
     setIds((ids) => ids.filter((x) => x !== ownedId))
   }
-
   if (isLoading) return <ActivityIndicator />
 
   return (
@@ -130,6 +133,11 @@ export default function ManyToMany<
             entityLinkCreator={ownedEntityLinkCreator}
             item={item}
             even={i % 2 === 0}>
+            {relationParams && (
+              <Text style={{ marginRight: 8 }}>
+                {relations[`${ownerEntityId}-${item.id}`].quantity}
+              </Text>
+            )}
             {editing && (
               <Button title="Unlink" onPress={() => deleteOwned(item.id as string)} color="#c00" />
             )}
@@ -170,6 +178,21 @@ export default function ManyToMany<
                       entityLinkCreator={ownedEntityLinkCreator}
                       item={item}
                       even={i % 2 === 0}>
+                      {relationParams && (
+                        <TextInput
+                          onChangeText={(text) => {
+                            setRelation((state) => ({ ...state, [item.id as string]: text }))
+                          }}
+                          style={{
+                            padding: 8,
+                            borderColor: '#ccc',
+                            borderWidth: 1,
+                            borderRadius: 3,
+                            flex: 1,
+                            marginRight: 8,
+                          }}
+                        />
+                      )}
                       <Button title="Link" onPress={() => updateOwned(item.id as string)} />
                     </SubItem>
                   )
