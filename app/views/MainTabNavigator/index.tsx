@@ -7,7 +7,7 @@ import Colors from '../../constants/Colors'
 import useColorScheme from '../../hooks/useColorScheme'
 
 import Analysis from './Analysis'
-import FrequentQuestions from './FrequentQuestions'
+import HelpStack from './HelpStack'
 import History from './History'
 import Scan from './Scan'
 import Search from './Search'
@@ -60,8 +60,8 @@ export default function MainTabNavigator(): JSX.Element {
         }}
       />
       <BottomTab.Screen
-        name="FrequentQuestions"
-        component={FrequentQuestions}
+        name="Help"
+        component={HelpStack}
         options={{
           tabBarIcon: createTabBarIcon('help'),
           title: 'Help',

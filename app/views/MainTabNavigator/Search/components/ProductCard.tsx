@@ -13,7 +13,7 @@ type Props = {
 
 export default function ProductCard(props: Props): JSX.Element {
   return (
-    <Card style={{ height: 80, marginVertical: 5 }}>
+    <Card style={{ height: 80 }}>
       <TouchableWithoutFeedback style={style.result} onPress={props.onPress}>
         <View style={{ flexDirection: 'row' }}>
           <View>

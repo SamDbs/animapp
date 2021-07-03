@@ -2,7 +2,7 @@ import { ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import useSWR from 'swr'
 
-import { SafeAreaPage, Title } from '../../components/Themed'
+import { SafeAreaPage, Title } from '../../../components/Themed'
 
 import FaqItem, { FaqItemType } from './components/FaqItem'
 

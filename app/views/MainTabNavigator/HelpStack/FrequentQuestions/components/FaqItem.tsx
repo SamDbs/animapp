@@ -2,7 +2,7 @@ import React from 'react'
 import { LayoutAnimation, Platform, StyleSheet, UIManager, View } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 
-import { Card, Text } from '../../../components/Themed'
+import { Card, Text } from '../../../../components/Themed'
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true)
@@ -26,7 +26,7 @@ export default function FaqItem(props: Props): JSX.Element {
         <Title>{props.item.question}</Title>
       </TouchableWithoutFeedback>
       {props.isOpen && (
-        <View>
+        <View style={style.answer}>
           <Text>{props.item.answer}</Text>
         </View>
       )}
@@ -36,5 +36,6 @@ export default function FaqItem(props: Props): JSX.Element {
 
 const style = StyleSheet.create({
   component: { padding: 10 },
-  title: { fontSize: 16, fontWeight: 'bold', marginBottom: 10 },
+  title: { fontSize: 16, fontWeight: '500' },
+  answer: { marginTop: 10 },
 })
