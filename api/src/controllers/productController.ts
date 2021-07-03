@@ -1,4 +1,4 @@
-import { FindManyOptions, FindOperator, In } from 'typeorm'
+import { Brackets, FindManyOptions } from 'typeorm'
 import { Request, RequestHandler } from 'express'
 
 import {
@@ -47,23 +47,37 @@ export const getAllProducts: RequestHandler = async (req, res) => {
   const filters = makeWhereFilter(req.query) as any
 
   if (req.query.q) {
-    const translations = await ProductTranslation.find({
-      where: { description: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
-    })
+    const formatQuery = req.query.q.toString().split(' ')
+    const queryTranslations = ProductTranslation.createQueryBuilder('pT').where(
+      "pT.languageId = 'EN'",
+    )
+    formatQuery.forEach((x) => queryTranslations.andWhere('pT.description ilike :x', { x }))
+
+    const translations = await queryTranslations.getMany()
 
     const productIds = translations.map((translation) => translation.productId)
-    const where: FindManyOptions<Product>['where'] = [
-      { id: In(productIds), ...filters },
-      { name: new FindOperator('ilike', `%${req.query.q}%`), ...filters },
-    ]
 
-    const [products, count] = await Product.findAndCount({
-      relations: ['translations'],
-      order: { name: 'ASC' },
-      where,
-      take: limit,
-      skip: offset,
+    const queryProduct = Product.createQueryBuilder('p').where('p.id IN (:...productIds)', {
+      productIds: [...productIds, null],
     })
+    if (filters.published === true || filters.published === false) {
+      queryProduct.andWhere('p.published = :published', { published: filters.published })
+    }
+    queryProduct.orWhere(
+      new Brackets((qb) => {
+        formatQuery.forEach((x, index) => {
+          if (index === 0) qb.where('p.name ilike :x', { x: `%${x}%` })
+          else qb.andWhere('p.name ilike :x', { x: `%${x}%` })
+        })
+      }),
+    )
+    const [products, count] = await queryProduct
+      .leftJoinAndSelect('p.translations', 'pT')
+      .limit(limit)
+      .offset(offset)
+      .orderBy('p.name', 'ASC')
+      .getManyAndCount()
+
     res.json({
       pagination: { count, limit, offset, page },
       products: viewProducts(products, req.params.lang?.toString()),
