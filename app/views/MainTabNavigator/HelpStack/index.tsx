@@ -11,9 +11,13 @@ const Stack = createStackNavigator<HelpStackParamList>()
 
 export default function HelpStack(): JSX.Element {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="HelpHome" component={HelpHome} />
-      <Stack.Screen name="FrequentQuestions" component={FrequentQuestions} />
+    <Stack.Navigator>
+      <Stack.Screen name="HelpHome" component={HelpHome} options={{ title: 'Help' }} />
+      <Stack.Screen
+        name="FrequentQuestions"
+        component={FrequentQuestions}
+        options={{ title: 'FAQ' }}
+      />
       <Stack.Screen name="Contact" component={Contact} />
     </Stack.Navigator>
   )

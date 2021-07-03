@@ -1,13 +1,11 @@
 import { ActivityIndicator, StyleSheet, TextInput, View } from 'react-native'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native-gesture-handler'
 import React, { useState } from 'react'
 import useSWR from 'swr'
 
-import { SafeAreaPage, Text } from '../../components/Themed'
+import { SafeAreaPage, Text, Title } from '../../components/Themed'
 import { RootStackParamList } from '../../../types'
-import useColorScheme from '../../../hooks/useColorScheme'
 
 import ProductCard from './components/ProductCard'
 
@@ -44,6 +42,7 @@ export default function SearchProducts({ navigation: { navigate } }: Props): JSX
 
   return (
     <SafeAreaPage>
+      <Title>Search a product</Title>
       <SearchInput input={input} setInput={setInput} />
       {!shouldFetch && (
         <Center>
@@ -82,7 +81,7 @@ const style = StyleSheet.create({
   searchInputContainer: { padding: 10 },
   searchInput: {
     backgroundColor: '#ddd',
-    borderRadius: 15,
+    borderRadius: 5,
     padding: 10,
   },
 

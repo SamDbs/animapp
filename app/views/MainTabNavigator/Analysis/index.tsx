@@ -84,12 +84,13 @@ export default function Analysis({ navigation }: Props): JSX.Element {
           multiline
           numberOfLines={10}
           style={{
-            backgroundColor: 'white',
+            backgroundColor: '#ddd',
             margin: 10,
             minHeight: 200,
             padding: 10,
             borderRadius: 5,
           }}
+          placeholder="paste, your, ingredients, here"
           textAlignVertical="top"
           onChangeText={setSearchBox}
           value={searchBox}

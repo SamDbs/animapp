@@ -17,20 +17,20 @@ function Title(props: JSX.Element['props']) {
 }
 export default function FaqItem(props: Props): JSX.Element {
   return (
-    <Card style={style.component}>
-      <TouchableWithoutFeedback
-        onPressIn={() => {
-          LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
-          props.toggle()
-        }}>
+    <TouchableWithoutFeedback
+      onPressIn={() => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
+        props.toggle()
+      }}>
+      <Card style={style.component}>
         <Title>{props.item.question}</Title>
-      </TouchableWithoutFeedback>
-      {props.isOpen && (
-        <View style={style.answer}>
-          <Text>{props.item.answer}</Text>
-        </View>
-      )}
-    </Card>
+        {props.isOpen && (
+          <View style={style.answer}>
+            <Text>{props.item.answer}</Text>
+          </View>
+        )}
+      </Card>
+    </TouchableWithoutFeedback>
   )
 }
 

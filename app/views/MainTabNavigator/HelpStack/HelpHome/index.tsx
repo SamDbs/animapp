@@ -1,16 +1,16 @@
 import { StackScreenProps } from '@react-navigation/stack'
 import React from 'react'
-import { StyleSheet, TouchableWithoutFeedback } from 'react-native'
+import { StyleSheet, TouchableWithoutFeedback, View } from 'react-native'
 
 import { HelpStackParamList } from '../../../../types'
-import { Card, SafeAreaPage, Text, Title } from '../../../components/Themed'
+import { Card, SafeAreaPage, Text } from '../../../components/Themed'
 
 type Props = StackScreenProps<HelpStackParamList, 'HelpHome'>
 
 export default function HelpHome({ navigation: { navigate } }: Props): JSX.Element {
   return (
-    <SafeAreaPage>
-      <Title>Help</Title>
+    <SafeAreaPage noContext>
+      <View style={style.marginTop} />
       <TouchableWithoutFeedback onPress={() => navigate('FrequentQuestions')}>
         <Card style={style.card}>
           <Text>Frequent questions</Text>
@@ -26,4 +26,4 @@ export default function HelpHome({ navigation: { navigate } }: Props): JSX.Eleme
   )
 }
 
-const style = StyleSheet.create({ card: { padding: 20 } })
+const style = StyleSheet.create({ card: { padding: 20 }, marginTop: { height: 5 } })
