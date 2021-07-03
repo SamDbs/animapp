@@ -169,19 +169,24 @@ export const getProductImage: RequestHandler = async (req, res) => {
 }
 
 export const getIngredientsByProduct: RequestHandler = async (req, res) => {
-  const ingredients = await ProductIngredient.createQueryBuilder('a')
+  const relations = await ProductIngredient.createQueryBuilder('a')
     .where('"productId" = :id', { id: req.params.id })
     .leftJoinAndSelect('a.ingredient', 'ingredient')
     .leftJoinAndSelect('ingredient.translations', 'translations')
     .getMany()
 
   const { language } = req.query
-  res.json(
-    viewIngredients(
-      ingredients.map((x) => x.ingredient),
+  res.json({
+    ingredients: viewIngredients(
+      relations.map((x) => x.ingredient),
       language?.toString().toUpperCase(),
     ),
-  )
+    relations: relations.map((x) => ({
+      productId: x.productId,
+      ingredientId: x.ingredientId,
+      quantity: x.quantity,
+    })),
+  })
 }
 
 export const deleteProduct: RequestHandler = async (req, res) => {
