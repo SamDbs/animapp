@@ -27,6 +27,14 @@ type AnalyticalConstituent = {
   description: string
 }
 
+type Ingredient = {
+  id: number
+  quantity: string
+  name: string
+  description: string
+  review: string
+}
+
 const IMG_MARGIN = 20
 
 const IngredientModalContext = createContext<{ ingredientId: number | null; open: any }>({
@@ -68,10 +76,12 @@ function ProductHeader({ product }: { product: any }) {
 
 function Ingredients({
   route: {
-    params: { ingredients },
+    params: {
+      ingredients: { ingredients },
+    },
   },
 }: {
-  route: { params: { ingredients: any[] } }
+  route: { params: { ingredients: { ingredients: Ingredient[]; relations: any[] } } }
   navigation: any
 }) {
   return (
@@ -160,7 +170,7 @@ function ProductDetails({
   productId,
 }: {
   ACs: { analyticalConstituents: AnalyticalConstituent[]; relations: any[] }
-  ingredients: any[]
+  ingredients: { ingredients: Ingredient[]; relations: any[] }
   productId: number
 }) {
   return (
