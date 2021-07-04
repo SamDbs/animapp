@@ -18,6 +18,8 @@ import { ConflictError, MissingParamError } from '../middleware/errorHandler'
 import Ingredient from '../models/ingredient'
 import ProductIngredient from '../models/productIngredients'
 
+const PG_UNIQUE_CHECK_ERROR_CODE = '23505'
+
 const limit = 10
 
 const allowedProductFilterKeys: (keyof Product)[] = ['published']
@@ -142,7 +144,7 @@ export const createProduct: RequestHandler = async (req, res) => {
     res.status(201).json(product)
   } catch (err) {
     if (err instanceof QueryFailedError) {
-      if ((err as any).code === '23505') {
+      if ((err as any).code === PG_UNIQUE_CHECK_ERROR_CODE) {
         throw new ConflictError('This product already exists.')
       }
     }

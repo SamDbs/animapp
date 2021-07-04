@@ -4,8 +4,9 @@ import { RequestHandler } from 'express'
 import Brand from '../models/brand'
 import { ConflictError, MissingParamError } from '../middleware/errorHandler'
 
-const limit = 5
+const PG_UNIQUE_CHECK_ERROR_CODE = '23505'
 
+const limit = 5
 // const allowedBrandFilterKeys: (keyof Brand)[] = ['id', 'name']
 // function GetAllowedBrandFilters(key: string): key is keyof Brand {
 //   return allowedBrandFilterKeys.includes(key as keyof Brand)
@@ -64,7 +65,7 @@ export const createBrand: RequestHandler = async (req, res) => {
     res.status(201).json(brand)
   } catch (err) {
     if (err instanceof QueryFailedError) {
-      if ((err as any).code === '23505') {
+      if ((err as any).code === PG_UNIQUE_CHECK_ERROR_CODE) {
         throw new ConflictError('This brand already exists.')
       }
     }
