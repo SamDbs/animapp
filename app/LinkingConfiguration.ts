@@ -24,7 +24,13 @@ export default {
               HistoryProduct: 'history-product',
             },
           },
-          FrequentQuestions: 'faq',
+          Help: {
+            screens: {
+              HelpHome: 'help',
+              FrequentQuestions: 'help-faq',
+              Contact: 'help-contact',
+            },
+          },
         },
       },
       NotFound: '*',

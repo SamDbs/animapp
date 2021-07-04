@@ -1,8 +1,8 @@
-import { ActivityIndicator } from 'react-native'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import React, { useState } from 'react'
 import useSWR from 'swr'
 
-import { SafeAreaPage, Title } from '../../components/Themed'
+import { SafeAreaPage } from '../../../components/Themed'
 
 import FaqItem, { FaqItemType } from './components/FaqItem'
 
@@ -14,8 +14,8 @@ export default function FrequentQuestions(): JSX.Element {
   const faqs = data?.faqs ?? []
 
   return (
-    <SafeAreaPage>
-      <Title>FAQ</Title>
+    <SafeAreaPage noContext>
+      <View style={style.marginTop} />
       {isLoading && <ActivityIndicator size={40} color="#ccc" />}
       {error && <ActivityIndicator size={40} color="#ccc" />}
       {faqs &&
@@ -32,3 +32,5 @@ export default function FrequentQuestions(): JSX.Element {
     </SafeAreaPage>
   )
 }
+
+const style = StyleSheet.create({ marginTop: { height: 5 } })
