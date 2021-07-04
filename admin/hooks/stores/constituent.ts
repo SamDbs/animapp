@@ -29,7 +29,7 @@ export type ConstituentStoreState = {
     query: string,
     page?: number,
   ) => Promise<{ ids: Constituent['id'][]; pagination: PaginationDetails }>
-  createConstituent: () => Promise<unknown>
+  createConstituent: () => Promise<Constituent['id']>
   getConstituentsByProductId: (productId: Product['id']) => Promise<{ ids: Constituent['id'][] }>
   updateConstituentsByProductId: (
     productId: Product['id'],
@@ -118,8 +118,9 @@ const useConstituentsStore = create<ConstituentStoreState>(
         set((state) => ({ constituents: { ...state.constituents, ...entities } }))
         return { ids, pagination: data.pagination }
       },
-      createConstituent() {
-        return fetcher.post(`/analytical-constituents`)
+      async createConstituent() {
+        const { data: constituent } = await fetcher.post<Constituent>(`/analytical-constituents`)
+        return constituent.id
       },
       async getConstituentsByProductId(productId) {
         const { data } = await fetcher.get<{

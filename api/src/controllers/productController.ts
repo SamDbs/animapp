@@ -1,4 +1,4 @@
-import { Brackets, FindManyOptions } from 'typeorm'
+import { Brackets, FindManyOptions, QueryFailedError } from 'typeorm'
 import { Request, RequestHandler } from 'express'
 
 import {
@@ -14,9 +14,11 @@ import ProductTranslation from '../models/productTranslation'
 import ProductAnalyticalConstituent from '../models/productAnalyticalConstituent'
 import AnalyticalConstituent from '../models/analyticalConstituent'
 import Image from '../models/image'
-import { MissingParamError } from '../middleware/errorHandler'
+import { ConflictError, MissingParamError } from '../middleware/errorHandler'
 import Ingredient from '../models/ingredient'
 import ProductIngredient from '../models/productIngredients'
+
+const PG_UNIQUE_CHECK_ERROR_CODE = '23505'
 
 const limit = 10
 
@@ -136,8 +138,18 @@ export const createProduct: RequestHandler = async (req, res) => {
   if (!req.body.brandId) throw new MissingParamError('A product needs a brand')
 
   const product = Product.create(req.body as Product)
-  await product.save()
-  res.status(201).json(product)
+
+  try {
+    await product.save()
+    res.status(201).json(product)
+  } catch (err) {
+    if (err instanceof QueryFailedError) {
+      if ((err as any).code === PG_UNIQUE_CHECK_ERROR_CODE) {
+        throw new ConflictError('This product already exists.')
+      }
+    }
+    throw err
+  }
 }
 
 export const patchProduct: RequestHandler = async (req, res) => {

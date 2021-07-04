@@ -22,7 +22,7 @@ export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
     return
   }
   if (error instanceof ConflictError) {
-    res.status(409).json({ message: 'Conflict with entities' })
+    res.status(409).json({ message: error?.message ?? 'Conflict with entities' })
     return
   }
   if (

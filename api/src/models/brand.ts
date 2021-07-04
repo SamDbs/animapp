@@ -6,12 +6,14 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm'
 
 import Product from './product'
 
 @Entity()
+@Unique('UQ_NAME', ['name'])
 export default class Brand extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number
