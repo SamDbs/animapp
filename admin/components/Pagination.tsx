@@ -50,7 +50,7 @@ export default function Pagination({ onChangePage, pagination }: Props) {
       <Pressable
         style={[style.button, isLastPage && style.disabled]}
         onPress={() => onChangePage(lastPageNumber - 1)}>
-        <Text>{lastPageNumber}</Text>
+        <Text>{isNaN(lastPageNumber) ? '-' : lastPageNumber}</Text>
       </Pressable>
 
       <Pressable

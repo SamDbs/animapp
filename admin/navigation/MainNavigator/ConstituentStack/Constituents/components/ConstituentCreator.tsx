@@ -1,9 +1,11 @@
 import Card from '@components/Card'
 import useConstituentsStore from '@hooks/stores/constituent'
+import { useNavigation } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { Button, Text } from 'react-native'
 
 export default function ConstituentCreator({ style }: any) {
+  const navigation = useNavigation()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const createConstituent = useConstituentsStore((state) => state.createConstituent)
@@ -11,7 +13,8 @@ export default function ConstituentCreator({ style }: any) {
     setLoading(true)
     setError('')
     try {
-      await createConstituent()
+      const id = await createConstituent()
+      navigation.navigate('ConstituentStack', { screen: 'Constituent', params: { id } })
     } catch (e) {
       setError(e?.response?.data?.message ?? 'An unknown error occured.')
     } finally {

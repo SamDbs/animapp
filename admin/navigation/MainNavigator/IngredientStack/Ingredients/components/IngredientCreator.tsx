@@ -1,9 +1,11 @@
 import Card from '@components/Card'
 import useIngredientsStore from '@hooks/stores/ingredient'
+import { useNavigation } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { Button, Text } from 'react-native'
 
 export default function IngredientCreator({ style }: any) {
+  const navigation = useNavigation()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const createIngredient = useIngredientsStore((state) => state.createIngredient)
@@ -11,7 +13,8 @@ export default function IngredientCreator({ style }: any) {
     setLoading(true)
     setError('')
     try {
-      await createIngredient()
+      const id = await createIngredient()
+      navigation.navigate('IngredientStack', { screen: 'Ingredient', params: { id } })
     } catch (e) {
       setError(e?.response?.data?.message ?? 'An unknown error occured.')
     } finally {
