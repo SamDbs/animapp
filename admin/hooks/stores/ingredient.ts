@@ -45,7 +45,7 @@ export type IngredientStore = {
     query: string,
     page?: number,
   ) => Promise<{ pagination: PaginationDetails; ids: Ingredient['id'][] }>
-  createIngredient: () => Promise<unknown>
+  createIngredient: () => Promise<Product['id']>
   getIngredientsByProductId: (productId: Product['id']) => Promise<{ ids: Ingredient['id'][] }>
   updateIngredientsByProductId: (
     productId: Product['id'],
@@ -141,8 +141,9 @@ const useIngredientsStore = create<IngredientStore>(
         set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
         return { pagination: data.pagination, ids }
       },
-      createIngredient() {
-        return fetcher.post(`/ingredients`)
+      async createIngredient() {
+        const { data: ingredient } = await fetcher.post<Ingredient>(`/ingredients`)
+        return ingredient.id
       },
       async getIngredientsByProductId(productId) {
         const { data } = await fetcher.get<{
