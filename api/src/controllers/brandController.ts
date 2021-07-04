@@ -1,4 +1,4 @@
-import { FindOperator, QueryFailedError } from 'typeorm'
+import { FindOperator, IsNull, Not, QueryFailedError } from 'typeorm'
 import { RequestHandler } from 'express'
 
 import Brand from '../models/brand'
@@ -32,21 +32,28 @@ export const getAllBrands: RequestHandler = async (req, res) => {
   const desiredPage = parseInt(req.query?.page?.toString() ?? '0')
   const page = desiredPage < 0 ? 0 : desiredPage
   const offset = limit * page
+  const deletedBrands = req.query.deleted ?? false
 
   if (req.query.q) {
     const [brands, count] = await Brand.findAndCount({
-      where: [{ name: new FindOperator('ilike', `%${req.query.q}%`) }],
+      where: {
+        name: new FindOperator('ilike', `%${req.query.q}%`),
+        deletedAt: deletedBrands ? Not(IsNull()) : IsNull(),
+      },
       order: { name: 'ASC' },
       take: limit,
       skip: offset,
+      withDeleted: true,
     })
     res.json({ pagination: { count, limit, offset, page }, brands })
     return
   }
   const [brands, count] = await Brand.findAndCount({
+    where: { deletedAt: deletedBrands ? Not(IsNull()) : IsNull() },
     order: { name: 'ASC' },
     take: limit,
     skip: offset,
+    withDeleted: true,
   })
   res.json({ pagination: { count, limit, offset, page }, brands })
 }
