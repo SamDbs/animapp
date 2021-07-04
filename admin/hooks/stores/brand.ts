@@ -19,7 +19,13 @@ export type BrandStore = {
   getBrandById: (id: Brand['id']) => Promise<{ id: Brand['id'] }>
   getBrandByProductId: (id: Product['id']) => Promise<{ id: Brand['id'] }>
   updateBrand: (id: Brand['id'], params: Partial<Brand>) => Promise<void>
+  restoreBrand: (id: Brand['id']) => Promise<void>
+  deleteBrand: (id: Brand['id']) => Promise<void>
   searchBrands: (
+    text: Brand['name'],
+    page?: number,
+  ) => Promise<{ pagination: PaginationDetails; ids: Brand['id'][] }>
+  searchDeletedBrands: (
     text: Brand['name'],
     page?: number,
   ) => Promise<{ pagination: PaginationDetails; ids: Brand['id'][] }>
@@ -108,6 +114,12 @@ const useBrandStore = create<BrandStore>(
         }))
         await prepareBrandUpdate(id, params)
       },
+      async restoreBrand(id: Brand['id']) {
+        await fetcher.patch<Brand>(`/brands/${id}`, { deletedAt: null })
+      },
+      async deleteBrand(id: Brand['id']) {
+        await fetcher.delete<Brand>(`/brands/${id}`)
+      },
       async searchBrands(text: string, page = 0) {
         const { data } = await fetcher.get<{ pagination: PaginationDetails; brands: Brand[] }>(
           `/brands`,
@@ -127,6 +139,23 @@ const useBrandStore = create<BrandStore>(
       },
       createBrand(params: { name: string }) {
         return fetcher.post(`/brands`, params)
+      },
+      async searchDeletedBrands(text: string, page = 0) {
+        const { data } = await fetcher.get<{ pagination: PaginationDetails; brands: Brand[] }>(
+          `/brands`,
+          { params: { q: text, page, deleted: true } },
+        )
+
+        const brands = data.brands.map((brand) => ({
+          ...brand,
+          id: brand.id.toString(),
+        }))
+
+        const ids = brands.map((brand) => brand.id)
+        const entities = keyBy((brand) => brand.id, brands)
+
+        set((state) => ({ brands: { ...state.brands, ...entities } }))
+        return { pagination: data.pagination, ids }
       },
     }),
     'brand',

@@ -1,9 +1,8 @@
 import Card from '@components/Card'
 import Pagination from '@components/Pagination'
-import { Feather } from '@expo/vector-icons'
+import { FontAwesome5 } from '@expo/vector-icons'
 import useBrandStore, { BrandStore, Brand } from '@hooks/stores/brand'
 import useSearchableList from '@hooks/useSearchableList'
-import { Link } from '@react-navigation/native'
 import React from 'react'
 import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
 
@@ -17,10 +16,10 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
     searchDebounced,
   } = useSearchableList<BrandStore, Brand>(
     useBrandStore,
-    (state) => state.searchBrands,
+    (state) => state.searchDeletedBrands,
     (ids) => (state) => ids.map((id) => state.brands[id]),
   )
-  const deleteBrand = useBrandStore((state) => state.deleteBrand)
+  const restoreBrand = useBrandStore((state) => state.restoreBrand)
 
   return (
     <Card style={style}>
@@ -79,21 +78,17 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
                   flexDirection: 'row',
                   alignItems: 'center',
                 }}>
-                <Link style={{ marginRight: 8, cursor: 'pointer' }} to={`/brands/${brand.id}`}>
-                  <Feather name="edit" size={24} color="grey" />
-                </Link>
-
                 <Pressable
                   style={{ cursor: 'pointer' }}
                   onPress={async () => {
                     try {
-                      await deleteBrand(brand.id)
+                      await restoreBrand(brand.id)
                       location.reload()
                     } catch (error) {
                       alert(error.response.data.message)
                     }
                   }}>
-                  <Feather name="trash" size={24} color="red" />
+                  <FontAwesome5 name="trash-restore" size={24} color="green" />
                 </Pressable>
               </View>
             </View>
