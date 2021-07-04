@@ -9,6 +9,7 @@ import {
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm'
 
@@ -19,6 +20,7 @@ import ProductIngredient from './productIngredients'
 import ProductTranslation from './productTranslation'
 
 @Entity()
+@Unique('UQ_NAME', ['name'])
 export default class Product extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number

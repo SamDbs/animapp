@@ -1,4 +1,4 @@
-import { FindOperator } from 'typeorm'
+import { FindOperator, QueryFailedError } from 'typeorm'
 import { RequestHandler } from 'express'
 
 import Brand from '../models/brand'
@@ -62,8 +62,18 @@ export const createBrand: RequestHandler = async (req, res) => {
     console.log('error', req.body.name.length)
     throw new MissingParamError()
   }
-  await brand.save()
-  res.status(201).json(brand)
+
+  try {
+    await brand.save()
+    res.status(201).json(brand)
+  } catch (err) {
+    if (err instanceof QueryFailedError) {
+      if ((err as any).code === '23505') {
+        throw new ConflictError('This brand already exists.')
+      }
+    }
+    throw err
+  }
 }
 
 export const patchBrand: RequestHandler = async (req, res) => {
