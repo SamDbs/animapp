@@ -1,11 +1,12 @@
-import { FindOperator } from 'typeorm'
+import { FindOperator, QueryFailedError } from 'typeorm'
 import { RequestHandler } from 'express'
 
 import Brand from '../models/brand'
 import { ConflictError, MissingParamError } from '../middleware/errorHandler'
 
-const limit = 5
+const PG_UNIQUE_CHECK_ERROR_CODE = '23505'
 
+const limit = 5
 // const allowedBrandFilterKeys: (keyof Brand)[] = ['id', 'name']
 // function GetAllowedBrandFilters(key: string): key is keyof Brand {
 //   return allowedBrandFilterKeys.includes(key as keyof Brand)
@@ -51,19 +52,25 @@ export const getAllBrands: RequestHandler = async (req, res) => {
 }
 
 export const getBrandById: RequestHandler = async (req, res) => {
-  console.log('hello')
   const brand = await Brand.findOneOrFail(req.params.id)
   res.json(brand)
 }
 
 export const createBrand: RequestHandler = async (req, res) => {
+  if (!req.body.name) throw new MissingParamError()
   const brand = Brand.create(req.body as Brand)
-  if (req.body.name.length < 1) {
-    console.log('error', req.body.name.length)
-    throw new MissingParamError()
+
+  try {
+    await brand.save()
+    res.status(201).json(brand)
+  } catch (err) {
+    if (err instanceof QueryFailedError) {
+      if ((err as any).code === PG_UNIQUE_CHECK_ERROR_CODE) {
+        throw new ConflictError('This brand already exists.')
+      }
+    }
+    throw err
   }
-  await brand.save()
-  res.status(201).json(brand)
 }
 
 export const patchBrand: RequestHandler = async (req, res) => {
