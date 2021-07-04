@@ -14,6 +14,12 @@ export type Ingredient = {
   review: string
 }
 
+export type ProductIngredient = {
+  productId: string
+  ingredientId: string
+  quantity: string
+}
+
 let combinedIngredientUpdate = {}
 async function prepareIngredientUpdate(id: Ingredient['id'], params: Partial<Ingredient>) {
   combinedIngredientUpdate = { ...combinedIngredientUpdate, ...params }
@@ -30,6 +36,7 @@ const sendIngredientCombinedUpdateDebounce = debounce(
 export type IngredientStore = {
   ingredients: Record<Ingredient['id'], Ingredient>
   usedIngredientIds: Record<Ingredient['id'], number>
+  productIngredients: Record<string, Partial<ProductIngredient>>
   registerIds: (ids: Ingredient['id'][]) => void
   unregisterIds: (ids: Ingredient['id'][]) => void
   getIngredientById: (id: Ingredient['id']) => Promise<{ id: Ingredient['id'] }>
@@ -43,6 +50,7 @@ export type IngredientStore = {
   updateIngredientsByProductId: (
     productId: Product['id'],
     ingredientId: Ingredient['id'],
+    param?: string,
   ) => Promise<void>
   deleteIngredientFromProductId: (
     productId: Product['id'],
@@ -56,6 +64,7 @@ const useIngredientsStore = create<IngredientStore>(
     (set) => ({
       ingredients: {},
       usedIngredientIds: {},
+      productIngredients: {},
       registerIds(ids: Ingredient['id'][]) {
         set((state) => {
           const update: Record<Ingredient['id'], number> = ids.reduce(
@@ -136,22 +145,48 @@ const useIngredientsStore = create<IngredientStore>(
         return fetcher.post(`/ingredients`)
       },
       async getIngredientsByProductId(productId) {
-        const { data } = await fetcher.get<Ingredient[]>(`/products/${productId}/ingredients`)
+        const { data } = await fetcher.get<{
+          ingredients: Ingredient[]
+          relations: ProductIngredient[]
+        }>(`/products/${productId}/ingredients`)
 
-        const ingredients = data.map((ingredient) => ({
+        const ingredients = data.ingredients.map((ingredient) => ({
           ...ingredient,
           id: ingredient.id.toString(),
+        }))
+
+        const relations = data.relations.map((relation) => ({
+          ...relation,
+          id: `${relation.productId.toString()}-${relation.ingredientId.toString()}`,
         }))
 
         const ids = ingredients.map((ingredient) => ingredient.id)
         const entities = keyBy((ingredient) => ingredient.id, ingredients)
 
-        set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
+        set((state) => ({
+          ...state,
+          productIngredients: keyBy((relation) => relation.id, relations),
+
+          ingredients: { ...state.ingredients, ...entities },
+        }))
 
         return { ids }
       },
-      async updateIngredientsByProductId(productId, ingredientId) {
-        await fetcher.put<Ingredient[]>(`/products/${productId}/ingredients/${ingredientId}`, {})
+      async updateIngredientsByProductId(productId, ingredientId, param = '') {
+        await fetcher.put<Ingredient[]>(`/products/${productId}/ingredients/${ingredientId}`, {
+          quantity: param,
+        })
+        set((state) => ({
+          ...state,
+          productIngredients: {
+            ...state.productIngredients,
+            [`${productId.toString()}-${ingredientId.toString()}`]: {
+              ingredientId,
+              productId,
+              quantity: param,
+            },
+          },
+        }))
       },
       async deleteIngredientFromProductId(productId, ingredientId) {
         await fetcher.delete<Ingredient[]>(`/products/${productId}/ingredients/${ingredientId}`, {})

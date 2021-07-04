@@ -24,7 +24,7 @@ type IngredientCardProps = {
 const CARD_SIZE = 80
 export function IngredientCard(props: IngredientCardProps): JSX.Element {
   return (
-    <Card style={{ height: 80, marginVertical: 5, marginTop: 8 }}>
+    <Card style={{ height: 80 }}>
       <TouchableWithoutFeedback
         style={style.result}
         onPress={() => props?.onPress?.(props.ingredient)}>
@@ -83,12 +83,19 @@ export default function Analysis({ navigation }: Props): JSX.Element {
         <TextInput
           multiline
           numberOfLines={10}
-          style={{ backgroundColor: 'white', margin: 10 }}
+          style={{
+            backgroundColor: '#ddd',
+            margin: 10,
+            minHeight: 200,
+            padding: 10,
+            borderRadius: 5,
+          }}
+          placeholder="paste, your, ingredients, here"
           textAlignVertical="top"
           onChangeText={setSearchBox}
           value={searchBox}
         />
-        <View style={{ marginHorizontal: 8 }}>
+        <View style={{ marginHorizontal: 8, marginBottom: 10 }}>
           <Button onPress={() => search()} title="Search" />
         </View>
         {ingredients &&
@@ -139,12 +146,12 @@ const style = StyleSheet.create({
     backgroundColor: 'rgba(100,100,100,0.5)',
     height: '100%',
     justifyContent: 'center',
-    padding: 16,
+    padding: 20,
   },
   modalContent: {
-    padding: 16,
+    padding: 20,
   },
   modalText: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
 })

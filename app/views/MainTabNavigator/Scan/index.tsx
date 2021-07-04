@@ -12,6 +12,7 @@ type Props = BottomTabScreenProps<MainTabParamList, 'Scan'>
 export default function ScanProduct({ navigation }: Props): JSX.Element {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
   const [code, setCode] = useState('')
+  const [camera, setCamera] = useState(true)
 
   useEffect(() => {
     async function checkCameraPermission() {
@@ -22,10 +23,20 @@ export default function ScanProduct({ navigation }: Props): JSX.Element {
 
     function emptyCodeOnFocus() {
       setCode('')
+      setCamera(true)
     }
 
-    const unsubscribe = navigation.addListener('focus', emptyCodeOnFocus)
-    return unsubscribe
+    function disableCamera() {
+      setCamera(false)
+    }
+
+    const unsubscribe1 = navigation.addListener('focus', emptyCodeOnFocus)
+    const unsubscribe2 = navigation.addListener('blur', disableCamera)
+
+    return () => {
+      unsubscribe1()
+      unsubscribe2()
+    }
   }, [navigation])
 
   const { data, error } = useSWR(code ? `/scan/${code}` : null)
@@ -62,7 +73,9 @@ export default function ScanProduct({ navigation }: Props): JSX.Element {
 
   return (
     <View style={style.screen}>
-      {!code && <BarCodeScanner onBarCodeScanned={onBarCodeScanned} style={style.viewFinder} />}
+      {camera && !code && (
+        <BarCodeScanner onBarCodeScanned={onBarCodeScanned} style={style.viewFinder} />
+      )}
       {!!code && <ActivityIndicator size={40} color="#ccc" />}
     </View>
   )
