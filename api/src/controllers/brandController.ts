@@ -51,17 +51,13 @@ export const getAllBrands: RequestHandler = async (req, res) => {
 }
 
 export const getBrandById: RequestHandler = async (req, res) => {
-  console.log('hello')
   const brand = await Brand.findOneOrFail(req.params.id)
   res.json(brand)
 }
 
 export const createBrand: RequestHandler = async (req, res) => {
+  if (!req.body.name) throw new MissingParamError()
   const brand = Brand.create(req.body as Brand)
-  if (req.body.name.length < 1) {
-    console.log('error', req.body.name.length)
-    throw new MissingParamError()
-  }
 
   try {
     await brand.save()
