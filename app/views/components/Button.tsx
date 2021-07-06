@@ -4,7 +4,7 @@ import { Pressable, View } from 'react-native'
 import { Text } from './Themed'
 
 export function Button({
-  color = '#04FF7F',
+  color = '#65A68E',
   disabled = false,
   onPress,
   style = {},

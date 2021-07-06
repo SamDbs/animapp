@@ -8,7 +8,7 @@ import useSWR from 'swr'
 
 import { MainTabParamList, RootStackParamList } from '../../../types'
 import ProductHistoryContext from '../../../hooks/ProductHistoryContext'
-import { SafeAreaPage, Text, Title, ContentView, Card } from '../../components/Themed'
+import { Card, PageHeader, SafeAreaPage, Text, Title } from '../../components/Themed'
 import ProductCard from '../Search/components/ProductCard'
 
 type Props = BottomTabScreenProps<MainTabParamList, 'History'>
@@ -39,7 +39,8 @@ export default function History({ navigation }: Props): JSX.Element {
 
   return (
     <SafeAreaPage>
-      <Title>History</Title>
+      <PageHeader>History</PageHeader>
+      <View style={style.marginTop} />
       {isEmpty ? (
         <View style={style.emptyContainer}>
           <Card style={style.empty}>
@@ -67,6 +68,7 @@ export default function History({ navigation }: Props): JSX.Element {
 }
 
 const style = StyleSheet.create({
+  marginTop: { marginTop: 30 },
   scrollView: { flexGrow: 1 },
   empty: { padding: 20, borderRadius: 200 },
   emptyContainer: {

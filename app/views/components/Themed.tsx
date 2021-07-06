@@ -1,5 +1,6 @@
 import { AntDesign as DefaultAntDesign } from '@expo/vector-icons'
 import { SafeAreaViewProps, SafeAreaView as SafeAreaViewSAC } from 'react-native-safe-area-context'
+import { LinearGradient } from 'expo-linear-gradient'
 import {
   SafeAreaView as DefaultSafeAreaView,
   Text as DefaultText,
@@ -98,4 +99,30 @@ export function AntDesign(props: AntDesignProps): JSX.Element {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text')
 
   return <DefaultAntDesign color={color} {...otherProps} />
+}
+
+export function PageHeader(props: ViewProps): JSX.Element {
+  const { children, style, ...otherProps } = props
+  return (
+    <DefaultView style={{ alignItems: 'center' }}>
+      <DefaultView
+        style={{
+          height: 50,
+          width: 50,
+          borderRadius: 50,
+          transform: [{ scaleX: 20 }, { scaleY: 5 }, { translateY: -20 }],
+          position: 'absolute',
+          overflow: 'hidden',
+          backgroundColor: 'red',
+          zIndex: 10,
+          elevation: 10,
+        }}
+        {...otherProps}>
+        <LinearGradient style={{ flex: 1 }} colors={['#F27A5E', '#F2CA80']} />
+      </DefaultView>
+      <DefaultView style={{ marginTop: 5, zIndex: 20, elevation: 20 }}>
+        <Text style={{ color: '#000', fontSize: 18 }}>{children}</Text>
+      </DefaultView>
+    </DefaultView>
+  )
 }

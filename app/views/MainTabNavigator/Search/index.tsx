@@ -4,7 +4,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import React, { useState } from 'react'
 import useSWR from 'swr'
 
-import { SafeAreaPage, Text, Title, useThemeColor } from '../../components/Themed'
+import { PageHeader, SafeAreaPage, Text, useThemeColor } from '../../components/Themed'
 import { RootStackParamList } from '../../../types'
 
 import ProductCard from './components/ProductCard'
@@ -48,22 +48,22 @@ export default function SearchProducts({ navigation: { navigate } }: Props): JSX
 
   return (
     <SafeAreaPage>
-      <Title>Search a product</Title>
-      <SearchInput input={input} setInput={setInput} />
-      {loading && (
-        <Center>
-          <ActivityIndicator size={40} color="#ccc" />
-        </Center>
-      )}
-      {empty && (
-        <Center>
-          <Text>No result</Text>
-        </Center>
-      )}
+      <PageHeader>Search a product</PageHeader>
+      <ScrollView>
+        <SearchInput input={input} setInput={setInput} />
+        {loading && (
+          <Center>
+            <ActivityIndicator size={40} color="#ccc" />
+          </Center>
+        )}
+        {empty && (
+          <Center>
+            <Text>No result</Text>
+          </Center>
+        )}
 
-      {data && (
-        <ScrollView>
-          {data.products.map((result: any, i: number) => (
+        {data &&
+          data.products.map((result: any, i: number) => (
             <ProductCard
               product={result}
               key={result.id}
@@ -72,8 +72,7 @@ export default function SearchProducts({ navigation: { navigate } }: Props): JSX
               }}
             />
           ))}
-        </ScrollView>
-      )}
+      </ScrollView>
     </SafeAreaPage>
   )
 }
@@ -83,6 +82,7 @@ const style = StyleSheet.create({
   searchInput: {
     borderRadius: 10,
     padding: 10,
+    marginTop: 20,
   },
 
   noResults: {

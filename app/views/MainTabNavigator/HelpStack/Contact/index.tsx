@@ -28,8 +28,8 @@ export default function Contact(): JSX.Element {
 
   const sendContact = async () => {
     setLoading(true)
-    // const request = await fetch(`${process.env.API_URL}/contacts`, {
-    const request = await fetch(`http://10.0.2.2:8080/contacts`, {
+    const request = await fetch(`${process.env.API_URL}/contacts`, {
+      // const request = await fetch(`http://10.0.2.2:8080/contacts`, {
       method: 'post',
       body: JSON.stringify({ name, email, message }),
       headers: { 'Content-Type': 'application/json' },

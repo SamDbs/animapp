@@ -12,7 +12,14 @@ import React, { useCallback, useState } from 'react'
 import * as Clipboard from 'expo-clipboard'
 
 import { MainTabParamList } from '../../../types'
-import { AntDesign, Card, SafeAreaPage, Text, Title, useThemeColor } from '../../components/Themed'
+import {
+  AntDesign,
+  Card,
+  PageHeader,
+  SafeAreaPage,
+  Text,
+  useThemeColor,
+} from '../../components/Themed'
 import { Button } from '../../components/Button'
 
 type Props = BottomTabScreenProps<MainTabParamList, 'History'>
@@ -72,8 +79,8 @@ export default function Analysis({ navigation }: Props): JSX.Element {
   const placeholderColor = useThemeColor({}, 'inputPlaceholder')
 
   const search = useCallback(async () => {
-    const request = await fetch(`http://10.0.2.2:8080/search/ingredients?q=${searchBox}`)
-    // const request = await fetch(`${process.env.API_URL}/search/ingredients?q=${searchBox}`)
+    // const request = await fetch(`http://10.0.2.2:8080/search/ingredients?q=${searchBox}`)
+    const request = await fetch(`${process.env.API_URL}/search/ingredients?q=${searchBox}`)
     const res = await request.json()
     setData(res)
   }, [searchBox])
@@ -97,10 +104,11 @@ export default function Analysis({ navigation }: Props): JSX.Element {
 
   return (
     <SafeAreaPage>
-      <Title>Ingredients analysis</Title>
+      <PageHeader>Ingredients analysis</PageHeader>
       <View
         style={{
           marginHorizontal: 8,
+          marginTop: 30,
           flexDirection: 'row',
         }}>
         <Button onPress={() => paste()} title="Paste" style={{ flex: 1, marginRight: 5 }} />
@@ -108,7 +116,7 @@ export default function Analysis({ navigation }: Props): JSX.Element {
           onPress={() => clear()}
           title="Clear"
           style={{ flex: 1, marginLeft: 5 }}
-          color="#be3636"
+          color="#F27A5E"
         />
       </View>
       <ScrollView style={style.scrollView}>
