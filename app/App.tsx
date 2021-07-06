@@ -14,8 +14,8 @@ import Navigation from './views'
 
 const swrConfig: SWRConfiguration = {
   fetcher: async (resource, init) => {
-    // const request = await fetch(`http://10.0.2.2:8080${resource}`, init)
-    const request = await fetch(`${process.env.API_URL}${resource}`, init)
+    const request = await fetch(`http://10.0.2.2:8080${resource}`, init)
+    // const request = await fetch(`${process.env.API_URL}${resource}`, init)
     if (!request.ok) {
       const error = new Error('Request failed.')
       //@ts-expect-error data doesn't exist

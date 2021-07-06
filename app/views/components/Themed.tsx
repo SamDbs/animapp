@@ -53,7 +53,7 @@ export function Card(props: ViewProps): JSX.Element {
         {
           backgroundColor: backgroundColorCard,
           borderRadius: 5,
-          elevation: 1,
+          elevation: 5,
           justifyContent: 'space-between',
           marginHorizontal: 10,
           marginVertical: 5,

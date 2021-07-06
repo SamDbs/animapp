@@ -4,7 +4,7 @@ import { ScrollView } from 'react-native-gesture-handler'
 import React, { useState } from 'react'
 import useSWR from 'swr'
 
-import { SafeAreaPage, Text, Title } from '../../components/Themed'
+import { SafeAreaPage, Text, Title, useThemeColor } from '../../components/Themed'
 import { RootStackParamList } from '../../../types'
 
 import ProductCard from './components/ProductCard'
@@ -15,14 +15,20 @@ function SearchInput(props: {
   input: string
   setInput: React.Dispatch<React.SetStateAction<string>>
 }) {
+  const color = useThemeColor({}, 'inputText')
+  const backgroundColor = useThemeColor({}, 'input')
+  const placeholderColor = useThemeColor({}, 'inputPlaceholder')
+
   return (
     <View style={style.searchInputContainer}>
       <TextInput
-        style={style.searchInput}
+        style={[style.searchInput, { color, backgroundColor }]}
         onChangeText={(event) => props.setInput(event)}
         value={props.input}
         returnKeyType="search"
         clearButtonMode="always"
+        placeholder="Type the name of a product or a brand"
+        placeholderTextColor={placeholderColor}
       />
     </View>
   )
@@ -44,11 +50,6 @@ export default function SearchProducts({ navigation: { navigate } }: Props): JSX
     <SafeAreaPage>
       <Title>Search a product</Title>
       <SearchInput input={input} setInput={setInput} />
-      {!shouldFetch && (
-        <Center>
-          <Text>Please type something</Text>
-        </Center>
-      )}
       {loading && (
         <Center>
           <ActivityIndicator size={40} color="#ccc" />
@@ -80,8 +81,7 @@ export default function SearchProducts({ navigation: { navigate } }: Props): JSX
 const style = StyleSheet.create({
   searchInputContainer: { padding: 10 },
   searchInput: {
-    backgroundColor: '#ddd',
-    borderRadius: 5,
+    borderRadius: 10,
     padding: 10,
   },
 
