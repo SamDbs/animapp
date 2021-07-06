@@ -121,7 +121,7 @@ export function PageHeader(props: ViewProps): JSX.Element {
         <LinearGradient style={{ flex: 1 }} colors={['#F27A5E', '#F2CA80']} />
       </DefaultView>
       <DefaultView style={{ marginTop: 5, zIndex: 20, elevation: 20 }}>
-        <Text style={{ color: '#000', fontSize: 18 }}>{children}</Text>
+        <Text style={{ color: '#222', fontSize: 18 }}>{children}</Text>
       </DefaultView>
     </DefaultView>
   )
