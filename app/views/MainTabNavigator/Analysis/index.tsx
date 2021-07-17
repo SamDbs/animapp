@@ -1,6 +1,5 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import {
-  Image,
   Modal,
   StyleSheet,
   TouchableWithoutFeedback as T,
@@ -36,22 +35,8 @@ export function IngredientCard(props: IngredientCardProps): JSX.Element {
       <TouchableWithoutFeedback
         style={style.result}
         onPress={() => props?.onPress?.(props.ingredient)}>
-        <View style={{ flexDirection: 'row' }}>
-          <View>
-            <Image
-              source={{ uri: props.ingredient.image }}
-              style={{
-                height: CARD_SIZE,
-                width: CARD_SIZE,
-                borderTopLeftRadius: 5,
-                borderBottomLeftRadius: 5,
-                overflow: 'hidden',
-              }}
-            />
-          </View>
-          <View style={{ padding: 10 }}>
-            <Text>{props.ingredient.name}</Text>
-          </View>
+        <View style={{ padding: 10 }}>
+          <Text>{props.ingredient.name}</Text>
         </View>
         <View
           style={{

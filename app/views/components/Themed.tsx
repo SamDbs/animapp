@@ -1,12 +1,17 @@
 import { AntDesign as DefaultAntDesign } from '@expo/vector-icons'
-import { SafeAreaViewProps, SafeAreaView as SafeAreaViewSAC } from 'react-native-safe-area-context'
-import { LinearGradient } from 'expo-linear-gradient'
 import {
+  SafeAreaViewProps,
+  SafeAreaView as SafeAreaViewSAC,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context'
+import {
+  Platform,
   SafeAreaView as DefaultSafeAreaView,
   Text as DefaultText,
   View as DefaultView,
 } from 'react-native'
 import React from 'react'
+import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg'
 
 import Colors from '../../constants/Colors'
 import useColorScheme from '../../hooks/useColorScheme'
@@ -103,26 +108,36 @@ export function AntDesign(props: AntDesignProps): JSX.Element {
 
 export function PageHeader(props: ViewProps): JSX.Element {
   const { children, style, ...otherProps } = props
+  const safeAreaInset = useSafeAreaInsets()
+  const height = safeAreaInset.top > 24 ? 18 : 12
+  const anchorHeight = height + 5
   return (
-    <DefaultView style={{ alignItems: 'center' }}>
+    <>
       <DefaultView
         style={{
-          height: 50,
-          width: 50,
-          borderRadius: 50,
-          transform: [{ scaleX: 20 }, { scaleY: 5 }, { translateY: -20 }],
+          aspectRatio: 100 / anchorHeight,
+          elevation: 20,
           position: 'absolute',
-          overflow: 'hidden',
-          backgroundColor: 'red',
-          zIndex: 10,
-          elevation: 10,
-        }}
-        {...otherProps}>
-        <LinearGradient style={{ flex: 1 }} colors={['#F27A5E', '#F2CA80']} />
+          width: '100%',
+          zIndex: 20,
+        }}>
+        <Svg width="100%" height="100%" viewBox={`0 0 100 ${anchorHeight}`}>
+          <Path
+            d={`M0 0 L100 0 L100 ${height} C80 ${anchorHeight}, 20 ${anchorHeight}, 0 ${height} Z`}
+            fill="#F2CA80"
+          />
+        </Svg>
+        <DefaultView
+          style={{
+            alignItems: 'center',
+            marginTop: safeAreaInset.top > 24 ? 45 : 20,
+            position: 'absolute',
+            width: '100%',
+          }}>
+          <Text style={{ color: '#222', fontSize: 18 }}>{children}</Text>
+        </DefaultView>
       </DefaultView>
-      <DefaultView style={{ marginTop: 5, zIndex: 20, elevation: 20 }}>
-        <Text style={{ color: '#222', fontSize: 18 }}>{children}</Text>
-      </DefaultView>
-    </DefaultView>
+      <DefaultView style={{ marginBottom: safeAreaInset.top > 24 ? 60 : 30 }} />
+    </>
   )
 }
