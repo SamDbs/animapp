@@ -14,6 +14,7 @@ export function viewIngredient(ingredient: Ingredient, language: Language['id'] 
     name: ingredientTranslation?.name ?? 'This ingredient is not translated yet',
     review: ingredientTranslation?.review ?? 'This ingredient is not translated yet',
     description: ingredientTranslation?.description ?? 'This ingredient is not translated yet',
+    rating: ingredient.rating,
   }
   return ingredientClient
 }
