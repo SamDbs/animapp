@@ -1,13 +1,16 @@
-const tintColorLight = '#2f95dc'
+const tintColorLight = '#F27A5E'
 const tintColorDark = '#fff'
 
 export default {
   light: {
     text: '#000',
     secondaryText: '#333',
-    background: '#eee',
+    background: '#fff',
     card: '#fff',
     shadowColor: '#ccc',
+    input: '#dce3ea',
+    inputText: '#000',
+    inputPlaceholder: '#555',
     tint: tintColorLight,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorLight,
@@ -18,6 +21,9 @@ export default {
     background: '#222',
     card: '#000',
     shadowColor: '#000',
+    input: '#dce3ea',
+    inputText: '#000',
+    inputPlaceholder: '#555',
     tint: tintColorDark,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorDark,

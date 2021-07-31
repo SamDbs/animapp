@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
@@ -26,6 +27,9 @@ export default class Ingredient extends BaseEntity {
 
   @OneToMany(() => ProductIngredient, (product) => product.ingredient)
   products!: ProductIngredient[]
+
+  @Column({ nullable: true })
+  rating!: number
 
   @CreateDateColumn()
   createdAt!: Date

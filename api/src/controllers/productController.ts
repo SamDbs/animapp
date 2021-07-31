@@ -50,9 +50,8 @@ export const getAllProducts: RequestHandler = async (req, res) => {
 
   if (req.query.q) {
     const formatQuery = req.query.q.toString().split(' ')
-    const queryTranslations = ProductTranslation.createQueryBuilder('pT').where(
-      "pT.languageId = 'EN'",
-    )
+    const queryTranslations =
+      ProductTranslation.createQueryBuilder('pT').where("pT.languageId = 'EN'")
     formatQuery.forEach((x) => queryTranslations.andWhere('pT.description ilike :x', { x }))
 
     const translations = await queryTranslations.getMany()
@@ -160,6 +159,8 @@ export const patchProduct: RequestHandler = async (req, res) => {
 }
 
 export const setProductImage: RequestHandler = async (req, res) => {
+  if (!req.file) throw new MissingParamError('An image is needed')
+
   const product = await Product.findOneOrFail(req.params.id)
   const existingImage = await Image.findOne({ where: { productId: product.id } })
 

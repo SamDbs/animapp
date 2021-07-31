@@ -6,6 +6,7 @@ import {
   View as DefaultView,
 } from 'react-native'
 import React from 'react'
+import Svg, { Path } from 'react-native-svg'
 
 import Colors from '../../constants/Colors'
 import useColorScheme from '../../hooks/useColorScheme'
@@ -53,13 +54,13 @@ export function Card(props: ViewProps): JSX.Element {
         {
           backgroundColor: backgroundColorCard,
           borderRadius: 5,
-          elevation: 1,
+          elevation: 5,
           justifyContent: 'space-between',
           marginHorizontal: 10,
           marginVertical: 5,
           shadowColor: cardShadowColor,
           shadowOffset: { height: 0, width: 0 },
-          shadowOpacity: 0.3,
+          shadowOpacity: 1,
         },
         style,
       ]}
@@ -98,4 +99,34 @@ export function AntDesign(props: AntDesignProps): JSX.Element {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text')
 
   return <DefaultAntDesign color={color} {...otherProps} />
+}
+
+export function PageHeader(props: ViewProps): JSX.Element {
+  const { children } = props
+  const height = 18
+  const anchorHeight = height + 5
+  return (
+    <>
+      <DefaultView
+        style={{
+          aspectRatio: 100 / anchorHeight,
+          elevation: 20,
+          position: 'absolute',
+          width: '100%',
+          zIndex: 20,
+        }}>
+        <Svg width="100%" height="100%" viewBox={`0 0 100 ${anchorHeight}`}>
+          <Path
+            d={`M0 0 L100 0 L100 ${height} C80 ${anchorHeight}, 20 ${anchorHeight}, 0 ${height} Z`}
+            fill="#F2CA80"
+          />
+        </Svg>
+        <DefaultView
+          style={{ alignItems: 'center', marginTop: 45, position: 'absolute', width: '100%' }}>
+          <Text style={{ color: '#222', fontSize: 18 }}>{children}</Text>
+        </DefaultView>
+      </DefaultView>
+      <DefaultView style={{ marginBottom: height + anchorHeight }} />
+    </>
+  )
 }

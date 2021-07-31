@@ -12,6 +12,7 @@ export type Ingredient = {
   name: string
   description: string
   review: string
+  rating: string
 }
 
 export type ProductIngredient = {

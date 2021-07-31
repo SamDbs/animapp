@@ -19,7 +19,7 @@ import admin from './routes/admin'
 import { errorHandler } from './middleware/errorHandler'
 import { isConnected } from './middleware/admin'
 
-const PORT = ((process.env.PORT as unknown) as number) || 8080
+const PORT = (process.env.PORT as unknown as number) || 8080
 const HOST = '0.0.0.0'
 if (process.env.DATABASE_URL) {
   console.log('Cest la prod')

@@ -1,7 +1,5 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import {
-  Button,
-  Image,
   Modal,
   StyleSheet,
   TouchableWithoutFeedback as T,
@@ -10,9 +8,18 @@ import {
 } from 'react-native'
 import { ScrollView, TextInput, TouchableWithoutFeedback } from 'react-native-gesture-handler'
 import React, { useCallback, useState } from 'react'
+import * as Clipboard from 'expo-clipboard'
 
 import { MainTabParamList } from '../../../types'
-import { AntDesign, Card, SafeAreaPage, Text, Title, useThemeColor } from '../../components/Themed'
+import {
+  AntDesign,
+  Card,
+  PageHeader,
+  SafeAreaPage,
+  Text,
+  useThemeColor,
+} from '../../components/Themed'
+import { Button } from '../../components/Button'
 
 type Props = BottomTabScreenProps<MainTabParamList, 'History'>
 
@@ -28,22 +35,8 @@ export function IngredientCard(props: IngredientCardProps): JSX.Element {
       <TouchableWithoutFeedback
         style={style.result}
         onPress={() => props?.onPress?.(props.ingredient)}>
-        <View style={{ flexDirection: 'row' }}>
-          <View>
-            <Image
-              source={{ uri: props.ingredient.image }}
-              style={{
-                height: CARD_SIZE,
-                width: CARD_SIZE,
-                borderTopLeftRadius: 5,
-                borderBottomLeftRadius: 5,
-                overflow: 'hidden',
-              }}
-            />
-          </View>
-          <View style={{ padding: 10 }}>
-            <Text>{props.ingredient.name}</Text>
-          </View>
+        <View style={{ padding: 10 }}>
+          <Text>{props.ingredient.name}</Text>
         </View>
         <View
           style={{
@@ -61,11 +54,14 @@ export function IngredientCard(props: IngredientCardProps): JSX.Element {
 
 export default function Analysis({ navigation }: Props): JSX.Element {
   const [searchBox, setSearchBox] = useState('')
-  const [data, setData] = useState<any>()
+  const [data, setData] = useState<any>(null)
   const [isModal, setIsModal] = useState(false)
   const [modalContent, setModalContent] = useState<any>(null)
 
   const backgroundColorCard = useThemeColor({}, 'card')
+  const inputText = useThemeColor({}, 'inputText')
+  const inputColor = useThemeColor({}, 'input')
+  const placeholderColor = useThemeColor({}, 'inputPlaceholder')
 
   const search = useCallback(async () => {
     // const request = await fetch(`http://10.0.2.2:8080/search/ingredients?q=${searchBox}`)
@@ -74,26 +70,57 @@ export default function Analysis({ navigation }: Props): JSX.Element {
     setData(res)
   }, [searchBox])
 
+  const paste = useCallback(async () => {
+    try {
+      const string = await Clipboard.getStringAsync()
+      setSearchBox(string)
+    } catch (e) {
+      console.log('errrr', JSON.stringify(e))
+      throw e
+    }
+  }, [])
+
+  const clear = useCallback(async () => {
+    setSearchBox('')
+    setData(null)
+  }, [])
+
   const ingredients = data && data?.map((x: any) => x.ingredientFound)?.filter(Boolean)
 
   return (
     <SafeAreaPage>
-      <Title>Ingredients analysis</Title>
+      <PageHeader>Ingredients analysis</PageHeader>
+      <View
+        style={{
+          marginHorizontal: 8,
+          marginTop: 30,
+          flexDirection: 'row',
+        }}>
+        <Button onPress={() => paste()} title="Paste" style={{ flex: 1, marginRight: 5 }} />
+        <Button
+          onPress={() => clear()}
+          title="Clear"
+          style={{ flex: 1, marginLeft: 5 }}
+          color="#F27A5E"
+        />
+      </View>
       <ScrollView style={style.scrollView}>
         <TextInput
           multiline
           numberOfLines={10}
           style={{
-            backgroundColor: '#ddd',
             margin: 10,
             minHeight: 200,
             padding: 10,
-            borderRadius: 5,
+            color: inputText,
+            borderRadius: 10,
+            backgroundColor: inputColor,
           }}
-          placeholder="paste, your, ingredients, here"
+          placeholder="Paste, your, ingredients, here"
           textAlignVertical="top"
           onChangeText={setSearchBox}
           value={searchBox}
+          placeholderTextColor={placeholderColor}
         />
         <View style={{ marginHorizontal: 8, marginBottom: 10 }}>
           <Button onPress={() => search()} title="Search" />
