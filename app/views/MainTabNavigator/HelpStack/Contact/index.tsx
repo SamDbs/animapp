@@ -85,6 +85,7 @@ export default function Contact(): JSX.Element {
         </View>
       ) : (
         <Button
+          style={style.button}
           title={error ? error : 'Send'}
           onPress={sendContact}
           disabled={loading || !!error}
@@ -96,18 +97,19 @@ export default function Contact(): JSX.Element {
 }
 
 const style = StyleSheet.create({
-  text: { marginBottom: 10 },
-  pageContainer: { padding: 10 },
+  text: { margin: 10 },
   marginTop: { height: 5 },
   error: {
     marginBottom: 10,
   },
   input: {
+    marginHorizontal: 10,
     marginBottom: 10,
     height: 40,
     padding: 10,
     borderRadius: 10,
   },
   big: { height: 120 },
-  thanks: { marginBottom: 5 },
+  button: { marginHorizontal: 10 },
+  thanks: { marginBottom: 5, marginHorizontal: 10 },
 })

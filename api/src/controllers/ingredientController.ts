@@ -10,6 +10,7 @@ import {
   viewIngredientTranslation,
   viewIngredientTranslations,
 } from '../views/ingredient'
+import { MissingParamError } from '../middleware/errorHandler'
 
 const limit = 5
 
@@ -74,6 +75,7 @@ export const patchIngredient: RequestHandler = async (req, res) => {
 }
 
 export const setIngredientImage: RequestHandler = async (req, res) => {
+  if (!req.file) throw new MissingParamError('An image is needed')
   const ingredient = await Ingredient.findOneOrFail(req.params.id)
   const existingImage = await Image.findOne({ where: { ingredientId: ingredient.id } })
 

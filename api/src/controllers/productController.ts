@@ -160,6 +160,8 @@ export const patchProduct: RequestHandler = async (req, res) => {
 }
 
 export const setProductImage: RequestHandler = async (req, res) => {
+  if (!req.file) throw new MissingParamError('An image is needed')
+
   const product = await Product.findOneOrFail(req.params.id)
   const existingImage = await Image.findOne({ where: { productId: product.id } })
 

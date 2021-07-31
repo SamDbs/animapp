@@ -1,17 +1,12 @@
 import { AntDesign as DefaultAntDesign } from '@expo/vector-icons'
+import { SafeAreaViewProps, SafeAreaView as SafeAreaViewSAC } from 'react-native-safe-area-context'
 import {
-  SafeAreaViewProps,
-  SafeAreaView as SafeAreaViewSAC,
-  useSafeAreaInsets,
-} from 'react-native-safe-area-context'
-import {
-  Platform,
   SafeAreaView as DefaultSafeAreaView,
   Text as DefaultText,
   View as DefaultView,
 } from 'react-native'
 import React from 'react'
-import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg'
+import Svg, { Path } from 'react-native-svg'
 
 import Colors from '../../constants/Colors'
 import useColorScheme from '../../hooks/useColorScheme'
@@ -65,7 +60,7 @@ export function Card(props: ViewProps): JSX.Element {
           marginVertical: 5,
           shadowColor: cardShadowColor,
           shadowOffset: { height: 0, width: 0 },
-          shadowOpacity: 0.3,
+          shadowOpacity: 1,
         },
         style,
       ]}
@@ -107,9 +102,8 @@ export function AntDesign(props: AntDesignProps): JSX.Element {
 }
 
 export function PageHeader(props: ViewProps): JSX.Element {
-  const { children, style, ...otherProps } = props
-  const safeAreaInset = useSafeAreaInsets()
-  const height = safeAreaInset.top > 24 ? 18 : 12
+  const { children } = props
+  const height = 18
   const anchorHeight = height + 5
   return (
     <>
@@ -128,16 +122,11 @@ export function PageHeader(props: ViewProps): JSX.Element {
           />
         </Svg>
         <DefaultView
-          style={{
-            alignItems: 'center',
-            marginTop: safeAreaInset.top > 24 ? 45 : 20,
-            position: 'absolute',
-            width: '100%',
-          }}>
+          style={{ alignItems: 'center', marginTop: 45, position: 'absolute', width: '100%' }}>
           <Text style={{ color: '#222', fontSize: 18 }}>{children}</Text>
         </DefaultView>
       </DefaultView>
-      <DefaultView style={{ marginBottom: safeAreaInset.top > 24 ? 60 : 30 }} />
+      <DefaultView style={{ marginBottom: height + anchorHeight }} />
     </>
   )
 }
