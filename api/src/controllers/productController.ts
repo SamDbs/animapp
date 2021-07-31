@@ -50,9 +50,8 @@ export const getAllProducts: RequestHandler = async (req, res) => {
 
   if (req.query.q) {
     const formatQuery = req.query.q.toString().split(' ')
-    const queryTranslations = ProductTranslation.createQueryBuilder('pT').where(
-      "pT.languageId = 'EN'",
-    )
+    const queryTranslations =
+      ProductTranslation.createQueryBuilder('pT').where("pT.languageId = 'EN'")
     formatQuery.forEach((x) => queryTranslations.andWhere('pT.description ilike :x', { x }))
 
     const translations = await queryTranslations.getMany()
