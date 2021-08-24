@@ -15,20 +15,18 @@ export default function ProductCard(props: Props): JSX.Element {
   return (
     <Card style={{ height: 80 }}>
       <TouchableWithoutFeedback style={style.result} onPress={props.onPress}>
-        <View style={{ flexDirection: 'row' }}>
-          <View>
-            <Image
-              source={{ uri: props.product.image }}
-              style={{
-                height: CARD_SIZE,
-                width: CARD_SIZE,
-                borderTopLeftRadius: 5,
-                borderBottomLeftRadius: 5,
-                overflow: 'hidden',
-              }}
-            />
-          </View>
-          <View style={{ padding: 10 }}>
+        <View style={{ flexDirection: 'row', flexShrink: 1 }}>
+          <Image
+            source={{ uri: props.product.image }}
+            style={{
+              height: CARD_SIZE,
+              width: CARD_SIZE,
+              borderTopLeftRadius: 5,
+              borderBottomLeftRadius: 5,
+              overflow: 'hidden',
+            }}
+          />
+          <View style={{ padding: 10, flexShrink: 1 }}>
             <Text>{props.product.name}</Text>
             <Text secondary style={{ fontSize: 12 }}>
               {props.product.brand}
