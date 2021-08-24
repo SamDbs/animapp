@@ -202,7 +202,7 @@ function ModalIngredient({ ingredient }: { ingredient: any }) {
         height: '100%',
         width: '100%',
         justifyContent: 'center',
-        elevation: 1,
+        elevation: 10,
       }}
       onPress={() => modal.open(null)}>
       <TouchableWithoutFeedback>
@@ -245,7 +245,7 @@ function ProductView(props: Props): JSX.Element {
     }
   }, [product, viewProduct, props.navigation])
 
-  if (!product || !ingredients || !ACs) return <Text>Loading...</Text>
+  if (!product || !ingredients?.ingredients || !ACs) return <Text>Loading...</Text>
 
   return (
     <SafeAreaPage noContext>
@@ -257,7 +257,7 @@ function ProductView(props: Props): JSX.Element {
       />
       {modal.ingredientId && (
         <ModalIngredient
-          ingredient={ingredients.find(({ id }: any) => id === modal.ingredientId)}
+          ingredient={ingredients.ingredients.find(({ id }: any) => id === modal.ingredientId)}
         />
       )}
     </SafeAreaPage>
