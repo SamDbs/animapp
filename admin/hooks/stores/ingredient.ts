@@ -24,13 +24,22 @@ export type ProductIngredient = {
 let combinedIngredientUpdate = {}
 async function prepareIngredientUpdate(id: Ingredient['id'], params: Partial<Ingredient>) {
   combinedIngredientUpdate = { ...combinedIngredientUpdate, ...params }
-  await sendIngredientCombinedUpdateDebounce(id, combinedIngredientUpdate)
+  await sendPromise(id, combinedIngredientUpdate)
 }
+const sendPromise = (id: any, combinedIngredientUpdate: any) =>
+  new Promise<void>((resolve, reject) => {
+    sendIngredientCombinedUpdateDebounce(id, combinedIngredientUpdate, resolve, reject)
+  })
 const sendIngredientCombinedUpdateDebounce = debounce(
   1000,
-  async (id: Ingredient['id'], params: Partial<Ingredient>) => {
-    await fetcher.patch(`/ingredients/${id}`, params)
-    combinedIngredientUpdate = {}
+  async (id: Ingredient['id'], params: Partial<Ingredient>, resolve, reject) => {
+    try {
+      await fetcher.patch(`/ingredients/${id}`, params)
+      combinedIngredientUpdate = {}
+      resolve()
+    } catch (e) {
+      reject(e)
+    }
   },
 )
 

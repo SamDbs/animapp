@@ -69,9 +69,11 @@ export const getIngredientById: RequestHandler = async (req, res) => {
 }
 
 export const patchIngredient: RequestHandler = async (req, res) => {
-  await Ingredient.update(req.params.id, req.body)
-  const ingredient = await Ingredient.findOneOrFail(req.params.id)
-  res.status(200).json(ingredient)
+  if (parseInt(req.body.rating) >= 0 && parseInt(req.body.rating) <= 2) {
+    await Ingredient.update(req.params.id, req.body)
+    const ingredient = await Ingredient.findOneOrFail(req.params.id)
+    res.status(200).json(ingredient)
+  } else throw new MissingParamError()
 }
 
 export const setIngredientImage: RequestHandler = async (req, res) => {
