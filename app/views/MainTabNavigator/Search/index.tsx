@@ -7,7 +7,7 @@ import useSWR from 'swr'
 import { PageHeader, SafeAreaPage, Text, useThemeColor } from '../../components/Themed'
 import { RootStackParamList } from '../../../types'
 
-import ProductCard from './components/ProductCard'
+import ProductListItem from './components/ProductListItem'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Product'>
 
@@ -64,12 +64,13 @@ export default function SearchProducts({ navigation: { navigate } }: Props): JSX
 
         {data &&
           data.products.map((result: any, i: number) => (
-            <ProductCard
+            <ProductListItem
               product={result}
               key={result.id}
               onPress={() => {
                 if (navigate) navigate('Product', { productId: result.id })
               }}
+              isFirst={i === 0}
             />
           ))}
       </ScrollView>

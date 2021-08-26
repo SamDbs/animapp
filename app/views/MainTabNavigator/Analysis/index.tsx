@@ -55,6 +55,7 @@ export function IngredientCard(props: IngredientCardProps): JSX.Element {
 export default function Analysis({ navigation }: Props): JSX.Element {
   const [searchBox, setSearchBox] = useState('')
   const [data, setData] = useState<any>(null)
+  const [isSearched, setIsSearched] = useState(false)
   const [isModal, setIsModal] = useState(false)
   const [modalContent, setModalContent] = useState<any>(null)
 
@@ -68,6 +69,7 @@ export default function Analysis({ navigation }: Props): JSX.Element {
     const request = await fetch(`${process.env.API_URL}/search/ingredients?q=${searchBox}`)
     const res = await request.json()
     setData(res)
+    setIsSearched(true)
   }, [searchBox])
 
   const paste = useCallback(async () => {
@@ -83,6 +85,7 @@ export default function Analysis({ navigation }: Props): JSX.Element {
   const clear = useCallback(async () => {
     setSearchBox('')
     setData(null)
+    setIsSearched(false)
   }, [])
 
   const ingredients = data && data?.map((x: any) => x.ingredientFound)?.filter(Boolean)
@@ -136,6 +139,9 @@ export default function Analysis({ navigation }: Props): JSX.Element {
               }}
             />
           ))}
+        {isSearched && !ingredients?.length && (
+          <Text style={style.nothing}>No ingredient found in our database.</Text>
+        )}
       </ScrollView>
       <Modal
         animationType="fade"
@@ -181,4 +187,5 @@ const style = StyleSheet.create({
   modalText: {
     marginBottom: 20,
   },
+  nothing: { padding: 10 },
 })

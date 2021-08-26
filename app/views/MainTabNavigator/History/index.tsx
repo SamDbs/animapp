@@ -1,4 +1,3 @@
-import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { ScrollView } from 'react-native-gesture-handler'
 import { StackNavigationProp } from '@react-navigation/stack'
@@ -8,12 +7,13 @@ import useSWR from 'swr'
 
 import { MainTabParamList, RootStackParamList } from '../../../types'
 import ProductHistoryContext from '../../../hooks/ProductHistoryContext'
-import { Card, PageHeader, SafeAreaPage, Text, Title } from '../../components/Themed'
-import ProductCard from '../Search/components/ProductCard'
+import { Card, PageHeader, SafeAreaPage, Text } from '../../components/Themed'
+import ProductListItem from '../Search/components/ProductListItem'
 
 type Props = BottomTabScreenProps<MainTabParamList, 'History'>
 
 function Product(props: {
+  isFirst: boolean
   productId: number
   navigate?: StackNavigationProp<RootStackParamList, 'Product'>['navigate']
 }) {
@@ -23,11 +23,12 @@ function Product(props: {
   if (!product) return <Text>Loading</Text>
 
   return (
-    <ProductCard
+    <ProductListItem
       product={product}
       onPress={() => {
         if (props.navigate) props.navigate('Product', { productId: props.productId })
       }}
+      isFirst={props.isFirst}
     />
   )
 }
@@ -40,7 +41,7 @@ export default function History({ navigation }: Props): JSX.Element {
   return (
     <SafeAreaPage>
       <PageHeader>History</PageHeader>
-      <View style={style.marginTop} />
+
       {isEmpty ? (
         <View style={style.emptyContainer}>
           <Card style={style.empty}>
@@ -49,10 +50,12 @@ export default function History({ navigation }: Props): JSX.Element {
         </View>
       ) : (
         <ScrollView style={style.scrollView}>
-          {historyProductsIds.map((id) => (
+          <View style={style.marginTop} />
+          {historyProductsIds.map((id, i) => (
             <Product
               key={id}
               productId={id}
+              isFirst={i === 0}
               navigate={
                 navigation.navigate as StackNavigationProp<
                   RootStackParamList,

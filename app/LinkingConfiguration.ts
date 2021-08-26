@@ -24,9 +24,9 @@ export default {
               HistoryProduct: 'history-product',
             },
           },
-          Help: {
+          About: {
             screens: {
-              HelpHome: 'help',
+              AboutHome: 'about',
               FrequentQuestions: 'help-faq',
               Contact: 'help-contact',
             },
