@@ -9,7 +9,7 @@ import useIngredientTranslationStore, {
 } from '@hooks/stores/ingredientTranslation'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
+import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native'
 
 import { IngredientStackParamList } from '../../../../types'
 
@@ -18,6 +18,7 @@ export default function Ingredient(
 ) {
   const [id, setId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
   const ingredient = useIngredientsStore((state) => state.ingredients[props.route.params?.id])
   const [registerIds, unregisterIds, getIngredientById, updateIngredient] = useIngredientsStore(
     (state) => [
@@ -76,8 +77,16 @@ export default function Ingredient(
               <FieldWithLabel
                 label="Rating (0 = neutral, 1 = good, 2 = bad)"
                 value={ingredient.rating}
-                onChangeValue={(val) => updateIngredient(ingredient.id, { rating: val })}
+                onChangeValue={async (val) => {
+                  try {
+                    await updateIngredient(ingredient.id, { rating: val })
+                    setError('')
+                  } catch (e) {
+                    setError('The number might be between 0 and 2')
+                  }
+                }}
               />
+              <Text style={{ color: 'red' }}>{error}</Text>
             </View>
             <View>
               <FieldTranslatable<
