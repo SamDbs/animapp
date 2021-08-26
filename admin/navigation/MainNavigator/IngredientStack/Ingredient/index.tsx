@@ -1,5 +1,6 @@
 import Card from '@components/Card'
 import FieldTranslatable from '@components/FieldTranslatable'
+import FieldWithLabel from '@components/FieldWithLabel'
 import { PageHeader } from '@components/Themed'
 import useIngredientsStore, { Ingredient as IngredientEntity } from '@hooks/stores/ingredient'
 import useIngredientTranslationStore, {
@@ -18,11 +19,14 @@ export default function Ingredient(
   const [id, setId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const ingredient = useIngredientsStore((state) => state.ingredients[props.route.params?.id])
-  const [registerIds, unregisterIds, getIngredientById] = useIngredientsStore((state) => [
-    state.registerIds,
-    state.unregisterIds,
-    state.getIngredientById,
-  ])
+  const [registerIds, unregisterIds, getIngredientById, updateIngredient] = useIngredientsStore(
+    (state) => [
+      state.registerIds,
+      state.unregisterIds,
+      state.getIngredientById,
+      state.updateIngredient,
+    ],
+  )
 
   useEffect(() => {
     if (!ingredient) return
@@ -66,6 +70,13 @@ export default function Ingredient(
                   overflow: 'hidden',
                   resizeMode: 'contain',
                 }}
+              />
+            </View>
+            <View>
+              <FieldWithLabel
+                label="Rating (0 = neutral, 1 = good, 2 = bad)"
+                value={ingredient.rating}
+                onChangeValue={(val) => updateIngredient(ingredient.id, { rating: val })}
               />
             </View>
             <View>
