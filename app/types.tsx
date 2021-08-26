@@ -6,10 +6,10 @@ export type RootStackParamList = {
 
 export type MainTabParamList = {
   Analysis: undefined
-  Help: undefined
   History: undefined
   Scan: undefined
   Search: undefined
+  About: undefined
 }
 
 export type SearchStackParamList = {
@@ -17,7 +17,7 @@ export type SearchStackParamList = {
 }
 
 export type HelpStackParamList = {
-  HelpHome: undefined
+  AboutHome: undefined
   FrequentQuestions: undefined
   Contact: undefined
 }

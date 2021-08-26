@@ -1,5 +1,6 @@
 const tintColorLight = '#F27A5E'
 const tintColorDark = '#fff'
+const accent = '#F2CA80'
 
 export default {
   light: {
@@ -12,6 +13,7 @@ export default {
     inputText: '#000',
     inputPlaceholder: '#555',
     tint: tintColorLight,
+    accent,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorLight,
   },
@@ -25,6 +27,7 @@ export default {
     inputText: '#000',
     inputPlaceholder: '#555',
     tint: tintColorDark,
+    accent,
     tabIconDefault: '#ccc',
     tabIconSelected: tintColorDark,
   },

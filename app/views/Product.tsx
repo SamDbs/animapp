@@ -11,8 +11,10 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 
-import ProductHistoryContext from '../hooks/ProductHistoryContext'
 import { RootStackParamList } from '../types'
+import Colors from '../constants/Colors'
+import ProductHistoryContext from '../hooks/ProductHistoryContext'
+import useColorScheme from '../hooks/useColorScheme'
 
 import { Card, ContentView, SafeAreaPage, Text, Title } from './components/Themed'
 
@@ -46,7 +48,7 @@ function ProductHeader({ product }: { product: any }) {
   const dimensions = useWindowDimensions()
   const { width } = dimensions
   return (
-    <Card style={{ flexDirection: 'row' }}>
+    <View style={{ flexDirection: 'row' }}>
       <View
         style={{
           height: width * 0.4,
@@ -70,7 +72,7 @@ function ProductHeader({ product }: { product: any }) {
         <Text style={{ fontSize: 12 }}>{product.type}</Text>
         <Text style={{ marginTop: 20 }}>{product.description}</Text>
       </View>
-    </Card>
+    </View>
   )
 }
 
@@ -173,9 +175,19 @@ function ProductDetails({
   ingredients: { ingredients: Ingredient[]; relations: any[] }
   productId: number
 }) {
+  const colorSheme = useColorScheme()
+  const { accent, tint } = Colors[colorSheme]
+
   return (
-    <Card style={{ marginTop: 0, flex: 1 }}>
-      <DetailsTabNavigator.Navigator initialRouteName="Ingredients" style={{ borderRadius: 10 }}>
+    <View style={{ marginTop: 0, flex: 1 }}>
+      <DetailsTabNavigator.Navigator
+        initialRouteName="Ingredients"
+        style={{ borderRadius: 10 }}
+        screenOptions={{
+          tabBarStyle: { backgroundColor: accent },
+          tabBarIndicatorStyle: { backgroundColor: tint },
+          tabBarPressColor: tint,
+        }}>
         <DetailsTabNavigator.Screen
           component={Ingredients}
           name="Ingredients"
@@ -187,7 +199,7 @@ function ProductDetails({
           initialParams={{ ACs, productId }}
         />
       </DetailsTabNavigator.Navigator>
-    </Card>
+    </View>
   )
 }
 
@@ -202,7 +214,6 @@ function ModalIngredient({ ingredient }: { ingredient: any }) {
         height: '100%',
         width: '100%',
         justifyContent: 'center',
-        elevation: 10,
       }}
       onPress={() => modal.open(null)}>
       <TouchableWithoutFeedback>

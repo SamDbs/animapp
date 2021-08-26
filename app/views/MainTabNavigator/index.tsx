@@ -26,7 +26,7 @@ export default function MainTabNavigator(): JSX.Element {
   return (
     <BottomTab.Navigator
       initialRouteName="Scan"
-      tabBarOptions={{ activeTintColor: Colors[colorScheme].tint }}>
+      screenOptions={{ tabBarActiveTintColor: Colors[colorScheme].tint, headerShown: false }}>
       <BottomTab.Screen
         name="Scan"
         component={Scan}
@@ -60,11 +60,11 @@ export default function MainTabNavigator(): JSX.Element {
         }}
       />
       <BottomTab.Screen
-        name="Help"
+        name="About"
         component={HelpStack}
         options={{
           tabBarIcon: createTabBarIcon('help'),
-          title: 'Help',
+          title: 'About',
         }}
       />
     </BottomTab.Navigator>

@@ -5,14 +5,14 @@ import { HelpStackParamList } from '../../../types'
 
 import Contact from './Contact'
 import FrequentQuestions from './FrequentQuestions'
-import HelpHome from './HelpHome'
+import HelpHome from './AboutHome'
 
 const Stack = createStackNavigator<HelpStackParamList>()
 
 export default function HelpStack(): JSX.Element {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="HelpHome" component={HelpHome} options={{ title: 'Help' }} />
+      <Stack.Screen name="AboutHome" component={HelpHome} options={{ title: 'About' }} />
       <Stack.Screen
         name="FrequentQuestions"
         component={FrequentQuestions}

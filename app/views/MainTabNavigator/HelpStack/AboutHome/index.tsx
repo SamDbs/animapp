@@ -3,27 +3,34 @@ import React from 'react'
 import { StyleSheet, TouchableWithoutFeedback, View } from 'react-native'
 
 import { HelpStackParamList } from '../../../../types'
-import { Card, SafeAreaPage, Text } from '../../../components/Themed'
+import { SafeAreaPage, Text } from '../../../components/Themed'
 
-type Props = StackScreenProps<HelpStackParamList, 'HelpHome'>
+type Props = StackScreenProps<HelpStackParamList, 'AboutHome'>
 
 export default function HelpHome({ navigation: { navigate } }: Props): JSX.Element {
   return (
     <SafeAreaPage noContext>
       <View style={style.marginTop} />
       <TouchableWithoutFeedback onPress={() => navigate('FrequentQuestions')}>
-        <Card style={style.card}>
+        <View
+          style={[
+            style.card,
+            { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#999' },
+          ]}>
           <Text>Frequent questions</Text>
-        </Card>
+        </View>
       </TouchableWithoutFeedback>
 
       <TouchableWithoutFeedback onPress={() => navigate('Contact')}>
-        <Card style={style.card}>
+        <View style={style.card}>
           <Text>Contact us</Text>
-        </Card>
+        </View>
       </TouchableWithoutFeedback>
     </SafeAreaPage>
   )
 }
 
-const style = StyleSheet.create({ card: { padding: 20 }, marginTop: { height: 5 } })
+const style = StyleSheet.create({
+  card: { marginHorizontal: 20, paddingVertical: 20 },
+  marginTop: { height: 5 },
+})
