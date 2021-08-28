@@ -107,8 +107,12 @@ export default function ManyToMany<
   }, [ids])
 
   const updateOwned = async (ownedId: OwnedItem['id']) => {
-    await upsertOwnedToOwner(ownerEntityId, ownedId, relation[ownedId as string])
-    setIds((ids) => [...ids, ownedId])
+    try {
+      await upsertOwnedToOwner(ownerEntityId, ownedId, relation[ownedId as string])
+      setIds((ids) => [...ids, ownedId])
+    } catch (e) {
+      console.log('erreur', e)
+    }
   }
 
   const deleteOwned = async (ownedId: OwnedItem['id']) => {
