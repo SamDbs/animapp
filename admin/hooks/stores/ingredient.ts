@@ -55,6 +55,10 @@ export type IngredientStore = {
     query: string,
     page?: number,
   ) => Promise<{ pagination: PaginationDetails; ids: Ingredient['id'][] }>
+  searchDeletedIngredients: (
+    query: string,
+    page?: number,
+  ) => Promise<{ pagination: PaginationDetails; ids: Ingredient['id'][] }>
   createIngredient: () => Promise<Product['id']>
   getIngredientsByProductId: (productId: Product['id']) => Promise<{ ids: Ingredient['id'][] }>
   updateIngredientsByProductId: (
@@ -138,6 +142,25 @@ const useIngredientsStore = create<IngredientStore>(
           ingredients: Ingredient[]
         }>(`/ingredients`, {
           params: { q: query, page },
+        })
+
+        const ingredients = data.ingredients.map((ingredient) => ({
+          ...ingredient,
+          id: ingredient.id.toString(),
+        }))
+
+        const ids = ingredients.map((ingredient) => ingredient.id)
+        const entities = keyBy((ingredient) => ingredient.id, ingredients)
+
+        set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
+        return { pagination: data.pagination, ids }
+      },
+      async searchDeletedIngredients(query: string, page = 0) {
+        const { data } = await fetcher.get<{
+          pagination: PaginationDetails
+          ingredients: Ingredient[]
+        }>(`/ingredients`, {
+          params: { q: query, page, deleted: true },
         })
 
         const ingredients = data.ingredients.map((ingredient) => ({

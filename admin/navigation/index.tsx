@@ -35,7 +35,7 @@ export default function RootNavigator() {
     <NavigationContainer
       linking={LinkingConfiguration}
       theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack.Navigator headerMode="none">
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         {!isConnected && <Stack.Screen name="Auth" component={AuthStackNavigator} />}
         {isConnected && (
           <>

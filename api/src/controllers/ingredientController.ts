@@ -1,4 +1,4 @@
-import { FindManyOptions, FindOperator, In } from 'typeorm'
+import { FindManyOptions, FindOperator, In, IsNull, Not } from 'typeorm'
 import { RequestHandler } from 'express'
 
 import Image from '../models/image'
@@ -18,13 +18,26 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
   const desiredPage = parseInt(req.query?.page?.toString() ?? '0')
   const page = desiredPage < 0 ? 0 : desiredPage
   const offset = limit * page
+  const deletedIngredients = req.query.deleted ?? false
 
   if (req.query.q) {
     const translations = await IngredientTranslation.find({
       where: [
-        { name: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
-        { description: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
-        { review: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
+        {
+          name: new FindOperator('ilike', `%${req.query.q}%`),
+          languageId: 'EN',
+          deletedAt: deletedIngredients ? Not(IsNull()) : IsNull(),
+        },
+        {
+          description: new FindOperator('ilike', `%${req.query.q}%`),
+          languageId: 'EN',
+          deletedAt: deletedIngredients ? Not(IsNull()) : IsNull(),
+        },
+        {
+          review: new FindOperator('ilike', `%${req.query.q}%`),
+          languageId: 'EN',
+          deletedAt: deletedIngredients ? Not(IsNull()) : IsNull(),
+        },
       ],
       order: { name: 'ASC' },
     })
@@ -44,6 +57,7 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
     return
   }
   const [ingredients, count] = await Ingredient.createQueryBuilder('ingredient')
+    .where(deletedIngredients ? 'ingredient.deletedAt IS NOT NULL' : 'ingredient.deletedAt IS NULL')
     .leftJoinAndSelect('ingredient.translations', 'it', "it.languageId = 'EN'")
     .orderBy('it.name', 'ASC')
     .offset(offset)
