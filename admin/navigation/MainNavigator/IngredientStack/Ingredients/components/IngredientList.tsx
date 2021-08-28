@@ -1,10 +1,11 @@
 import Card from '@components/Card'
 import Pagination from '@components/Pagination'
+import { Feather } from '@expo/vector-icons'
 import useIngredientsStore, { Ingredient, IngredientStore } from '@hooks/stores/ingredient'
 import useSearchableList from '@hooks/useSearchableList'
 import { Link } from '@react-navigation/native'
 import React from 'react'
-import { Text, TextInput, View, ActivityIndicator } from 'react-native'
+import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native'
 
 export default function IngredientList({ style }: { style?: View['props']['style'] }) {
   const {
@@ -19,6 +20,9 @@ export default function IngredientList({ style }: { style?: View['props']['style
     (state) => state.searchIngredients,
     (ids) => (state) => ids.map((id) => state.ingredients[id]),
   )
+
+  const deleteIngredient = useIngredientsStore((state) => state.deleteIngredient)
+
   return (
     <Card style={style}>
       <Text style={{ fontSize: 18 }}>Ingredient list</Text>
@@ -55,7 +59,7 @@ export default function IngredientList({ style }: { style?: View['props']['style
             <Text>No result.</Text>
           </View>
         )}
-        {ingredients.filter(Boolean).map((ingredient, i: number) => {
+        {ingredients.filter(Boolean).map((ingredient: any, i: number) => {
           return (
             <View
               key={ingredient.id}
@@ -67,13 +71,31 @@ export default function IngredientList({ style }: { style?: View['props']['style
                 flexDirection: 'row',
                 justifyContent: 'space-between',
               }}>
-              <Text>{ingredient.name}</Text>
-              <Text>{ingredient.review}</Text>
-              <Text>{ingredient.description}</Text>
-              <Text>{ingredient.image}</Text>
-              <Link to={`/ingredients/${ingredient.id}`}>
-                <Text style={{ cursor: 'pointer' }}>edit</Text>
-              </Link>
+              <View style={{ flexDirection: 'row', flexShrink: 1 }}>
+                <Text>{ingredient.name}</Text>
+                <Text>{ingredient.review}</Text>
+                <Text>{ingredient.description}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', marginLeft: 10 }}>
+                <Link
+                  style={{ marginRight: 8, cursor: 'pointer' }}
+                  to={`/ingredients/${ingredient.id}`}>
+                  <Feather name="edit" size={24} color="grey" />
+                </Link>
+
+                <Pressable
+                  style={{ cursor: 'pointer' }}
+                  onPress={async () => {
+                    try {
+                      await deleteIngredient(ingredient.id)
+                      location.reload()
+                    } catch (error) {
+                      alert(error.response.data.message)
+                    }
+                  }}>
+                  <Feather name="trash" size={24} color="red" />
+                </Pressable>
+              </View>
             </View>
           )
         })}

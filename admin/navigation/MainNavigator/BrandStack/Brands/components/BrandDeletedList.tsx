@@ -23,7 +23,7 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
 
   return (
     <Card style={style}>
-      <Text style={{ fontSize: 18 }}>Brand list</Text>
+      <Text style={{ fontSize: 18 }}>Deleted brands</Text>
       <View
         style={{
           flexDirection: 'row',
@@ -73,24 +73,19 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
                 alignItems: 'center',
               }}>
               <Text>{brand.name}</Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
+
+              <Pressable
+                style={{ cursor: 'pointer' }}
+                onPress={async () => {
+                  try {
+                    await restoreBrand(brand.id)
+                    location.reload()
+                  } catch (error) {
+                    alert(error.response.data.message)
+                  }
                 }}>
-                <Pressable
-                  style={{ cursor: 'pointer' }}
-                  onPress={async () => {
-                    try {
-                      await restoreBrand(brand.id)
-                      location.reload()
-                    } catch (error) {
-                      alert(error.response.data.message)
-                    }
-                  }}>
-                  <FontAwesome5 name="trash-restore" size={24} color="green" />
-                </Pressable>
-              </View>
+                <FontAwesome5 name="trash-restore" size={24} color="green" />
+              </Pressable>
             </View>
           )
         })}

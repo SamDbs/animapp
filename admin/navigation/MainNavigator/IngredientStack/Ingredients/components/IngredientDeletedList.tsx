@@ -1,10 +1,10 @@
 import Card from '@components/Card'
 import Pagination from '@components/Pagination'
+import { FontAwesome5 } from '@expo/vector-icons'
 import useIngredientsStore, { Ingredient, IngredientStore } from '@hooks/stores/ingredient'
 import useSearchableList from '@hooks/useSearchableList'
-import { Link } from '@react-navigation/native'
 import React from 'react'
-import { Text, TextInput, View, ActivityIndicator } from 'react-native'
+import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
 
 export default function IngredientDeletedList({ style }: { style?: View['props']['style'] }) {
   const {
@@ -19,9 +19,12 @@ export default function IngredientDeletedList({ style }: { style?: View['props']
     (state) => state.searchDeletedIngredients,
     (ids) => (state) => ids.map((id) => state.ingredients[id]),
   )
+
+  const restoreIngredient = useIngredientsStore((state) => state.restoreIngredient)
+
   return (
     <Card style={style}>
-      <Text style={{ fontSize: 18 }}>Ingredient list</Text>
+      <Text style={{ fontSize: 18 }}>Deleted ingredients</Text>
       <View
         style={{
           flexDirection: 'row',
@@ -55,7 +58,7 @@ export default function IngredientDeletedList({ style }: { style?: View['props']
             <Text>No result.</Text>
           </View>
         )}
-        {ingredients.filter(Boolean).map((ingredient, i: number) => {
+        {ingredients.filter(Boolean).map((ingredient: any, i: number) => {
           return (
             <View
               key={ingredient.id}
@@ -67,13 +70,23 @@ export default function IngredientDeletedList({ style }: { style?: View['props']
                 flexDirection: 'row',
                 justifyContent: 'space-between',
               }}>
-              <Text>{ingredient.name}</Text>
-              <Text>{ingredient.review}</Text>
-              <Text>{ingredient.description}</Text>
-              <Text>{ingredient.image}</Text>
-              <Link to={`/ingredients/${ingredient.id}`}>
-                <Text style={{ cursor: 'pointer' }}>edit</Text>
-              </Link>
+              <View style={{ flexDirection: 'row', flexShrink: 1 }}>
+                <Text>{ingredient.name}</Text>
+                <Text>{ingredient.review}</Text>
+                <Text>{ingredient.description}</Text>
+              </View>
+              <Pressable
+                style={{ cursor: 'pointer' }}
+                onPress={async () => {
+                  try {
+                    await restoreIngredient(ingredient.id)
+                    location.reload()
+                  } catch (error) {
+                    alert(error.response.data.message)
+                  }
+                }}>
+                <FontAwesome5 name="trash-restore" size={24} color="green" />
+              </Pressable>
             </View>
           )
         })}

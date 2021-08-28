@@ -20,7 +20,9 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
   const offset = limit * page
   const deletedIngredients = req.query.deleted ?? false
 
+  console.log('deletedIngredients', deletedIngredients)
   if (req.query.q) {
+    console.log('queryyy')
     const translations = await IngredientTranslation.find({
       where: [
         {
@@ -49,6 +51,7 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
       where,
       take: limit,
       skip: offset,
+      withDeleted: true,
     })
     res.json({
       pagination: { count, limit, offset, page },
@@ -57,12 +60,30 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
     return
   }
   const [ingredients, count] = await Ingredient.createQueryBuilder('ingredient')
-    .where(deletedIngredients ? 'ingredient.deletedAt IS NOT NULL' : 'ingredient.deletedAt IS NULL')
+    .withDeleted()
+    .where(
+      deletedIngredients ? 'ingredient."deletedAt" IS NOT NULL' : 'ingredient."deletedAt" IS NULL',
+    )
     .leftJoinAndSelect('ingredient.translations', 'it', "it.languageId = 'EN'")
     .orderBy('it.name', 'ASC')
     .offset(offset)
     .limit(limit)
     .getManyAndCount()
+
+  console.log(
+    Ingredient.createQueryBuilder('ingredient')
+      .where(
+        deletedIngredients
+          ? 'ingredient."deletedAt" IS NOT NULL'
+          : 'ingredient."deletedAt" IS NULL',
+      )
+      .withDeleted()
+      .leftJoinAndSelect('ingredient.translations', 'it', "it.languageId = 'EN'")
+      .orderBy('it.name', 'ASC')
+      .offset(offset)
+      .limit(limit)
+      .getSql(),
+  )
 
   res.json({
     pagination: { count, limit, offset, page },
@@ -83,11 +104,15 @@ export const getIngredientById: RequestHandler = async (req, res) => {
 }
 
 export const patchIngredient: RequestHandler = async (req, res) => {
-  if (parseInt(req.body.rating) >= 0 && parseInt(req.body.rating) <= 2) {
-    await Ingredient.update(req.params.id, req.body)
-    const ingredient = await Ingredient.findOneOrFail(req.params.id)
-    res.status(200).json(ingredient)
-  } else throw new MissingParamError()
+  if (typeof req.body.rating !== 'undefined') {
+    if (parseInt(req.body.rating) < 0 || parseInt(req.body.rating) > 2) {
+      throw new MissingParamError('Rating should be between 0 and 2')
+    }
+  }
+
+  await Ingredient.update(req.params.id, req.body)
+  const ingredient = await Ingredient.findOneOrFail(req.params.id)
+  res.status(200).json(ingredient)
 }
 
 export const setIngredientImage: RequestHandler = async (req, res) => {
