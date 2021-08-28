@@ -68,6 +68,7 @@ export default function ManyToMany<
 }: Props<OwnerItem, OwnedItem, StoreShape>) {
   const [ids, setIds] = useState<OwnedItem['id'][]>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
   const getOwnedByOwnerId = useOwnedStore(ownedItemsGetterSelector)
   const upsertOwnedToOwner = useOwnedStore(ownedItemsUpdaterSelector)
   const deleteOwnedFromOwner = useOwnedStore(ownedItemsDeletorSelector)
@@ -110,8 +111,9 @@ export default function ManyToMany<
     try {
       await upsertOwnedToOwner(ownerEntityId, ownedId, relation[ownedId as string])
       setIds((ids) => [...ids, ownedId])
+      setError('')
     } catch (e) {
-      console.log('erreur', e)
+      setError(e.response.data.message)
     }
   }
 
@@ -202,6 +204,11 @@ export default function ManyToMany<
                   )
                 })}
           </View>
+          {error && (
+            <View>
+              <Text style={{ color: 'red' }}>{error}</Text>
+            </View>
+          )}
         </>
       )}
       <Button title={editing ? 'Close' : 'Edit'} onPress={() => setEditing((x) => !x)} />

@@ -225,7 +225,7 @@ export const createProductACQuantity: RequestHandler = async (req, res) => {
     } as ProductAnalyticalConstituent)
 
   if (req.body.quantity > 0) relation.quantity = req.body.quantity
-  else throw new MissingParamError()
+  else throw new MissingParamError('The quantity should be a positive number')
 
   await relation.save()
 
