@@ -9,7 +9,7 @@ import useIngredientTranslationStore, {
 } from '@hooks/stores/ingredientTranslation'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native'
 
 import { IngredientStackParamList } from '../../../../types'
 
