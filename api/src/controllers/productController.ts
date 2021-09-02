@@ -74,6 +74,7 @@ export const getAllProducts: RequestHandler = async (req, res) => {
     )
     const [products, count] = await queryProduct
       .leftJoinAndSelect('p.translations', 'pT')
+      .leftJoinAndSelect('p.brand', 'brand')
       .limit(limit)
       .offset(offset)
       .orderBy('p.name', 'ASC')
@@ -88,7 +89,7 @@ export const getAllProducts: RequestHandler = async (req, res) => {
 
   const [products, count] = await Product.findAndCount({
     where: filters,
-    relations: ['translations'],
+    relations: ['translations', 'brand'],
     order: { name: 'ASC' },
     take: limit,
     skip: offset,
