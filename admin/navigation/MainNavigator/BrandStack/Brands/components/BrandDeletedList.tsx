@@ -23,7 +23,7 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
 
   return (
     <Card style={style}>
-      <Text style={{ fontSize: 18 }}>Brand list</Text>
+      <Text style={{ fontSize: 18 }}>Brand deleted list</Text>
       <View
         style={{
           flexDirection: 'row',
