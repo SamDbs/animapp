@@ -59,21 +59,6 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
     .limit(limit)
     .getManyAndCount()
 
-  console.log(
-    Ingredient.createQueryBuilder('ingredient')
-      .where(
-        deletedIngredients
-          ? 'ingredient."deletedAt" IS NOT NULL'
-          : 'ingredient."deletedAt" IS NULL',
-      )
-      .withDeleted()
-      .leftJoinAndSelect('ingredient.translations', 'it', "it.languageId = 'EN'")
-      .orderBy('it.name', 'ASC')
-      .offset(offset)
-      .limit(limit)
-      .getSql(),
-  )
-
   res.json({
     pagination: { count, limit, offset, page },
     ingredients: viewIngredients(ingredients, req.query.lang?.toString()),
