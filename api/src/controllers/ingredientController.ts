@@ -1,4 +1,4 @@
-import { FindManyOptions, FindOperator, In } from 'typeorm'
+import { FindManyOptions, FindOperator, In, IsNull, Not } from 'typeorm'
 import { RequestHandler } from 'express'
 
 import Image from '../models/image'
@@ -18,6 +18,7 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
   const desiredPage = parseInt(req.query?.page?.toString() ?? '0')
   const page = desiredPage < 0 ? 0 : desiredPage
   const offset = limit * page
+  const deletedIngredients = req.query.deleted ?? false
 
   if (req.query.q) {
     const translations = await IngredientTranslation.find({
@@ -29,13 +30,17 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
       order: { name: 'ASC' },
     })
     const ingredientIds = translations.map((translation) => translation.ingredientId)
-    const where: FindManyOptions<Ingredient>['where'] = { id: In(ingredientIds) }
+    const where: FindManyOptions<Ingredient>['where'] = {
+      id: In(ingredientIds),
+      deletedAt: deletedIngredients ? Not(IsNull()) : IsNull(),
+    }
     const [ingredients, count] = await Ingredient.findAndCount({
       relations: ['translations'],
       order: { id: 'ASC' },
       where,
       take: limit,
       skip: offset,
+      withDeleted: true,
     })
     res.json({
       pagination: { count, limit, offset, page },
@@ -44,6 +49,10 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
     return
   }
   const [ingredients, count] = await Ingredient.createQueryBuilder('ingredient')
+    .withDeleted()
+    .where(
+      deletedIngredients ? 'ingredient."deletedAt" IS NOT NULL' : 'ingredient."deletedAt" IS NULL',
+    )
     .leftJoinAndSelect('ingredient.translations', 'it', "it.languageId = 'EN'")
     .orderBy('it.name', 'ASC')
     .offset(offset)
@@ -69,11 +78,15 @@ export const getIngredientById: RequestHandler = async (req, res) => {
 }
 
 export const patchIngredient: RequestHandler = async (req, res) => {
-  if (parseInt(req.body.rating) >= 0 && parseInt(req.body.rating) <= 2) {
-    await Ingredient.update(req.params.id, req.body)
-    const ingredient = await Ingredient.findOneOrFail(req.params.id)
-    res.status(200).json(ingredient)
-  } else throw new MissingParamError()
+  if (typeof req.body.rating !== 'undefined') {
+    if (parseInt(req.body.rating) < 0 || parseInt(req.body.rating) > 2) {
+      throw new MissingParamError('Rating should be between 0 and 2')
+    }
+  }
+
+  await Ingredient.update(req.params.id, req.body)
+  const ingredient = await Ingredient.findOneOrFail(req.params.id)
+  res.status(200).json(ingredient)
 }
 
 export const setIngredientImage: RequestHandler = async (req, res) => {

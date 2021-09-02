@@ -1,13 +1,12 @@
 import Card from '@components/Card'
 import Pagination from '@components/Pagination'
-import { Feather } from '@expo/vector-icons'
+import { FontAwesome5 } from '@expo/vector-icons'
 import useIngredientsStore, { Ingredient, IngredientStore } from '@hooks/stores/ingredient'
 import useSearchableList from '@hooks/useSearchableList'
-import { Link } from '@react-navigation/native'
 import React from 'react'
-import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native'
+import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
 
-export default function IngredientList({ style }: { style?: View['props']['style'] }) {
+export default function IngredientDeletedList({ style }: { style?: View['props']['style'] }) {
   const {
     changePage,
     isLoading,
@@ -17,15 +16,15 @@ export default function IngredientList({ style }: { style?: View['props']['style
     searchDebounced,
   } = useSearchableList<IngredientStore, Ingredient>(
     useIngredientsStore,
-    (state) => state.searchIngredients,
+    (state) => state.searchDeletedIngredients,
     (ids) => (state) => ids.map((id) => state.ingredients[id]),
   )
 
-  const deleteIngredient = useIngredientsStore((state) => state.deleteIngredient)
+  const restoreIngredient = useIngredientsStore((state) => state.restoreIngredient)
 
   return (
     <Card style={style}>
-      <Text style={{ fontSize: 18 }}>Ingredient list</Text>
+      <Text style={{ fontSize: 18 }}>Deleted ingredients</Text>
       <View
         style={{
           flexDirection: 'row',
@@ -76,26 +75,18 @@ export default function IngredientList({ style }: { style?: View['props']['style
                 <Text>{ingredient.review}</Text>
                 <Text>{ingredient.description}</Text>
               </View>
-              <View style={{ flexDirection: 'row', marginLeft: 10 }}>
-                <Link
-                  style={{ marginRight: 8, cursor: 'pointer' }}
-                  to={`/ingredients/${ingredient.id}`}>
-                  <Feather name="edit" size={24} color="grey" />
-                </Link>
-
-                <Pressable
-                  style={{ cursor: 'pointer' }}
-                  onPress={async () => {
-                    try {
-                      await deleteIngredient(ingredient.id)
-                      location.reload()
-                    } catch (error) {
-                      alert(error.response.data.message)
-                    }
-                  }}>
-                  <Feather name="trash" size={24} color="red" />
-                </Pressable>
-              </View>
+              <Pressable
+                style={{ cursor: 'pointer' }}
+                onPress={async () => {
+                  try {
+                    await restoreIngredient(ingredient.id)
+                    location.reload()
+                  } catch (error) {
+                    alert(error.response.data.message)
+                  }
+                }}>
+                <FontAwesome5 name="trash-restore" size={24} color="green" />
+              </Pressable>
             </View>
           )
         })}

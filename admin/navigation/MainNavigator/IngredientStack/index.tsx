@@ -10,9 +10,8 @@ const Stack = createStackNavigator<IngredientStackParamList>()
 export default function IngredientStack() {
   return (
     <Stack.Navigator
-      headerMode="none"
       initialRouteName="Ingredients"
-      screenOptions={{ animationEnabled: true }}>
+      screenOptions={{ animationEnabled: true, headerShown: false }}>
       <Stack.Screen name="Ingredients" component={Ingredients} />
       <Stack.Screen name="Ingredient" component={Ingredient} />
     </Stack.Navigator>

@@ -13,7 +13,6 @@ services:
 
   db:
     image: postgres
-    restart: always
     env_file:
       - database.env # configure postgres
     ports:

@@ -51,7 +51,13 @@ export type IngredientStore = {
   unregisterIds: (ids: Ingredient['id'][]) => void
   getIngredientById: (id: Ingredient['id']) => Promise<{ id: Ingredient['id'] }>
   updateIngredient: (id: Ingredient['id'], params: Partial<Ingredient>) => Promise<void>
+  deleteIngredient: (id: Ingredient['id']) => Promise<void>
+  restoreIngredient: (id: Ingredient['id']) => Promise<void>
   searchIngredients: (
+    query: string,
+    page?: number,
+  ) => Promise<{ pagination: PaginationDetails; ids: Ingredient['id'][] }>
+  searchDeletedIngredients: (
     query: string,
     page?: number,
   ) => Promise<{ pagination: PaginationDetails; ids: Ingredient['id'][] }>
@@ -151,6 +157,25 @@ const useIngredientsStore = create<IngredientStore>(
         set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
         return { pagination: data.pagination, ids }
       },
+      async searchDeletedIngredients(query: string, page = 0) {
+        const { data } = await fetcher.get<{
+          pagination: PaginationDetails
+          ingredients: Ingredient[]
+        }>(`/ingredients`, {
+          params: { q: query, page, deleted: true },
+        })
+
+        const ingredients = data.ingredients.map((ingredient) => ({
+          ...ingredient,
+          id: ingredient.id.toString(),
+        }))
+
+        const ids = ingredients.map((ingredient) => ingredient.id)
+        const entities = keyBy((ingredient) => ingredient.id, ingredients)
+
+        set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
+        return { pagination: data.pagination, ids }
+      },
       async createIngredient() {
         const { data: ingredient } = await fetcher.post<Ingredient>(`/ingredients`)
         return ingredient.id
@@ -220,6 +245,12 @@ const useIngredientsStore = create<IngredientStore>(
 
         set((state) => ({ ingredients: { ...state.ingredients, ...entities } }))
         return { ids }
+      },
+      async restoreIngredient(id: Ingredient['id']) {
+        await fetcher.patch<Ingredient>(`/ingredients/${id}`, { deletedAt: null })
+      },
+      async deleteIngredient(id: Ingredient['id']) {
+        await fetcher.delete<Ingredient>(`/ingredients/${id}`)
       },
     }),
     'ingredient',

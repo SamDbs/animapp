@@ -19,7 +19,10 @@ export default function TabNavigator() {
   return (
     <View style={{ flex: 1, flexDirection: 'row' }}>
       <Menu />
-      <BottomTab.Navigator initialRouteName="ProductStack" tabBar={() => null}>
+      <BottomTab.Navigator
+        initialRouteName="ProductStack"
+        tabBar={() => null}
+        screenOptions={{ headerShown: false }}>
         <BottomTab.Screen name="IngredientStack" component={IngredientStack} />
         <BottomTab.Screen name="Contacts" component={Contacts} />
         <BottomTab.Screen name="LanguageStack" component={LanguageStack} />

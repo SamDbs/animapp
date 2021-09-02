@@ -9,9 +9,8 @@ const Stack = createStackNavigator<DevStackParamList>()
 export default function DevStack() {
   return (
     <Stack.Navigator
-      headerMode="none"
       initialRouteName="Dev"
-      screenOptions={{ animationEnabled: true }}>
+      screenOptions={{ animationEnabled: true, headerShown: false }}>
       <Stack.Screen name="Dev" component={Dev} />
     </Stack.Navigator>
   )
