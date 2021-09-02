@@ -20,31 +20,20 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
   const offset = limit * page
   const deletedIngredients = req.query.deleted ?? false
 
-  console.log('deletedIngredients', deletedIngredients)
   if (req.query.q) {
-    console.log('queryyy')
     const translations = await IngredientTranslation.find({
       where: [
-        {
-          name: new FindOperator('ilike', `%${req.query.q}%`),
-          languageId: 'EN',
-          deletedAt: deletedIngredients ? Not(IsNull()) : IsNull(),
-        },
-        {
-          description: new FindOperator('ilike', `%${req.query.q}%`),
-          languageId: 'EN',
-          deletedAt: deletedIngredients ? Not(IsNull()) : IsNull(),
-        },
-        {
-          review: new FindOperator('ilike', `%${req.query.q}%`),
-          languageId: 'EN',
-          deletedAt: deletedIngredients ? Not(IsNull()) : IsNull(),
-        },
+        { name: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
+        { description: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
+        { review: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
       ],
       order: { name: 'ASC' },
     })
     const ingredientIds = translations.map((translation) => translation.ingredientId)
-    const where: FindManyOptions<Ingredient>['where'] = { id: In(ingredientIds) }
+    const where: FindManyOptions<Ingredient>['where'] = {
+      id: In(ingredientIds),
+      deletedAt: deletedIngredients ? Not(IsNull()) : IsNull(),
+    }
     const [ingredients, count] = await Ingredient.findAndCount({
       relations: ['translations'],
       order: { id: 'ASC' },
