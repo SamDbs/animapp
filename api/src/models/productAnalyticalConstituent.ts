@@ -21,8 +21,8 @@ export default class ProductAnalyticalConstituent extends BaseEntity {
   @PrimaryColumn()
   analyticalConstituentId!: number
 
-  @Column({ nullable: true })
-  quantity!: string
+  @Column({ type: 'varchar', nullable: true })
+  quantity!: string | null
 
   @ManyToOne(() => Product, (product) => product.analyticalConstituents)
   @JoinColumn({ name: 'productId' })
