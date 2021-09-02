@@ -9,7 +9,7 @@ import useIngredientTranslationStore, {
 } from '@hooks/stores/ingredientTranslation'
 import { StackScreenProps } from '@react-navigation/stack'
 import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native'
+import { ActivityIndicator, ScrollView, Text, View } from 'react-native'
 
 import { IngredientStackParamList } from '../../../../types'
 
@@ -53,26 +53,6 @@ export default function Ingredient(
         {isLoading && !ingredient && <ActivityIndicator />}
         {ingredient && (
           <>
-            <View
-              style={{
-                height: 400,
-                width: 400,
-                alignItems: 'center',
-              }}>
-              <Image
-                source={{
-                  uri: 'https://cdn.stocksnap.io/img-thumbs/960w/vintage-red_8QKIFL9ZUI.jpg',
-                }}
-                style={{
-                  height: 400 - 20,
-                  width: 400 - 20,
-                  margin: 20 / 2,
-                  borderRadius: 5,
-                  overflow: 'hidden',
-                  resizeMode: 'contain',
-                }}
-              />
-            </View>
             <View>
               <FieldWithLabel
                 label="Rating (0 = neutral, 1 = good, 2 = bad)"
@@ -94,7 +74,7 @@ export default function Ingredient(
                 IngredientTranslation,
                 IngredientTranslationStore
               >
-                fields={{ description: 'Description', review: 'Review', name: 'Name' }}
+                fields={{ name: 'Name', description: 'Description', review: 'Review' }}
                 baseEntityId={ingredient.id}
                 useStore={useIngredientTranslationStore}
                 translationGetterSelector={(state) => state.getIngredientTranslations}

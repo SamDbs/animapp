@@ -224,7 +224,8 @@ export const createProductACQuantity: RequestHandler = async (req, res) => {
       deletedAt: null,
     } as ProductAnalyticalConstituent)
 
-  if (req.body.quantity) relation.quantity = req.body.quantity
+  if (req.body.quantity > 0) relation.quantity = req.body.quantity
+  else throw new MissingParamError('The quantity should be a positive number')
 
   await relation.save()
 
@@ -257,6 +258,8 @@ export const deleteProductACQuantity: RequestHandler = async (req, res) => {
     productId: parseInt(req.params.id),
     analyticalConstituentId: parseInt(req.params.idAC),
   })
+  relation.quantity = null
+  await relation.save()
   relation.softRemove()
   res.sendStatus(200)
 }
