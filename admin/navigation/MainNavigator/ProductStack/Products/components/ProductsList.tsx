@@ -2,9 +2,10 @@ import Card from '@components/Card'
 import Pagination from '@components/Pagination'
 import useProductsStore, { ProductStore, Product } from '@hooks/stores/product'
 import useSearchableList from '@hooks/useSearchableList'
-import { Link } from '@react-navigation/native'
-import React, { SetStateAction, useCallback, useState } from 'react'
+import { useNavigation } from '@react-navigation/native'
+import React, { useCallback, useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
+import { DataTable, IconButton } from 'react-native-paper'
 
 export default function ProductList({ style }: { style?: View['props']['style'] }) {
   const {
@@ -30,6 +31,8 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
     else setFilters({})
     setFilterPublished(newValue)
   }, [])
+
+  const { navigate } = useNavigation()
 
   return (
     <Card style={style}>
@@ -135,36 +138,45 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
             <Text>No result.</Text>
           </View>
         )}
-        {products.filter(Boolean).map((product: any, i: number) => {
-          return (
-            <View
-              key={product.id}
-              style={{
-                padding: 8,
-                borderBottomColor: '#ccc',
-                borderBottomWidth: i === products.length - 1 ? 0 : 1,
-                backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <View
-                  style={{
-                    marginRight: 8,
-                    borderRadius: 10,
-                    borderWidth: 10,
-                    borderColor: product.published ? '#00ff11' : '#ffff00',
-                  }}
-                />
-
-                <Text>{product.name}</Text>
-              </View>
-              <Link to={`/products/${product.id}`}>
-                <Text style={{ cursor: 'pointer' }}>edit</Text>
-              </Link>
-            </View>
-          )
-        })}
+        <DataTable>
+          <DataTable.Header>
+            <DataTable.Title style={{ flex: 0, flexBasis: 50 }}>Status</DataTable.Title>
+            <DataTable.Title>Name</DataTable.Title>
+            <DataTable.Title>Brand</DataTable.Title>
+            <DataTable.Title numeric>Actions</DataTable.Title>
+          </DataTable.Header>
+          {products.filter(Boolean).map((product: any, i: number) => {
+            return (
+              <DataTable.Row key={product.id}>
+                <DataTable.Cell style={{ flex: 0, flexBasis: 50 }}>
+                  <View
+                    style={{
+                      marginRight: 8,
+                      borderRadius: 10,
+                      borderWidth: 10,
+                      borderColor: product.published ? '#00ff11' : '#ffff00',
+                    }}
+                  />
+                </DataTable.Cell>
+                <DataTable.Cell>{product.name}</DataTable.Cell>
+                <DataTable.Cell>{product.brand}</DataTable.Cell>
+                <DataTable.Cell numeric>
+                  {/* <Link to={`/products/${product.id}`}> */}
+                  <IconButton
+                    icon="pencil"
+                    onPress={() =>
+                      navigate('ProductStack', {
+                        screen: 'Product',
+                        params: { id: product.id },
+                      })
+                    }
+                  />
+                  {/* </Link> */}
+                </DataTable.Cell>
+              </DataTable.Row>
+            )
+          })}
+        </DataTable>
       </View>
       <ActivityIndicator style={{ margin: 8 }} color={isLoading ? undefined : 'transparent'} />
       <Pagination onChangePage={changePage} pagination={pagination} />

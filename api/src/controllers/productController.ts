@@ -54,26 +54,36 @@ export const getAllProducts: RequestHandler = async (req, res) => {
       ProductTranslation.createQueryBuilder('pT').where("pT.languageId = 'EN'")
     formatQuery.forEach((x) => queryTranslations.andWhere('pT.description ilike :x', { x }))
 
+    console.log('formatQuery', formatQuery)
     const translations = await queryTranslations.getMany()
 
     const productIds = translations.map((translation) => translation.productId)
 
-    const queryProduct = Product.createQueryBuilder('p').where('p.id IN (:...productIds)', {
-      productIds: [...productIds, null],
-    })
-    if (filters.published === true || filters.published === false) {
-      queryProduct.andWhere('p.published = :published', { published: filters.published })
+    const queryProduct = Product.createQueryBuilder('p')
+
+    if (filters.published === '1' || filters.published === '0') {
+      queryProduct.where('p.published = :published', { published: filters.published })
     }
-    queryProduct.orWhere(
+
+    queryProduct.andWhere(
       new Brackets((qb) => {
-        formatQuery.forEach((x, index) => {
-          if (index === 0) qb.where('p.name ilike :x', { x: `%${x}%` })
-          else qb.andWhere('p.name ilike :x', { x: `%${x}%` })
+        qb.where('p.id IN (:...productIds)', {
+          productIds: [...productIds, null],
         })
+        qb.orWhere(
+          new Brackets((qb) => {
+            formatQuery.forEach((x, index) => {
+              if (index === 0) qb.where('p.name ilike :x', { x: `%${x}%` })
+              else qb.andWhere('p.name ilike :x', { x: `%${x}%` })
+            })
+          }),
+        )
       }),
     )
+
     const [products, count] = await queryProduct
       .leftJoinAndSelect('p.translations', 'pT')
+      .leftJoinAndSelect('p.brand', 'brand')
       .limit(limit)
       .offset(offset)
       .orderBy('p.name', 'ASC')
@@ -88,7 +98,7 @@ export const getAllProducts: RequestHandler = async (req, res) => {
 
   const [products, count] = await Product.findAndCount({
     where: filters,
-    relations: ['translations'],
+    relations: ['translations', 'brand'],
     order: { name: 'ASC' },
     take: limit,
     skip: offset,
