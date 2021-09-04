@@ -26,6 +26,9 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
         { name: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
         { description: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
         { review: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
+        { name: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'FR' },
+        { description: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'FR' },
+        { review: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'FR' },
       ],
       order: { name: 'ASC' },
     })
