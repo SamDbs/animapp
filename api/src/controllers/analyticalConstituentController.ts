@@ -22,6 +22,8 @@ export const getAllAnalyticalConstituents: RequestHandler = async (req, res) => 
       where: [
         { name: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
         { description: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'EN' },
+        { name: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'FR' },
+        { description: new FindOperator('ilike', `%${req.query.q}%`), languageId: 'FR' },
       ],
     })
     const constituentIds = translations.map((translation) => translation.analyticalConstituentId)

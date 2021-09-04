@@ -71,7 +71,7 @@ export default function IngredientList({ style }: { style?: View['props']['style
                 flexDirection: 'row',
                 justifyContent: 'space-between',
               }}>
-              <View style={{ flexDirection: 'row', flexShrink: 1 }}>
+              <View style={{ flexDirection: 'row', flexShrink: 1, gap: 5 }}>
                 <Text>{ingredient.name}</Text>
                 <Text>{ingredient.review}</Text>
                 <Text>{ingredient.description}</Text>
