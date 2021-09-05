@@ -1,6 +1,7 @@
 import useAuthStore from '@hooks/stores/auth'
 import { Product } from '@hooks/stores/product'
 import { UploadyContext, useItemFinishListener } from '@rpldy/uploady'
+import Constants from 'expo-constants'
 import React, { useCallback, useContext } from 'react'
 import { Button } from 'react-native'
 import { StateSelector, UseStore } from 'zustand'
@@ -30,7 +31,7 @@ export default function UploadButton<ItemStore extends object, OwnerItem extends
       destination: {
         headers: { Authorization: jwt },
         method: 'put',
-        url: `${process.env.API_URL}${uploadLinkCreator(ownerId)}`,
+        url: `${Constants.manifest?.extra?.API_URL}${uploadLinkCreator(ownerId)}`,
       },
     })
   }, [])

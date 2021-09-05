@@ -1,9 +1,10 @@
 import useAuthStore from '@hooks/stores/auth'
 import axios, { AxiosRequestConfig } from 'axios'
+import Constants from 'expo-constants'
 
 export default function createFetcher(jwt?: string) {
   const config: AxiosRequestConfig = {
-    baseURL: process.env.API_URL,
+    baseURL: Constants.manifest?.extra?.API_URL,
     validateStatus: (status) => (status >= 200 && status < 300) || status === 401,
   }
 

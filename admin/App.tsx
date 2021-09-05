@@ -2,7 +2,7 @@ import useCachedResources from '@hooks/useCachedResources'
 import Uploady from '@rpldy/uploady'
 import { StatusBar } from 'expo-status-bar'
 import React from 'react'
-import { DefaultTheme, Provider as PaperProvider, DarkTheme } from 'react-native-paper'
+import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper'
 import { Theme } from 'react-native-paper/lib/typescript/types'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 

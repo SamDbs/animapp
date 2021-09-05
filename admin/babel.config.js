@@ -1,7 +1,7 @@
 module.exports = function (api) {
-  api.cache(false)
+  api.cache(true)
   return {
     presets: ['babel-preset-expo'],
-    plugins: ['react-native-reanimated/plugin', 'react-native-paper/babel', 'inline-dotenv'],
+    plugins: ['react-native-reanimated/plugin', 'react-native-paper/babel'],
   }
 }
