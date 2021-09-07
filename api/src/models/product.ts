@@ -19,14 +19,20 @@ import ProductAnalyticalConstituent from './productAnalyticalConstituent'
 import ProductIngredient from './productIngredients'
 import ProductTranslation from './productTranslation'
 
+export enum ProductType {
+  DRY_FOOD = 'DRY_FOOD',
+  TREATS = 'TREATS',
+  WET_FOOD = 'WET_FOOD',
+}
+
 @Entity()
 @Unique('UQ_NAME', ['name'])
 export default class Product extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number
 
-  @Column()
-  type!: string
+  @Column({ type: 'enum', enum: ProductType, default: ProductType.DRY_FOOD })
+  type!: ProductType
 
   @Column()
   name!: string

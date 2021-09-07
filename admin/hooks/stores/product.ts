@@ -6,10 +6,16 @@ import { devtools } from 'zustand/middleware'
 
 import { fetcher } from './index'
 
+export enum ProductType {
+  DRY_FOOD = 'DRY_FOOD',
+  TREATS = 'TREATS',
+  WET_FOOD = 'WET_FOOD',
+}
+
 export type Product = {
   id: string
   name: string
-  type: string
+  type: ProductType
   published: boolean
   image: string
   barCode: string

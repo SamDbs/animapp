@@ -1,4 +1,5 @@
 import Card from '@components/Card'
+import FieldSelectWithLabel from '@components/FieldSelectWithlabel'
 import FieldTranslatable from '@components/FieldTranslatable'
 import FieldWithLabel from '@components/FieldWithLabel'
 import ManyToMany from '@components/ManyToMany'
@@ -8,7 +9,11 @@ import UploadSingleImage from '@components/UploadSingleImage'
 import useBrandStore, { Brand, BrandStore } from '@hooks/stores/brand'
 import useConstituentsStore from '@hooks/stores/constituent'
 import useIngredientStore from '@hooks/stores/ingredient'
-import useProductsStore, { Product as ProductEntity, ProductStore } from '@hooks/stores/product'
+import useProductsStore, {
+  Product as ProductEntity,
+  ProductStore,
+  ProductType,
+} from '@hooks/stores/product'
 import useProductTranslationStore, {
   ProductTranslation,
   ProductTranslationStore,
@@ -102,10 +107,12 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
                 value={product.name}
                 onChangeValue={(val) => updateProduct(product.id, { name: val })}
               />
-              <FieldWithLabel
+              <FieldSelectWithLabel
                 label="Type"
-                value={product.type}
                 onChangeValue={(val) => updateProduct(product.id, { type: val })}
+                options={Object.keys(ProductType) as ProductType[]}
+                translationKey="ProductType"
+                value={product.type}
               />
               <FieldWithLabel
                 label="Bar code"
