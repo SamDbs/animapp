@@ -1,14 +1,19 @@
 import Card from '@components/Card'
+import FieldSelectWithLabel from '@components/FieldSelectWithlabel'
 import FieldWithLabel from '@components/FieldWithLabel'
 import OneToMany from '@components/OneToMany'
+import SubItem from '@components/SubItem'
 import useBrandStore, { Brand, BrandStore } from '@hooks/stores/brand'
-import useProductsStore, { Product, ProductStore } from '@hooks/stores/product'
+import useProductsStore, { Product, ProductStore, ProductType } from '@hooks/stores/product'
 import React, { useEffect, useState } from 'react'
 import { Button, Text, View } from 'react-native'
 
-import SubItem from '@components/SubItem'
-
-const initialState = { type: '', name: '', barCode: '', brandId: '' }
+const initialState: { type: ProductType; name: string; barCode: string; brandId: string } = {
+  type: ProductType.DRY_FOOD,
+  name: '',
+  barCode: '',
+  brandId: '',
+}
 
 export default function ProductCreator({ style }: { style?: View['props']['style'] }) {
   const [product, setProduct] = useState({ ...initialState })
@@ -35,7 +40,7 @@ export default function ProductCreator({ style }: { style?: View['props']['style
     try {
       await createProduct(product)
       setProduct({ ...initialState })
-    } catch (e) {
+    } catch (e: any) {
       setError(e?.response?.data?.message ?? 'An unknown error occured.')
     } finally {
       setLoading(false)
@@ -77,10 +82,12 @@ export default function ProductCreator({ style }: { style?: View['props']['style
         value={product.name}
         onChangeValue={(val) => setProduct((current) => ({ ...current, name: val }))}
       />
-      <FieldWithLabel
+      <FieldSelectWithLabel
         label="Type"
-        value={product.type}
         onChangeValue={(val) => setProduct((current) => ({ ...current, type: val }))}
+        options={Object.keys(ProductType) as ProductType[]}
+        translationKey="ProductType"
+        value={product.type as ProductType}
       />
       <FieldWithLabel
         label="Bar code"
