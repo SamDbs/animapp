@@ -15,7 +15,7 @@ import Menu from './components/Menu'
 
 const BottomTab = createBottomTabNavigator<MainTabParamList>()
 
-export default function TabNavigator() {
+export default function MainNavigator() {
   return (
     <View style={{ flex: 1, flexDirection: 'row' }}>
       <Menu />

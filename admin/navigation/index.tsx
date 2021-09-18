@@ -32,7 +32,7 @@ export default function RootNavigator() {
   if (!isInitialized) return null
 
   return (
-    <NavigationContainer
+    <NavigationContainer<RootStackParamList>
       linking={LinkingConfiguration}
       theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
