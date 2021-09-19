@@ -25,7 +25,7 @@ export default function Pagination({ onChangePage, pagination }: Props) {
   }, [currentPageText])
 
   return (
-    <View style={{ flexDirection: 'row' }}>
+    <View style={{ flexDirection: 'row', marginTop: 16 }}>
       <Pressable
         disabled={pagination.page === 0}
         onPress={() => onChangePage((page: number) => page - 1)}

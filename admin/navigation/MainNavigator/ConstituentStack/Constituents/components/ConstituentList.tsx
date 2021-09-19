@@ -1,4 +1,5 @@
 import Card from '@components/Card'
+import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
 import useConstituentsStore, { ConstituentStoreState, Constituent } from '@hooks/stores/constituent'
 import useSearchableList from '@hooks/useSearchableList'
@@ -54,11 +55,6 @@ export default function ConstituentList({ style }: { style: View['props']['style
           borderRadius: 3,
           overflow: 'hidden',
         }}>
-        {noResult && (
-          <View style={{ padding: 8 }}>
-            <Text>No result.</Text>
-          </View>
-        )}
         <DataTable>
           <DataTable.Header>
             <DataTable.Title>Name</DataTable.Title>
@@ -85,9 +81,10 @@ export default function ConstituentList({ style }: { style: View['props']['style
               </DataTable.Row>
             )
           })}
+          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!isLoading && noResult && <NoResult />}
         </DataTable>
       </View>
-      <ActivityIndicator style={{ margin: 8 }} color={isLoading ? undefined : 'transparent'} />
       <Pagination onChangePage={changePage} pagination={pagination} />
     </Card>
   )

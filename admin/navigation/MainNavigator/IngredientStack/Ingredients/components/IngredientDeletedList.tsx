@@ -1,10 +1,12 @@
 import Card from '@components/Card'
+import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
 import { FontAwesome5 } from '@expo/vector-icons'
 import useIngredientsStore, { Ingredient, IngredientStore } from '@hooks/stores/ingredient'
 import useSearchableList from '@hooks/useSearchableList'
 import React from 'react'
 import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
+import { DataTable, IconButton } from 'react-native-paper'
 
 export default function IngredientDeletedList({ style }: { style?: View['props']['style'] }) {
   const {
@@ -53,45 +55,41 @@ export default function IngredientDeletedList({ style }: { style?: View['props']
           borderRadius: 3,
           overflow: 'hidden',
         }}>
-        {noResult && (
-          <View style={{ padding: 8 }}>
-            <Text>No result.</Text>
-          </View>
-        )}
-        {ingredients.filter(Boolean).map((ingredient: any, i: number) => {
-          return (
-            <View
-              key={ingredient.id}
-              style={{
-                padding: 8,
-                borderBottomColor: '#ccc',
-                borderBottomWidth: i === ingredients.length - 1 ? 0 : 1,
-                backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-              <View style={{ flexDirection: 'row', flexShrink: 1 }}>
-                <Text>{ingredient.name}</Text>
-                <Text>{ingredient.review}</Text>
-                <Text>{ingredient.description}</Text>
-              </View>
-              <Pressable
-                style={{ cursor: 'pointer' }}
-                onPress={async () => {
-                  try {
-                    await restoreIngredient(ingredient.id)
-                    location.reload()
-                  } catch (error) {
-                    alert(error.response.data.message)
-                  }
-                }}>
-                <FontAwesome5 name="trash-restore" size={24} color="green" />
-              </Pressable>
-            </View>
-          )
-        })}
+        <DataTable>
+          <DataTable.Header>
+            <DataTable.Title>Name</DataTable.Title>
+            <DataTable.Title>Review</DataTable.Title>
+            <DataTable.Title>Description</DataTable.Title>
+            <DataTable.Title numeric>Actions</DataTable.Title>
+          </DataTable.Header>
+
+          {ingredients.filter(Boolean).map((ingredient, i: number) => {
+            return (
+              <DataTable.Row key={ingredient.id}>
+                <DataTable.Cell>{ingredient.name}</DataTable.Cell>
+                <DataTable.Cell>{ingredient.review}</DataTable.Cell>
+                <DataTable.Cell>{ingredient.description}</DataTable.Cell>
+                <DataTable.Cell numeric>
+                  <IconButton
+                    icon="delete-restore"
+                    style={{ margin: 0 }}
+                    onPress={async () => {
+                      try {
+                        await restoreIngredient(ingredient.id)
+                        location.reload()
+                      } catch (error: any) {
+                        alert(error.response.data.message)
+                      }
+                    }}
+                  />
+                </DataTable.Cell>
+              </DataTable.Row>
+            )
+          })}
+          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!isLoading && noResult && <NoResult />}
+        </DataTable>
       </View>
-      <ActivityIndicator style={{ margin: 8 }} color={isLoading ? undefined : 'transparent'} />
       <Pagination onChangePage={changePage} pagination={pagination} />
     </Card>
   )

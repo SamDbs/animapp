@@ -1,4 +1,5 @@
 import Card from '@components/Card'
+import NoResult from '@components/NoResult'
 import useLanguageStore from '@hooks/stores/languages'
 import { useNavigation } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
@@ -47,12 +48,6 @@ export default function IngredientList({ style }: { style: View['props']['style'
           borderRadius: 3,
           overflow: 'hidden',
         }}>
-        {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
-        {noResult && (
-          <View style={{ padding: 8 }}>
-            <Text>No result.</Text>
-          </View>
-        )}
         <DataTable>
           <DataTable.Header>
             <DataTable.Title>Name</DataTable.Title>
@@ -77,6 +72,8 @@ export default function IngredientList({ style }: { style: View['props']['style'
               </DataTable.Row>
             )
           })}
+          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!isLoading && noResult && <NoResult />}
         </DataTable>
       </View>
     </Card>

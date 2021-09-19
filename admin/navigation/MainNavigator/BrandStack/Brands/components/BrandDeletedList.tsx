@@ -1,10 +1,12 @@
 import Card from '@components/Card'
+import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
 import { FontAwesome5 } from '@expo/vector-icons'
 import useBrandStore, { BrandStore, Brand } from '@hooks/stores/brand'
 import useSearchableList from '@hooks/useSearchableList'
 import React from 'react'
 import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
+import { DataTable, IconButton } from 'react-native-paper'
 
 export default function BrandList({ style }: { style?: View['props']['style'] }) {
   const {
@@ -19,6 +21,7 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
     (state) => state.searchDeletedBrands,
     (ids) => (state) => ids.map((id) => state.brands[id]),
   )
+
   const restoreBrand = useBrandStore((state) => state.restoreBrand)
 
   return (
@@ -47,48 +50,41 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
       <View
         style={{
           marginTop: 16,
-          marginBottom: 8,
           borderColor: '#ccc',
           borderWidth: 1,
           borderRadius: 3,
           overflow: 'hidden',
         }}>
-        {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
-        {noResult && (
-          <View style={{ padding: 8 }}>
-            <Text>No result.</Text>
-          </View>
-        )}
-        {brands.filter(Boolean).map((brand: any, i: number) => {
-          return (
-            <View
-              key={brand.id}
-              style={{
-                padding: 8,
-                borderBottomColor: '#ccc',
-                borderBottomWidth: i === brands.length - 1 ? 0 : 1,
-                backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-              <Text>{brand.name}</Text>
+        <DataTable>
+          <DataTable.Header>
+            <DataTable.Title>Name</DataTable.Title>
+            <DataTable.Title numeric>Actions</DataTable.Title>
+          </DataTable.Header>
 
-              <Pressable
-                style={{ cursor: 'pointer' }}
-                onPress={async () => {
-                  try {
-                    await restoreBrand(brand.id)
-                    location.reload()
-                  } catch (error) {
-                    alert(error.response.data.message)
-                  }
-                }}>
-                <FontAwesome5 name="trash-restore" size={24} color="green" />
-              </Pressable>
-            </View>
-          )
-        })}
+          {brands.filter(Boolean).map((brand: any, i: number) => {
+            return (
+              <DataTable.Row key={brand.id}>
+                <DataTable.Cell>{brand.name}</DataTable.Cell>
+                <DataTable.Cell numeric>
+                  <IconButton
+                    icon="delete-restore"
+                    style={{ margin: 0 }}
+                    onPress={async () => {
+                      try {
+                        await restoreBrand(brand.id)
+                        location.reload()
+                      } catch (error: any) {
+                        alert(error.response.data.message)
+                      }
+                    }}
+                  />
+                </DataTable.Cell>
+              </DataTable.Row>
+            )
+          })}
+          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!isLoading && noResult && <NoResult />}
+        </DataTable>
       </View>
       <Pagination onChangePage={changePage} pagination={pagination} />
     </Card>

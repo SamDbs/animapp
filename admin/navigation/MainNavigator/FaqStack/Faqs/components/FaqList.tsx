@@ -1,4 +1,5 @@
 import Card from '@components/Card'
+import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
 import useFaqStore, { FaqStoreState, Faq } from '@hooks/stores/faq'
 import useSearchableList from '@hooks/useSearchableList'
@@ -53,11 +54,6 @@ export default function FaqList({ style }: { style: View['props']['style'] }) {
           borderRadius: 3,
           overflow: 'hidden',
         }}>
-        {noResult && (
-          <View style={{ padding: 8 }}>
-            <Text>No result.</Text>
-          </View>
-        )}
         <DataTable>
           <DataTable.Header>
             <DataTable.Title>Question</DataTable.Title>
@@ -84,9 +80,10 @@ export default function FaqList({ style }: { style: View['props']['style'] }) {
               </DataTable.Row>
             )
           })}
+          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!isLoading && noResult && <NoResult />}
         </DataTable>
       </View>
-      <ActivityIndicator style={{ margin: 8 }} color={isLoading ? undefined : 'transparent'} />
       <Pagination onChangePage={changePage} pagination={pagination} />
     </Card>
   )

@@ -1,10 +1,11 @@
 import Card from '@components/Card'
+import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
 import useBrandStore, { BrandStore, Brand } from '@hooks/stores/brand'
 import useSearchableList from '@hooks/useSearchableList'
 import { useNavigation } from '@react-navigation/native'
 import React from 'react'
-import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
+import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
 
 export default function BrandList({ style }: { style?: View['props']['style'] }) {
@@ -49,18 +50,11 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
       <View
         style={{
           marginTop: 16,
-          marginBottom: 8,
           borderColor: '#ccc',
           borderWidth: 1,
           borderRadius: 3,
           overflow: 'hidden',
         }}>
-        {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
-        {noResult && (
-          <View style={{ padding: 8 }}>
-            <Text>No result.</Text>
-          </View>
-        )}
         <DataTable>
           <DataTable.Header>
             <DataTable.Title>Name</DataTable.Title>
@@ -97,6 +91,8 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
               </DataTable.Row>
             )
           })}
+          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!isLoading && noResult && <NoResult />}
         </DataTable>
       </View>
       <Pagination onChangePage={changePage} pagination={pagination} />
