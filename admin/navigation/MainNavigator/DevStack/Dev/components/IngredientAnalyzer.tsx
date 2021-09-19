@@ -59,7 +59,7 @@ export default function IngredientsAnalyzer(props: Props) {
           <SubItem<Ingredient>
             even={i % 2 === 0}
             item={ingredients[id]}
-            entityLinkCreator={(item) => ''}
+            entityLinkCreator={(item) => `/ingredients/${item.id}`}
           />
         </View>
       ))}

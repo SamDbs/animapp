@@ -1,8 +1,9 @@
 import Card from '@components/Card'
 import useLanguageStore from '@hooks/stores/languages'
-import { Link } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Text, View, ActivityIndicator } from 'react-native'
+import { DataTable, IconButton } from 'react-native-paper'
 
 export default function IngredientList({ style }: { style: View['props']['style'] }) {
   const [ids, setIngredientIds] = useState<string[]>([])
@@ -31,6 +32,8 @@ export default function IngredientList({ style }: { style: View['props']['style'
     fn()
   }, [])
 
+  const { navigate } = useNavigation()
+
   const noResult = !languages.length
 
   return (
@@ -50,25 +53,31 @@ export default function IngredientList({ style }: { style: View['props']['style'
             <Text>No result.</Text>
           </View>
         )}
-        {languages.filter(Boolean).map((language, i: number) => {
-          return (
-            <View
-              key={language.id}
-              style={{
-                padding: 8,
-                borderBottomColor: '#ccc',
-                borderBottomWidth: i === languages.length - 1 ? 0 : 1,
-                backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-              <Text>{language.name}</Text>
-              <Link to={`/languages/${language.id}`}>
-                <Text style={{ cursor: 'pointer' }}>edit</Text>
-              </Link>
-            </View>
-          )
-        })}
+        <DataTable>
+          <DataTable.Header>
+            <DataTable.Title>Name</DataTable.Title>
+            <DataTable.Title numeric>Actions</DataTable.Title>
+          </DataTable.Header>
+          {languages.filter(Boolean).map((language, i: number) => {
+            return (
+              <DataTable.Row key={language.id}>
+                <DataTable.Cell>{language.name}</DataTable.Cell>
+                <DataTable.Cell numeric>
+                  <IconButton
+                    icon="pencil"
+                    style={{ margin: 0 }}
+                    onPress={() =>
+                      navigate('LanguageStack', {
+                        screen: 'Language',
+                        params: { id: language.id },
+                      })
+                    }
+                  />
+                </DataTable.Cell>
+              </DataTable.Row>
+            )
+          })}
+        </DataTable>
       </View>
     </Card>
   )

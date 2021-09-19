@@ -1,11 +1,11 @@
 import Card from '@components/Card'
 import Pagination from '@components/Pagination'
-import { Feather } from '@expo/vector-icons'
 import useBrandStore, { BrandStore, Brand } from '@hooks/stores/brand'
 import useSearchableList from '@hooks/useSearchableList'
-import { Link } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import React from 'react'
 import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
+import { DataTable, IconButton } from 'react-native-paper'
 
 export default function BrandList({ style }: { style?: View['props']['style'] }) {
   const {
@@ -20,6 +20,7 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
     (state) => state.searchBrands,
     (ids) => (state) => ids.map((id) => state.brands[id]),
   )
+  const { navigate } = useNavigation()
   const deleteBrand = useBrandStore((state) => state.deleteBrand)
 
   return (
@@ -60,45 +61,43 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
             <Text>No result.</Text>
           </View>
         )}
-        {brands.filter(Boolean).map((brand: any, i: number) => {
-          return (
-            <View
-              key={brand.id}
-              style={{
-                padding: 8,
-                borderBottomColor: '#ccc',
-                borderBottomWidth: i === brands.length - 1 ? 0 : 1,
-                backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}>
-              <Text>{brand.name}</Text>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <Link style={{ marginRight: 8, cursor: 'pointer' }} to={`/brands/${brand.id}`}>
-                  <Feather name="edit" size={24} color="grey" />
-                </Link>
-
-                <Pressable
-                  style={{ cursor: 'pointer' }}
-                  onPress={async () => {
-                    try {
-                      await deleteBrand(brand.id)
-                      location.reload()
-                    } catch (error) {
-                      alert(error.response.data.message)
+        <DataTable>
+          <DataTable.Header>
+            <DataTable.Title>Name</DataTable.Title>
+            <DataTable.Title numeric>Actions</DataTable.Title>
+          </DataTable.Header>
+          {brands.filter(Boolean).map((brand: any, i: number) => {
+            return (
+              <DataTable.Row key={brand.id}>
+                <DataTable.Cell>{brand.name}</DataTable.Cell>
+                <DataTable.Cell numeric>
+                  <IconButton
+                    icon="pencil"
+                    style={{ margin: 0 }}
+                    onPress={() =>
+                      navigate('BrandStack', {
+                        screen: 'Brand',
+                        params: { id: brand.id },
+                      })
                     }
-                  }}>
-                  <Feather name="trash" size={24} color="red" />
-                </Pressable>
-              </View>
-            </View>
-          )
-        })}
+                  />
+                  <IconButton
+                    icon="delete"
+                    style={{ margin: 0 }}
+                    onPress={async () => {
+                      try {
+                        await deleteBrand(brand.id)
+                        location.reload()
+                      } catch (error: any) {
+                        alert(error.response.data.message)
+                      }
+                    }}
+                  />
+                </DataTable.Cell>
+              </DataTable.Row>
+            )
+          })}
+        </DataTable>
       </View>
       <Pagination onChangePage={changePage} pagination={pagination} />
     </Card>

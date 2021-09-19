@@ -161,7 +161,6 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
                 <DataTable.Cell>{product.name}</DataTable.Cell>
                 <DataTable.Cell>{product.brand}</DataTable.Cell>
                 <DataTable.Cell numeric>
-                  {/* <Link to={`/products/${product.id}`}> */}
                   <IconButton
                     icon="pencil"
                     onPress={() =>
@@ -171,7 +170,6 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
                       })
                     }
                   />
-                  {/* </Link> */}
                 </DataTable.Cell>
               </DataTable.Row>
             )

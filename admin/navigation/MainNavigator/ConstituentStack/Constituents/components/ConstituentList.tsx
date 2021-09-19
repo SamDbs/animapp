@@ -2,9 +2,10 @@ import Card from '@components/Card'
 import Pagination from '@components/Pagination'
 import useConstituentsStore, { ConstituentStoreState, Constituent } from '@hooks/stores/constituent'
 import useSearchableList from '@hooks/useSearchableList'
-import { Link } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import React from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
+import { DataTable, IconButton } from 'react-native-paper'
 
 export default function ConstituentList({ style }: { style: View['props']['style'] }) {
   const {
@@ -19,6 +20,8 @@ export default function ConstituentList({ style }: { style: View['props']['style
     (state) => state.searchConstituents,
     (ids) => (state) => ids.map((id) => state.constituents[id]),
   )
+
+  const { navigate } = useNavigation()
 
   return (
     <Card style={style}>
@@ -56,26 +59,33 @@ export default function ConstituentList({ style }: { style: View['props']['style
             <Text>No result.</Text>
           </View>
         )}
-        {constituents.filter(Boolean).map((constituent, i: number) => {
-          return (
-            <View
-              key={constituent.id}
-              style={{
-                padding: 8,
-                borderBottomColor: '#ccc',
-                borderBottomWidth: i === constituents.length - 1 ? 0 : 1,
-                backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-              <Text>{constituent.name}</Text>
-              <Text>{constituent.description}</Text>
-              <Link to={`/constituents/${constituent.id}`}>
-                <Text style={{ cursor: 'pointer' }}>edit</Text>
-              </Link>
-            </View>
-          )
-        })}
+        <DataTable>
+          <DataTable.Header>
+            <DataTable.Title>Name</DataTable.Title>
+            <DataTable.Title>Description</DataTable.Title>
+            <DataTable.Title numeric>Actions</DataTable.Title>
+          </DataTable.Header>
+          {constituents.filter(Boolean).map((constituent, i: number) => {
+            return (
+              <DataTable.Row key={constituent.id}>
+                <DataTable.Cell>{constituent.name}</DataTable.Cell>
+                <DataTable.Cell>{constituent.description}</DataTable.Cell>
+                <DataTable.Cell numeric>
+                  <IconButton
+                    icon="pencil"
+                    style={{ margin: 0 }}
+                    onPress={() =>
+                      navigate('ConstituentStack', {
+                        screen: 'Constituent',
+                        params: { id: constituent.id },
+                      })
+                    }
+                  />
+                </DataTable.Cell>
+              </DataTable.Row>
+            )
+          })}
+        </DataTable>
       </View>
       <ActivityIndicator style={{ margin: 8 }} color={isLoading ? undefined : 'transparent'} />
       <Pagination onChangePage={changePage} pagination={pagination} />

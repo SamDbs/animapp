@@ -4,6 +4,7 @@ import useContactsStore, { ContactStoreState, Contact } from '@hooks/stores/cont
 import useSearchableList from '@hooks/useSearchableList'
 import React from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
+import { DataTable } from 'react-native-paper'
 
 export default function ContactList({ style }: { style?: View['props']['style'] }) {
   const {
@@ -55,21 +56,20 @@ export default function ContactList({ style }: { style?: View['props']['style'] 
             <Text>No result.</Text>
           </View>
         )}
-        {contacts.filter(Boolean).map((contact: any, i: number) => {
-          return (
-            <View
-              key={contact.id}
-              style={{
-                padding: 8,
-                borderBottomColor: '#ccc',
-                borderBottomWidth: i === contacts.length - 1 ? 0 : 1,
-                backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
-              }}>
-              <Text>{contact.name}</Text>
-              <Text>{contact.message}</Text>
-            </View>
-          )
-        })}
+        <DataTable>
+          <DataTable.Header>
+            <DataTable.Title>Name</DataTable.Title>
+            <DataTable.Title>Message</DataTable.Title>
+          </DataTable.Header>
+          {contacts.filter(Boolean).map((contact, i: number) => {
+            return (
+              <DataTable.Row key={contact.id}>
+                <DataTable.Cell>{contact.name}</DataTable.Cell>
+                <DataTable.Cell>{contact.message}</DataTable.Cell>
+              </DataTable.Row>
+            )
+          })}
+        </DataTable>
       </View>
       <ActivityIndicator style={{ margin: 8 }} color={isLoading ? undefined : 'transparent'} />
       <Pagination onChangePage={changePage} pagination={pagination} />

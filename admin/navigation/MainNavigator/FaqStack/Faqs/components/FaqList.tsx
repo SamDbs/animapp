@@ -2,9 +2,10 @@ import Card from '@components/Card'
 import Pagination from '@components/Pagination'
 import useFaqStore, { FaqStoreState, Faq } from '@hooks/stores/faq'
 import useSearchableList from '@hooks/useSearchableList'
-import { Link } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import React from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
+import { DataTable, IconButton } from 'react-native-paper'
 
 export default function FaqList({ style }: { style: View['props']['style'] }) {
   const {
@@ -19,6 +20,7 @@ export default function FaqList({ style }: { style: View['props']['style'] }) {
     (state) => state.searchFaqs,
     (ids) => (state) => ids.map((id) => state.faqs[id]),
   )
+  const { navigate } = useNavigation()
 
   return (
     <Card style={style}>
@@ -56,26 +58,33 @@ export default function FaqList({ style }: { style: View['props']['style'] }) {
             <Text>No result.</Text>
           </View>
         )}
-        {faqs.filter(Boolean).map((faq, i: number) => {
-          return (
-            <View
-              key={faq.id}
-              style={{
-                padding: 8,
-                borderBottomColor: '#ccc',
-                borderBottomWidth: i === faqs.length - 1 ? 0 : 1,
-                backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-              <Text>{faq.question}</Text>
-              <Text>{faq.answer}</Text>
-              <Link to={`/faq/${faq.id}`}>
-                <Text style={{ cursor: 'pointer' }}>edit</Text>
-              </Link>
-            </View>
-          )
-        })}
+        <DataTable>
+          <DataTable.Header>
+            <DataTable.Title>Question</DataTable.Title>
+            <DataTable.Title>Answer</DataTable.Title>
+            <DataTable.Title numeric>Actions</DataTable.Title>
+          </DataTable.Header>
+          {faqs.filter(Boolean).map((faq, i: number) => {
+            return (
+              <DataTable.Row key={faq.id}>
+                <DataTable.Cell>{faq.question}</DataTable.Cell>
+                <DataTable.Cell>{faq.answer}</DataTable.Cell>
+                <DataTable.Cell numeric>
+                  <IconButton
+                    icon="pencil"
+                    style={{ margin: 0 }}
+                    onPress={() =>
+                      navigate('FaqStack', {
+                        screen: 'Faq',
+                        params: { id: faq.id },
+                      })
+                    }
+                  />
+                </DataTable.Cell>
+              </DataTable.Row>
+            )
+          })}
+        </DataTable>
       </View>
       <ActivityIndicator style={{ margin: 8 }} color={isLoading ? undefined : 'transparent'} />
       <Pagination onChangePage={changePage} pagination={pagination} />

@@ -1,11 +1,11 @@
 import Card from '@components/Card'
 import Pagination from '@components/Pagination'
-import { Feather } from '@expo/vector-icons'
 import useIngredientsStore, { Ingredient, IngredientStore } from '@hooks/stores/ingredient'
 import useSearchableList from '@hooks/useSearchableList'
-import { Link } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 import React from 'react'
-import { ActivityIndicator, Pressable, Text, TextInput, View } from 'react-native'
+import { ActivityIndicator, Text, TextInput, View } from 'react-native'
+import { DataTable, IconButton } from 'react-native-paper'
 
 export default function IngredientList({ style }: { style?: View['props']['style'] }) {
   const {
@@ -20,6 +20,8 @@ export default function IngredientList({ style }: { style?: View['props']['style
     (state) => state.searchIngredients,
     (ids) => (state) => ids.map((id) => state.ingredients[id]),
   )
+
+  const { navigate } = useNavigation()
 
   const deleteIngredient = useIngredientsStore((state) => state.deleteIngredient)
 
@@ -59,46 +61,47 @@ export default function IngredientList({ style }: { style?: View['props']['style
             <Text>No result.</Text>
           </View>
         )}
-        {ingredients.filter(Boolean).map((ingredient: any, i: number) => {
-          return (
-            <View
-              key={ingredient.id}
-              style={{
-                padding: 8,
-                borderBottomColor: '#ccc',
-                borderBottomWidth: i === ingredients.length - 1 ? 0 : 1,
-                backgroundColor: i % 2 === 0 ? '#f5f5f5' : '#fff',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              }}>
-              <View style={{ flexDirection: 'row', flexShrink: 1, gap: 5 }}>
-                <Text>{ingredient.name}</Text>
-                <Text>{ingredient.review}</Text>
-                <Text>{ingredient.description}</Text>
-              </View>
-              <View style={{ flexDirection: 'row', marginLeft: 10 }}>
-                <Link
-                  style={{ marginRight: 8, cursor: 'pointer' }}
-                  to={`/ingredients/${ingredient.id}`}>
-                  <Feather name="edit" size={24} color="grey" />
-                </Link>
-
-                <Pressable
-                  style={{ cursor: 'pointer' }}
-                  onPress={async () => {
-                    try {
-                      await deleteIngredient(ingredient.id)
-                      location.reload()
-                    } catch (error) {
-                      alert(error.response.data.message)
+        <DataTable>
+          <DataTable.Header>
+            <DataTable.Title>Name</DataTable.Title>
+            <DataTable.Title>Review</DataTable.Title>
+            <DataTable.Title>Description</DataTable.Title>
+            <DataTable.Title numeric>Actions</DataTable.Title>
+          </DataTable.Header>
+          {ingredients.filter(Boolean).map((ingredient: any, i: number) => {
+            return (
+              <DataTable.Row key={ingredient.id}>
+                <DataTable.Cell>{ingredient.name}</DataTable.Cell>
+                <DataTable.Cell>{ingredient.review}</DataTable.Cell>
+                <DataTable.Cell>{ingredient.description}</DataTable.Cell>
+                <DataTable.Cell numeric>
+                  <IconButton
+                    icon="pencil"
+                    style={{ margin: 0 }}
+                    onPress={() =>
+                      navigate('IngredientStack', {
+                        screen: 'Ingredient',
+                        params: { id: ingredient.id },
+                      })
                     }
-                  }}>
-                  <Feather name="trash" size={24} color="red" />
-                </Pressable>
-              </View>
-            </View>
-          )
-        })}
+                  />
+                  <IconButton
+                    icon="delete"
+                    style={{ margin: 0 }}
+                    onPress={async () => {
+                      try {
+                        await deleteIngredient(ingredient.id)
+                        location.reload()
+                      } catch (error: any) {
+                        alert(error.response.data.message)
+                      }
+                    }}
+                  />
+                </DataTable.Cell>
+              </DataTable.Row>
+            )
+          })}
+        </DataTable>
       </View>
       <ActivityIndicator style={{ margin: 8 }} color={isLoading ? undefined : 'transparent'} />
       <Pagination onChangePage={changePage} pagination={pagination} />
