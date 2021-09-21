@@ -1,0 +1,28 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Start admin",
+      "request": "launch",
+      "type": "pwa-node",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["web"],
+      "skipFiles": ["<node_internals>/**"],
+      "autoAttachChildProcesses": false
+    },
+    {
+      "name": "Debug with Chrome",
+      "request": "launch",
+      "type": "pwa-chrome",
+      "url": "http://localhost:19006",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Debug with Firefox",
+      "request": "launch",
+      "type": "firefox",
+      "url": "http://localhost:19006",
+      "webRoot": "${workspaceFolder}"
+    }
+  ]
+}
