@@ -4,6 +4,7 @@ import { Product } from '@hooks/stores/product'
 import useSearchableList, { PaginationDetails } from '@hooks/useSearchableList'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
+import { PanGestureHandler } from 'react-native-gesture-handler'
 import type { UseStore, StateSelector } from 'zustand'
 
 import SubItem from './SubItem'
@@ -43,6 +44,7 @@ type Props<
   >
   ownedEntityLinkCreator: (item: Partial<OwnedItem>) => string
   ownedItemsRelationGetterSelector?: StateSelector<any, any>
+  withOrder?: boolean
 }
 
 export default function ManyToMany<
@@ -65,6 +67,7 @@ export default function ManyToMany<
   relationParams,
   ownedEntityLinkCreator,
   ownedItemsRelationGetterSelector,
+  withOrder,
 }: Props<OwnerItem, OwnedItem, StoreShape>) {
   const [ids, setIds] = useState<OwnedItem['id'][]>([])
   const [isLoading, setIsLoading] = useState(false)

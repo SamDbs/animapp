@@ -162,6 +162,7 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             searchItemsSelector={(state) => state.searchIngredients}
             ownedEntityLinkCreator={(item) => `/ingredients/${item.id}`}
             ownedItemsRelationGetterSelector={(state) => state.productIngredients}
+            withOrder
           />
         )}
       </Card>
