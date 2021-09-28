@@ -4,7 +4,6 @@ import { Product } from '@hooks/stores/product'
 import useSearchableList, { PaginationDetails } from '@hooks/useSearchableList'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
-import { PanGestureHandler } from 'react-native-gesture-handler'
 import type { UseStore, StateSelector } from 'zustand'
 
 import SubItem from './SubItem'
@@ -138,6 +137,7 @@ export default function ManyToMany<
         }}>
         {ownedEntities.filter(Boolean).map((item, i) => (
           <SubItem<OwnedItem>
+            withOrder={withOrder && editing}
             key={item.id}
             entityLinkCreator={ownedEntityLinkCreator}
             item={item}

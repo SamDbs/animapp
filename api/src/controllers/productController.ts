@@ -330,7 +330,7 @@ export const upsertProductIngredient: RequestHandler = async (req, res) => {
       productId: product.id,
       ingredientId: ingredient.id,
       deletedAt: null,
-    } as ProductIngredient)
+    })
 
   if (req.body.quantity) relation.quantity = req.body.quantity
 
