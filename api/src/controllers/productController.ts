@@ -206,8 +206,9 @@ export const getProductIngredients: RequestHandler = async (req, res) => {
       language?.toString().toUpperCase(),
     ),
     relations: relations.map((x) => ({
-      productId: x.productId,
       ingredientId: x.ingredientId,
+      order: x.order,
+      productId: x.productId,
       quantity: x.quantity,
     })),
   })

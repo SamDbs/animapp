@@ -19,6 +19,7 @@ export type ProductIngredient = {
   productId: string
   ingredientId: string
   quantity: string
+  order?: number
 }
 
 let combinedIngredientUpdate = {}

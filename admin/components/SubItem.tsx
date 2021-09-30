@@ -7,13 +7,16 @@ import { Text, View } from 'react-native'
 import { PanGestureHandler, State } from 'react-native-gesture-handler'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 
+const ITEM_HEIGHT = 50
+
 type Props<OwnedItem extends Brand | Ingredient | Constituent> = {
   children?: View['props']['children']
-  item: Partial<OwnedItem>
   entityLinkCreator: (entity: Partial<OwnedItem>) => string
   even: boolean
+  index?: number
+  item: Partial<OwnedItem>
+  onOrderChange?: Function
   withOrder?: boolean
-  onChangeOrder?: Function
 }
 
 export default function SubItem<OwnedItem extends Brand | Ingredient | Constituent>(
@@ -33,22 +36,28 @@ export default function SubItem<OwnedItem extends Brand | Ingredient | Constitue
       style={[
         {
           alignItems: 'center',
-          backgroundColor: taken ? '#c0c0c0' : props.even ? '#f5f5f5' : '#fff',
+          backgroundColor: props.even ? '#f5f5f5' : '#fff',
           flexDirection: 'row',
+          height: ITEM_HEIGHT,
           justifyContent: 'space-between',
           padding: 8,
-          zIndex: taken ? 1 : 0,
           shadowColor: 'rgba(4,9,20,0.10)',
-          shadowRadius: taken ? 10 : 0,
           shadowOffset: { width: 0, height: 0 },
+          shadowRadius: taken ? 10 : 0,
           transition: 'shadow 100ms, background 100ms',
+          zIndex: taken ? 1 : 0,
         },
         animatedStyle,
       ]}>
       <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
         {props.withOrder && (
           <PanGestureHandler
-            onGestureEvent={(e) => (y.value = e.nativeEvent.translationY)}
+            onGestureEvent={(e) => {
+              console.log('onGestureEvent - e.nativeEvent.state', e.nativeEvent.state)
+              if (e.nativeEvent.state === State.ACTIVE) {
+                y.value = e.nativeEvent.translationY
+              }
+            }}
             onHandlerStateChange={(e) => {
               console.log('onHandlerStateChange - e.nativeEvent.state', e.nativeEvent.state)
               if (e.nativeEvent.state === State.END) {

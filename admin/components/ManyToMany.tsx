@@ -5,6 +5,7 @@ import useSearchableList, { PaginationDetails } from '@hooks/useSearchableList'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
 import type { UseStore, StateSelector } from 'zustand'
+import { shuffle } from 'lodash/fp'
 
 import SubItem from './SubItem'
 
@@ -83,9 +84,16 @@ export default function ManyToMany<
   const relations = useOwnedStore(
     ownedItemsRelationGetterSelector ? ownedItemsRelationGetterSelector : () => null,
   )
+
+  const sortedEntities = [...ownedEntities].sort((a, b) => {
+    return relations[`${ownerEntityId}-${a.id}`]?.order >
+      relations[`${ownerEntityId}-${b.id}`]?.order
+      ? 1
+      : -1
+  })
+
   const {
     isLoading: isLoadingOwnedItems,
-    items: ownedItems,
     noResult: noResultOwnedItems,
     searchDebounced: searchOwnedItems,
   } = useSearchableList<StoreShape, OwnedItem>(
@@ -114,7 +122,7 @@ export default function ManyToMany<
       await upsertOwnedToOwner(ownerEntityId, ownedId, relation[ownedId as string])
       setIds((ids) => [...ids, ownedId])
       setError('')
-    } catch (e) {
+    } catch (e: any) {
       setError(e.response.data.message)
     }
   }
@@ -137,11 +145,12 @@ export default function ManyToMany<
         }}>
         {ownedEntities.filter(Boolean).map((item, i) => (
           <SubItem<OwnedItem>
-            withOrder={withOrder && editing}
-            key={item.id}
             entityLinkCreator={ownedEntityLinkCreator}
+            even={i % 2 === 0}
+            index={i}
             item={item}
-            even={i % 2 === 0}>
+            key={item.id}
+            withOrder={withOrder && editing}>
             {relationParams && (
               <Text style={{ marginRight: 8 }}>
                 {relations[`${ownerEntityId}-${item.id}`].quantity}
@@ -178,7 +187,7 @@ export default function ManyToMany<
             }}>
             {isLoadingOwnedItems && <ActivityIndicator />}
             {!noResultOwnedItems &&
-              ownedItems
+              sortedEntities
                 .filter((item) => !ids.includes(item.id as string))
                 .map((item, i) => {
                   return (
