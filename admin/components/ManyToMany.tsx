@@ -4,10 +4,10 @@ import { Product } from '@hooks/stores/product'
 import useSearchableList, { PaginationDetails } from '@hooks/useSearchableList'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
+import { acc } from 'react-native-reanimated'
 import type { UseStore, StateSelector } from 'zustand'
-import { shuffle } from 'lodash/fp'
 
-import SubItem from './SubItem'
+import SubItem, { ITEM_HEIGHT } from './SubItem'
 
 type Props<
   OwnerItem extends Product,
@@ -45,6 +45,13 @@ type Props<
   ownedEntityLinkCreator: (item: Partial<OwnedItem>) => string
   ownedItemsRelationGetterSelector?: StateSelector<any, any>
   withOrder?: boolean
+  setOrderSelector?: StateSelector<
+    StoreShape,
+    (
+      ownerEntityId: OwnerItem['id'],
+      newOrders: { ownedEntityId: OwnedItem['id']; order: number }[],
+    ) => Promise<void>
+  >
 }
 
 export default function ManyToMany<
@@ -68,6 +75,7 @@ export default function ManyToMany<
   ownedEntityLinkCreator,
   ownedItemsRelationGetterSelector,
   withOrder,
+  setOrderSelector,
 }: Props<OwnerItem, OwnedItem, StoreShape>) {
   const [ids, setIds] = useState<OwnedItem['id'][]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -84,13 +92,44 @@ export default function ManyToMany<
   const relations = useOwnedStore(
     ownedItemsRelationGetterSelector ? ownedItemsRelationGetterSelector : () => null,
   )
+  const setEntityOrder = useOwnedStore(setOrderSelector ? setOrderSelector : () => null)
 
-  const sortedEntities = [...ownedEntities].sort((a, b) => {
-    return relations[`${ownerEntityId}-${a.id}`]?.order >
-      relations[`${ownerEntityId}-${b.id}`]?.order
-      ? 1
-      : -1
-  })
+  const sortedEntities = withOrder
+    ? [...ownedEntities].sort((a, b) => {
+        return relations[`${ownerEntityId}-${a.id}`]?.order >
+          relations[`${ownerEntityId}-${b.id}`]?.order
+          ? 1
+          : -1
+      })
+    : ownedEntities
+
+  const changeEntityOrder = async (oldMovedItemIndex: number, movement: number) => {
+    if (!relations || !movement || !setEntityOrder) return
+
+    const newMovedItemIndex = Math.max(0, oldMovedItemIndex + Math.floor(movement / ITEM_HEIGHT))
+
+    const newOrders: any = sortedEntities.map((e, i) => {
+      const wasBefore = i < oldMovedItemIndex
+      const isAfter = i >= newMovedItemIndex
+
+      const wasAfter = i > oldMovedItemIndex
+      const isBefore = i <= newMovedItemIndex + 1
+
+      let order = 0
+      if (oldMovedItemIndex === i) {
+        order = newMovedItemIndex
+      } else if (wasBefore && isAfter) {
+        order = i + 1
+      } else if (wasAfter && isBefore) {
+        order = i - 1
+      } else {
+        order = i
+      }
+
+      return { ownedEntityId: e.id, order }
+    })
+    setEntityOrder(ownerEntityId, newOrders)
+  }
 
   const {
     isLoading: isLoadingOwnedItems,
@@ -150,7 +189,8 @@ export default function ManyToMany<
             index={i}
             item={item}
             key={item.id}
-            withOrder={withOrder && editing}>
+            withOrder={withOrder && editing}
+            onOrderChange={changeEntityOrder}>
             {relationParams && (
               <Text style={{ marginRight: 8 }}>
                 {relations[`${ownerEntityId}-${item.id}`].quantity}

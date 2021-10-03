@@ -7,7 +7,7 @@ import { Text, View } from 'react-native'
 import { PanGestureHandler, State } from 'react-native-gesture-handler'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 
-const ITEM_HEIGHT = 50
+export const ITEM_HEIGHT = 50
 
 type Props<OwnedItem extends Brand | Ingredient | Constituent> = {
   children?: View['props']['children']
@@ -15,7 +15,7 @@ type Props<OwnedItem extends Brand | Ingredient | Constituent> = {
   even: boolean
   index?: number
   item: Partial<OwnedItem>
-  onOrderChange?: Function
+  onOrderChange?: (a: Props<OwnedItem>['index'], movement: number) => Promise<void>
   withOrder?: boolean
 }
 
@@ -61,6 +61,7 @@ export default function SubItem<OwnedItem extends Brand | Ingredient | Constitue
             onHandlerStateChange={(e) => {
               console.log('onHandlerStateChange - e.nativeEvent.state', e.nativeEvent.state)
               if (e.nativeEvent.state === State.END) {
+                props.onOrderChange?.(props.index, y.value)
                 take(false)
                 y.value = 0
               } else {

@@ -163,6 +163,7 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             ownedEntityLinkCreator={(item) => `/ingredients/${item.id}`}
             ownedItemsRelationGetterSelector={(state) => state.productIngredients}
             withOrder
+            setOrderSelector={(state) => state.setIngredientsOrder}
           />
         )}
       </Card>

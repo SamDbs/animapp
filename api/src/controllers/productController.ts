@@ -352,6 +352,14 @@ export const deleteProductIngredient: RequestHandler = async (req, res) => {
 }
 
 export const setProductsIngredientOrder: RequestHandler = async (req, res) => {
-  console.log('received', req.body)
+  await Promise.all(
+    req.body.map(
+      (item: { ingredientId: Ingredient['id']; productId: Product['id']; order: number }) => {
+        const { ingredientId, order, productId } = item
+        return ProductIngredient.update({ ingredientId, productId }, { order })
+      },
+    ),
+  )
+
   res.sendStatus(200)
 }
