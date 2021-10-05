@@ -56,7 +56,7 @@ export default class Product extends BaseEntity {
   analyticalConstituents!: ProductAnalyticalConstituent[]
 
   @OneToMany(() => ProductIngredient, (productIngredient) => productIngredient.product)
-  ingredients!: ProductAnalyticalConstituent[]
+  ingredients!: ProductIngredient[]
 
   @OneToMany(() => ProductTranslation, (translation) => translation.product)
   translations!: ProductTranslation[]

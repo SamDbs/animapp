@@ -10,7 +10,7 @@ const router = Router()
 
 router.get('/:id', productController.getProductById)
 router.get('/:id/image', productController.getProductImage)
-router.get('/:id/ingredients', productController.getIngredientsByProduct)
+router.get('/:id/ingredients', productController.getProductIngredients)
 router.get('/:id/analytical-constituents', productController.getACByProduct)
 
 router.use(authAdmin)
@@ -24,6 +24,7 @@ router.get('/:id/brand', productController.getBrandByProductIdx)
 router.put('/:id/brand', productController.updateBrandInProductIdx)
 
 // CRUD ingredients
+router.put('/:id/ingredients/order', productController.setProductsIngredientOrder)
 router.put('/:id/ingredients/:ingredientId', productController.upsertProductIngredient)
 router.delete('/:id/ingredients/:ingredientId', productController.deleteProductIngredient)
 

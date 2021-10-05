@@ -191,10 +191,11 @@ export const getProductImage: RequestHandler = async (req, res) => {
   res.status(200).set('Content-Type', img.type).send(img.image)
 }
 
-export const getIngredientsByProduct: RequestHandler = async (req, res) => {
-  const relations = await ProductIngredient.createQueryBuilder('a')
+export const getProductIngredients: RequestHandler = async (req, res) => {
+  const relations = await ProductIngredient.createQueryBuilder('p')
     .where('"productId" = :id', { id: req.params.id })
-    .leftJoinAndSelect('a.ingredient', 'ingredient')
+    .orderBy('p.order', 'ASC')
+    .leftJoinAndSelect('p.ingredient', 'ingredient')
     .leftJoinAndSelect('ingredient.translations', 'translations')
     .getMany()
 
@@ -205,8 +206,9 @@ export const getIngredientsByProduct: RequestHandler = async (req, res) => {
       language?.toString().toUpperCase(),
     ),
     relations: relations.map((x) => ({
-      productId: x.productId,
       ingredientId: x.ingredientId,
+      order: x.order,
+      productId: x.productId,
       quantity: x.quantity,
     })),
   })
@@ -241,7 +243,6 @@ export const createProductACQuantity: RequestHandler = async (req, res) => {
   res.status(201).json(relation)
 }
 
-// View that returns product's analytical constituents
 export const getACByProduct: RequestHandler = async (req, res) => {
   const relations = await ProductAnalyticalConstituent.createQueryBuilder('a')
     .where('"productId" = :id', { id: req.params.id })
@@ -273,7 +274,6 @@ export const deleteProductACQuantity: RequestHandler = async (req, res) => {
   res.sendStatus(200)
 }
 
-// CRUD Translations
 export const createProductTranslation: RequestHandler = async (req, res) => {
   const translation = ProductTranslation.create({
     languageId: req.body.languageId.toUpperCase(),
@@ -313,8 +313,13 @@ export const deleteProductTranslation: RequestHandler = async (req, res) => {
 }
 
 export const upsertProductIngredient: RequestHandler = async (req, res) => {
-  const product = await Product.findOneOrFail(req.params.id)
   const ingredient = await Ingredient.findOneOrFail(req.params.ingredientId)
+
+  const product = await Product.createQueryBuilder('p')
+    .select(['p.id', 'p.name', 'pi.order'])
+    .where('p.id = :id', { id: req.params.id })
+    .innerJoin('p.ingredients', 'pi')
+    .getOneOrFail()
 
   const existingRelation = await ProductIngredient.findOne({
     where: { productId: product.id, ingredientId: ingredient.id },
@@ -326,9 +331,11 @@ export const upsertProductIngredient: RequestHandler = async (req, res) => {
       productId: product.id,
       ingredientId: ingredient.id,
       deletedAt: null,
-    } as ProductIngredient)
+    })
 
   if (req.body.quantity) relation.quantity = req.body.quantity
+
+  relation.order = Math.max(0, ...product.ingredients.map((ir) => ir.order)) + 1
 
   await relation.save()
 
@@ -341,5 +348,18 @@ export const deleteProductIngredient: RequestHandler = async (req, res) => {
     ingredientId: parseInt(req.params.ingredientId),
   })
   relation.softRemove()
+  res.sendStatus(200)
+}
+
+export const setProductsIngredientOrder: RequestHandler = async (req, res) => {
+  await Promise.all(
+    req.body.map(
+      (item: { ingredientId: Ingredient['id']; productId: Product['id']; order: number }) => {
+        const { ingredientId, order, productId } = item
+        return ProductIngredient.update({ ingredientId, productId }, { order })
+      },
+    ),
+  )
+
   res.sendStatus(200)
 }

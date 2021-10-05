@@ -6,7 +6,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
 import type { UseStore, StateSelector } from 'zustand'
 
-import SubItem from './SubItem'
+import SubItem, { ITEM_HEIGHT } from './SubItem'
 
 type Props<
   OwnerItem extends Product,
@@ -43,6 +43,14 @@ type Props<
   >
   ownedEntityLinkCreator: (item: Partial<OwnedItem>) => string
   ownedItemsRelationGetterSelector?: StateSelector<any, any>
+  withOrder?: boolean
+  setOrderSelector?: StateSelector<
+    StoreShape,
+    (
+      ownerEntityId: OwnerItem['id'],
+      newOrders: { ownedEntityId: OwnedItem['id']; order: number }[],
+    ) => Promise<void>
+  >
 }
 
 export default function ManyToMany<
@@ -65,6 +73,8 @@ export default function ManyToMany<
   relationParams,
   ownedEntityLinkCreator,
   ownedItemsRelationGetterSelector,
+  withOrder,
+  setOrderSelector,
 }: Props<OwnerItem, OwnedItem, StoreShape>) {
   const [ids, setIds] = useState<OwnedItem['id'][]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -81,10 +91,40 @@ export default function ManyToMany<
   const relations = useOwnedStore(
     ownedItemsRelationGetterSelector ? ownedItemsRelationGetterSelector : () => null,
   )
+  const setEntityOrder = useOwnedStore(setOrderSelector ? setOrderSelector : () => null)
+
+  const changeEntityOrder = async (oldMovedItemIndex: number, movement: number) => {
+    if (!relations || !movement || !setEntityOrder) return
+
+    const newMovedItemIndex = Math.max(0, oldMovedItemIndex + Math.floor(movement / ITEM_HEIGHT))
+
+    const newOrders: any = ownedEntities.map((e, i) => {
+      const wasBefore = i < oldMovedItemIndex
+      const isAfter = i >= newMovedItemIndex
+
+      const wasAfter = i > oldMovedItemIndex
+      const isBefore = i <= newMovedItemIndex + 1
+
+      let order = 0
+      if (oldMovedItemIndex === i) {
+        order = newMovedItemIndex
+      } else if (wasBefore && isAfter) {
+        order = i + 1
+      } else if (wasAfter && isBefore) {
+        order = i - 1
+      } else {
+        order = i
+      }
+
+      return { ownedEntityId: e.id, order }
+    })
+    setEntityOrder(ownerEntityId, newOrders)
+  }
+
   const {
     isLoading: isLoadingOwnedItems,
-    items: ownedItems,
     noResult: noResultOwnedItems,
+    items: ownedItems,
     searchDebounced: searchOwnedItems,
   } = useSearchableList<StoreShape, OwnedItem>(
     useOwnedStore,
@@ -109,10 +149,10 @@ export default function ManyToMany<
 
   const updateOwned = async (ownedId: OwnedItem['id']) => {
     try {
-      await upsertOwnedToOwner(ownerEntityId, ownedId, relation[ownedId as string])
+      await upsertOwnedToOwner(ownerEntityId, ownedId, relation[ownedId])
       setIds((ids) => [...ids, ownedId])
       setError('')
-    } catch (e) {
+    } catch (e: any) {
       setError(e.response.data.message)
     }
   }
@@ -135,10 +175,13 @@ export default function ManyToMany<
         }}>
         {ownedEntities.filter(Boolean).map((item, i) => (
           <SubItem<OwnedItem>
-            key={item.id}
             entityLinkCreator={ownedEntityLinkCreator}
+            even={i % 2 === 0}
+            index={i}
             item={item}
-            even={i % 2 === 0}>
+            key={item.id}
+            withOrder={withOrder && editing}
+            onOrderChange={changeEntityOrder}>
             {relationParams && (
               <Text style={{ marginRight: 8 }}>
                 {relations[`${ownerEntityId}-${item.id}`].quantity}

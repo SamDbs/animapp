@@ -24,6 +24,9 @@ export default class ProductIngredient extends BaseEntity {
   @Column({ nullable: true })
   quantity!: string
 
+  @Column({ default: 0 })
+  order!: number
+
   @ManyToOne(() => Product, (product) => product.ingredients)
   @JoinColumn({ name: 'productId' })
   product!: Product

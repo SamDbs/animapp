@@ -156,12 +156,22 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             ownedItemsUpdaterSelector={(state) => state.updateIngredientsByProductId}
             relationParams
             ownedItemsDeletorSelector={(state) => state.deleteIngredientFromProductId}
-            ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.ingredients[id])}
+            ownedItemsSelectorCreator={(ids) => (state) =>
+              ids
+                .map((id) => state.ingredients[id])
+                .sort((a, b) => {
+                  return (state?.productIngredients[`${product.id}-${a.id}`]?.order ?? 0) >
+                    (state?.productIngredients[`${product.id}-${b.id}`]?.order ?? 0)
+                    ? 1
+                    : -1
+                })}
             registerOwnedIdsSelector={(state) => state.registerIds}
             unregisterOwnedIdsSelector={(state) => state.unregisterIds}
             searchItemsSelector={(state) => state.searchIngredients}
             ownedEntityLinkCreator={(item) => `/ingredients/${item.id}`}
             ownedItemsRelationGetterSelector={(state) => state.productIngredients}
+            withOrder
+            setOrderSelector={(state) => state.setIngredientsOrder}
           />
         )}
       </Card>
