@@ -2,10 +2,11 @@ import { Brand } from '@hooks/stores/brand'
 import { Constituent } from '@hooks/stores/constituent'
 import { Ingredient } from '@hooks/stores/ingredient'
 import { Link } from '@react-navigation/native'
-import React, { useState } from 'react'
-import { Text, View } from 'react-native'
+import { MaterialIcons } from '@expo/vector-icons'
 import { PanGestureHandler, State } from 'react-native-gesture-handler'
+import { Text, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
+import React, { useState } from 'react'
 
 export const ITEM_HEIGHT = 50
 
@@ -57,13 +58,11 @@ export default function SubItem<OwnedItem extends Brand | Ingredient | Constitue
         {props.withOrder && (
           <PanGestureHandler
             onGestureEvent={(e) => {
-              console.log('onGestureEvent - e.nativeEvent.state', e.nativeEvent.state)
               if (e.nativeEvent.state === State.ACTIVE) {
                 y.value = e.nativeEvent.translationY
               }
             }}
             onHandlerStateChange={(e) => {
-              console.log('onHandlerStateChange - e.nativeEvent.state', e.nativeEvent.state)
               if (e.nativeEvent.state === State.END) {
                 props.onOrderChange?.(props.index, y.value)
                 take(false)
@@ -72,7 +71,7 @@ export default function SubItem<OwnedItem extends Brand | Ingredient | Constitue
                 take(true)
               }
             }}>
-            <View style={{ width: 20, height: 20, backgroundColor: 'red', cursor: 'grab' }} />
+            <MaterialIcons name="drag-handle" size={24} color="black" style={{ cursor: 'grab' }} />
           </PanGestureHandler>
         )}
         <Link to={props.entityLinkCreator(props.item)}>
