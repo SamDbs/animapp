@@ -124,6 +124,7 @@ export default function ManyToMany<
   const {
     isLoading: isLoadingOwnedItems,
     noResult: noResultOwnedItems,
+    items: ownedItems,
     searchDebounced: searchOwnedItems,
   } = useSearchableList<StoreShape, OwnedItem>(
     useOwnedStore,
@@ -148,7 +149,7 @@ export default function ManyToMany<
 
   const updateOwned = async (ownedId: OwnedItem['id']) => {
     try {
-      await upsertOwnedToOwner(ownerEntityId, ownedId, relation[ownedId as string])
+      await upsertOwnedToOwner(ownerEntityId, ownedId, relation[ownedId])
       setIds((ids) => [...ids, ownedId])
       setError('')
     } catch (e: any) {
@@ -217,7 +218,7 @@ export default function ManyToMany<
             }}>
             {isLoadingOwnedItems && <ActivityIndicator />}
             {!noResultOwnedItems &&
-              ownedEntities
+              ownedItems
                 .filter((item) => !ids.includes(item.id as string))
                 .map((item, i) => {
                   return (
