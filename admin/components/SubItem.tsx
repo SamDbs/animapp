@@ -13,11 +13,15 @@ type Props<OwnedItem extends Brand | Ingredient | Constituent> = {
   children?: View['props']['children']
   entityLinkCreator: (entity: Partial<OwnedItem>) => string
   even: boolean
-  index?: number
   item: Partial<OwnedItem>
-  onOrderChange?: (a: Props<OwnedItem>['index'], movement: number) => Promise<void>
-  withOrder?: boolean
-}
+} & (
+  | { withOrder?: false }
+  | {
+      withOrder: true
+      index: number
+      onOrderChange: (current: number, movement: number) => Promise<void>
+    }
+)
 
 export default function SubItem<OwnedItem extends Brand | Ingredient | Constituent>(
   props: Props<OwnedItem>,

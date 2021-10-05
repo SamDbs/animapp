@@ -273,7 +273,7 @@ const useIngredientsStore = create<IngredientStore>(
             }, {}),
           },
         }))
-        // await fetcher.put<void>(`/products/${productId}/ingredients/order`, newOrders)
+        await fetcher.put<void>(`/products/${productId}/ingredients/order`, newOrders)
       },
     }),
     'ingredient',

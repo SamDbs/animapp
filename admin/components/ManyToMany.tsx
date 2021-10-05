@@ -4,7 +4,6 @@ import { Product } from '@hooks/stores/product'
 import useSearchableList, { PaginationDetails } from '@hooks/useSearchableList'
 import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Button, Text, TextInput, View } from 'react-native'
-import { acc } from 'react-native-reanimated'
 import type { UseStore, StateSelector } from 'zustand'
 
 import SubItem, { ITEM_HEIGHT } from './SubItem'
@@ -94,21 +93,12 @@ export default function ManyToMany<
   )
   const setEntityOrder = useOwnedStore(setOrderSelector ? setOrderSelector : () => null)
 
-  const sortedEntities = withOrder
-    ? [...ownedEntities].sort((a, b) => {
-        return relations[`${ownerEntityId}-${a.id}`]?.order >
-          relations[`${ownerEntityId}-${b.id}`]?.order
-          ? 1
-          : -1
-      })
-    : ownedEntities
-
   const changeEntityOrder = async (oldMovedItemIndex: number, movement: number) => {
     if (!relations || !movement || !setEntityOrder) return
 
     const newMovedItemIndex = Math.max(0, oldMovedItemIndex + Math.floor(movement / ITEM_HEIGHT))
 
-    const newOrders: any = sortedEntities.map((e, i) => {
+    const newOrders: any = ownedEntities.map((e, i) => {
       const wasBefore = i < oldMovedItemIndex
       const isAfter = i >= newMovedItemIndex
 
@@ -227,7 +217,7 @@ export default function ManyToMany<
             }}>
             {isLoadingOwnedItems && <ActivityIndicator />}
             {!noResultOwnedItems &&
-              sortedEntities
+              ownedEntities
                 .filter((item) => !ids.includes(item.id as string))
                 .map((item, i) => {
                   return (
