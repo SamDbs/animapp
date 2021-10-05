@@ -5,6 +5,7 @@ import OneToMany from '@components/OneToMany'
 import SubItem from '@components/SubItem'
 import useBrandStore, { Brand, BrandStore } from '@hooks/stores/brand'
 import useProductsStore, { Product, ProductStore, ProductType } from '@hooks/stores/product'
+import { useNavigation } from '@react-navigation/native'
 import React, { useEffect, useState } from 'react'
 import { Button, Text, View } from 'react-native'
 
@@ -19,6 +20,7 @@ export default function ProductCreator({ style }: { style?: View['props']['style
   const [product, setProduct] = useState({ ...initialState })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const navigation = useNavigation()
   const createProduct = useProductsStore((state) => state.createProduct)
   const [brands, registerBrandIds, unregisterBrandIds] = useBrandStore((state) => [
     state.brands,
@@ -38,8 +40,8 @@ export default function ProductCreator({ style }: { style?: View['props']['style
     setLoading(true)
     setError('')
     try {
-      await createProduct(product)
-      setProduct({ ...initialState })
+      const id = await createProduct(product)
+      navigation.navigate('ProductStack', { screen: 'Product', params: { id } })
     } catch (e: any) {
       setError(e?.response?.data?.message ?? 'An unknown error occured.')
     } finally {

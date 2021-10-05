@@ -49,7 +49,7 @@ export type ProductStore = {
     page: number,
     filters?: object,
   ) => Promise<{ pagination: PaginationDetails; ids: Product['id'][] }>
-  createProduct: (params: { barCode: string; name: string; type: string }) => Promise<unknown>
+  createProduct: (params: { barCode: string; name: string; type: string }) => Promise<Product['id']>
   locallySetProductImage: (productId: Product['id'], image: string) => void
 }
 
@@ -135,8 +135,9 @@ const useProductsStore = create<ProductStore>(
         set((state) => ({ products: { ...state.products, ...entities } }))
         return { pagination: data.pagination, ids }
       },
-      createProduct(params: { barCode: string; name: string; type: string }) {
-        return fetcher.post(`/products`, params)
+      async createProduct(params: { barCode: string; name: string; type: string }) {
+        const { data: product } = await fetcher.post<Product>(`/products`, params)
+        return product.id
       },
       locallySetProductImage(productId: Product['id'], image: string) {
         if (!get().products[productId]) return

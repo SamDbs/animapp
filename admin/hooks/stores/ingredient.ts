@@ -62,7 +62,7 @@ export type IngredientStore = {
     query: string,
     page?: number,
   ) => Promise<{ pagination: PaginationDetails; ids: Ingredient['id'][] }>
-  createIngredient: () => Promise<Product['id']>
+  createIngredient: () => Promise<Ingredient['id']>
   getIngredientsByProductId: (productId: Product['id']) => Promise<{ ids: Ingredient['id'][] }>
   updateIngredientsByProductId: (
     productId: Product['id'],
