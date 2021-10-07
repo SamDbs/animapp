@@ -1,3 +1,4 @@
+import { ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   Column,
@@ -10,10 +11,11 @@ import {
   UpdateDateColumn,
 } from 'typeorm'
 
-import Product from './product'
 import Language from './language'
+import Product from './product'
 
 @Entity()
+@ObjectType()
 export default class ProductTranslation extends BaseEntity {
   @PrimaryColumn()
   productId!: number

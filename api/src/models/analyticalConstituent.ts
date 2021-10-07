@@ -1,3 +1,4 @@
+import { ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   CreateDateColumn,
@@ -12,6 +13,7 @@ import ProductAnalyticalConstituent from './productAnalyticalConstituent'
 import ConstituentTranslation from './constituentTranslation'
 
 @Entity()
+@ObjectType()
 export default class AnalyticalConstituent extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number

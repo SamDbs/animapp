@@ -1,3 +1,4 @@
+import { ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   Column,
@@ -13,6 +14,7 @@ import {
 import Product from './product'
 
 @Entity()
+@ObjectType()
 @Unique('UQ_NAME', ['name'])
 export default class Brand extends BaseEntity {
   @PrimaryGeneratedColumn()

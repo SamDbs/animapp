@@ -1,3 +1,4 @@
+import { ObjectType } from 'type-graphql'
 import { genSalt, hash } from 'bcryptjs'
 import {
   BaseEntity,
@@ -10,6 +11,7 @@ import {
 } from 'typeorm'
 
 @Entity()
+@ObjectType()
 export default class Admin extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number

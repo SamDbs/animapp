@@ -1,3 +1,4 @@
+import { ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   Column,
@@ -15,6 +16,7 @@ import IngredientTranslation from './ingredientTranslation'
 import ProductIngredient from './productIngredients'
 
 @Entity()
+@ObjectType()
 export default class Ingredient extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number

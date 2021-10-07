@@ -1,3 +1,4 @@
+import { ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   Column,
@@ -9,6 +10,7 @@ import {
 } from 'typeorm'
 
 @Entity()
+@ObjectType()
 export default class Contact extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number

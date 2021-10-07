@@ -9,6 +9,7 @@
     "module": "CommonJS",
     "outDir": "./build",
     "target": "ESNext",
+    "lib": ["ESNext"]
   },
   "exclude": ["tests/**/*"]
 }

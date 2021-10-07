@@ -1,3 +1,4 @@
+import { ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   CreateDateColumn,
@@ -11,6 +12,7 @@ import {
 import FaqTranslation from './faqTranslation'
 
 @Entity()
+@ObjectType()
 export default class Faq extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number

@@ -1,3 +1,4 @@
+import { Field, ID, ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   Column,
@@ -26,14 +27,17 @@ export enum ProductType {
 }
 
 @Entity()
+@ObjectType()
 @Unique('UQ_NAME', ['name'])
 export default class Product extends BaseEntity {
+  @Field(() => ID)
   @PrimaryGeneratedColumn()
   id!: number
 
   @Column({ type: 'enum', enum: ProductType, default: ProductType.DRY_FOOD })
   type!: ProductType
 
+  @Field()
   @Column()
   name!: string
 
