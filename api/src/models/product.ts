@@ -34,6 +34,7 @@ export default class Product extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number
 
+  @Field()
   @Column({ type: 'enum', enum: ProductType, default: ProductType.DRY_FOOD })
   type!: ProductType
 
