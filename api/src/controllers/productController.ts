@@ -318,7 +318,7 @@ export const upsertProductIngredient: RequestHandler = async (req, res) => {
   const product = await Product.createQueryBuilder('p')
     .select(['p.id', 'p.name', 'pi.order'])
     .where('p.id = :id', { id: req.params.id })
-    .innerJoin('p.ingredients', 'pi')
+    .leftJoin('p.ingredients', 'pi')
     .getOneOrFail()
 
   const existingRelation = await ProductIngredient.findOne({
