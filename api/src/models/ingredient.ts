@@ -1,4 +1,4 @@
-import { ObjectType } from 'type-graphql'
+import { Field, ID, ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   Column,
@@ -18,6 +18,7 @@ import ProductIngredient from './productIngredients'
 @Entity()
 @ObjectType()
 export default class Ingredient extends BaseEntity {
+  @Field(() => ID)
   @PrimaryGeneratedColumn()
   id!: number
 
@@ -30,15 +31,19 @@ export default class Ingredient extends BaseEntity {
   @OneToMany(() => ProductIngredient, (product) => product.ingredient)
   products!: ProductIngredient[]
 
+  @Field({ nullable: true })
   @Column({ nullable: true })
   rating!: number
 
+  @Field()
   @CreateDateColumn()
   createdAt!: Date
 
+  @Field()
   @UpdateDateColumn()
   updatedAt!: Date
 
+  @Field()
   @DeleteDateColumn()
   deletedAt!: Date
 }

@@ -6,8 +6,9 @@ import { buildSchema } from 'type-graphql'
 
 config()
 
-import 'express-async-errors'
 import ProductResolver from './resolvers/product'
+import IngredientResolver from './resolvers/ingredient'
+import ProductIngredientResolver from './resolvers/productIngredient'
 
 const PORT = (process.env.PORT as unknown as number) || 8080
 
@@ -31,7 +32,7 @@ async function main() {
   }
 
   const schema = await buildSchema({
-    resolvers: [ProductResolver],
+    resolvers: [IngredientResolver, ProductResolver, ProductIngredientResolver],
   })
   const server = new ApolloServer({ schema })
   await server.listen(PORT)

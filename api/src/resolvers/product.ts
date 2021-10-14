@@ -1,24 +1,26 @@
-import { Arg, Info, Query, Resolver } from 'type-graphql'
+import { Arg, FieldResolver, Info, Query, Resolver, Root } from 'type-graphql'
+import { GraphQLResolveInfo } from 'graphql'
 
 import Product from '../models/product'
+import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
+import ProductIngredient from '../models/productIngredients'
 
-@Resolver()
+@Resolver(() => Product)
 export default class ProductResolver {
   @Query(() => Product)
-  product(@Arg('id') id: string, @Info() ctx: any): ReturnType<typeof Product['findOne']> {
-    console.log(
-      'ctx',
-      JSON.stringify(
-        ctx.operation.selectionSet.selections
-          .find((y: any) => y.name.value === 'product')
-          .selectionSet.selections.map((x: any) => x.name.value),
-      ),
-    )
-    return Product.findOne(id)
+  product(@Arg('id') id: string, @Info() info: GraphQLResolveInfo): Promise<Product> {
+    return Product.findOneOrFail(id, {
+      select: getSelectedFieldsFromForModel(info, Product),
+    })
   }
 
   @Query(() => [Product])
-  products(): ReturnType<typeof Product['find']> {
+  products(): Promise<Product[]> {
     return Product.find()
+  }
+
+  @FieldResolver()
+  ingredients(@Root() product: Product): Promise<ProductIngredient[]> {
+    return ProductIngredient.find({ where: { productId: product.id } })
   }
 }
