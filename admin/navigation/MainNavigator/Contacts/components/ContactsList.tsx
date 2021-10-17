@@ -1,25 +1,50 @@
+import { useQuery, gql } from '@apollo/client'
 import Card from '@components/Card'
 import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
-import useContactsStore, { ContactStoreState, Contact } from '@hooks/stores/contact'
-import useSearchableList from '@hooks/useSearchableList'
-import React from 'react'
+import useSearch from '@hooks/useSearch'
+import React, { useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 import { DataTable } from 'react-native-paper'
 
+type Contact = {
+  id: string
+  name: string
+  message: string
+}
+
+const LIMIT = 5
+
+const GET_CONTACTS = gql`
+  query GetContacts($offset: Int, $limit: Int = ${LIMIT}, $searchTerms: String = "") {
+    contacts(limit: $limit, offset: $offset, searchTerms: $searchTerms) {
+      id
+      name
+      message
+    }
+    contactsCount(searchTerms: $searchTerms)
+  }
+`
+
+const initialPagination = {
+  page: 0,
+  offset: 0,
+}
+
 export default function ContactList({ style }: { style?: View['props']['style'] }) {
-  const {
-    changePage,
-    isLoading,
-    items: contacts,
-    noResult,
-    pagination,
-    searchDebounced,
-  } = useSearchableList<ContactStoreState, Contact>(
-    useContactsStore,
-    (state) => state.searchContacts,
-    (ids) => (state) => ids.map((id) => state.contacts[id]),
-  )
+  const [pagination, setPagination] = useState(initialPagination)
+
+  const { data, loading, refetch } = useQuery<{
+    contacts: Contact[]
+    contactsCount: number
+  }>(GET_CONTACTS, {
+    variables: { limit: LIMIT, offset: pagination.offset },
+  })
+
+  const search = useSearch((searchTerms) => {
+    setPagination(initialPagination)
+    refetch({ offset: 0, searchTerms })
+  })
 
   return (
     <Card style={style}>
@@ -40,7 +65,7 @@ export default function ContactList({ style }: { style?: View['props']['style'] 
               height: 30,
               paddingHorizontal: 8,
             }}
-            onChangeText={searchDebounced}
+            onChangeText={search}
           />
         </View>
       </View>
@@ -57,7 +82,7 @@ export default function ContactList({ style }: { style?: View['props']['style'] 
             <DataTable.Title>Name</DataTable.Title>
             <DataTable.Title>Message</DataTable.Title>
           </DataTable.Header>
-          {contacts.filter(Boolean).map((contact, i: number) => {
+          {data?.contacts.map((contact) => {
             return (
               <DataTable.Row key={contact.id}>
                 <DataTable.Cell>{contact.name}</DataTable.Cell>
@@ -65,11 +90,18 @@ export default function ContactList({ style }: { style?: View['props']['style'] 
               </DataTable.Row>
             )
           })}
-          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
-          {!isLoading && noResult && <NoResult />}
+          {loading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!loading && data?.contacts.length === 0 && <NoResult />}
         </DataTable>
       </View>
-      <Pagination onChangePage={changePage} pagination={pagination} />
+      <Pagination
+        onChangePage={(i) => setPagination((x) => ({ ...x, page: i, offset: LIMIT * i }))}
+        pagination={{
+          count: data?.contactsCount ?? 0,
+          limit: LIMIT,
+          page: pagination.page,
+        }}
+      />
     </Card>
   )
 }
