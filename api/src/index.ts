@@ -19,7 +19,7 @@ import analyticalConstituents from './routes/analyticalConstituents'
 import authentication from './routes/authentication'
 import admin from './routes/admin'
 import { errorHandler } from './middleware/errorHandler'
-import { isConnected } from './middleware/admin'
+import { authAdmin, isConnected } from './middleware/admin'
 import IngredientResolver from './resolvers/ingredient'
 import ProductResolver from './resolvers/product'
 import ProductIngredientResolver from './resolvers/productIngredient'
@@ -84,7 +84,7 @@ async function main() {
   app.use('/auth', authentication)
   app.use('/admin', admin)
 
-  app.use('/graphql', graphqlHTTP({ schema }))
+  app.use('/graphql', authAdmin, graphqlHTTP({ schema }))
 
   app.use(errorHandler)
   app.use((req, res) => {
