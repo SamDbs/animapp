@@ -1,3 +1,4 @@
+import { Field, ID, ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   Column,
@@ -26,23 +27,29 @@ export enum ProductType {
 }
 
 @Entity()
+@ObjectType()
 @Unique('UQ_NAME', ['name'])
 export default class Product extends BaseEntity {
+  @Field(() => ID)
   @PrimaryGeneratedColumn()
   id!: number
 
+  @Field()
   @Column({ type: 'enum', enum: ProductType, default: ProductType.DRY_FOOD })
   type!: ProductType
 
+  @Field()
   @Column()
   name!: string
 
   @OneToOne(() => Image, (image) => image.product)
   image?: Image
 
+  @Field()
   @Column()
   barCode!: string
 
+  @Field()
   @Column({ default: false })
   published!: boolean
 
@@ -55,6 +62,7 @@ export default class Product extends BaseEntity {
   )
   analyticalConstituents!: ProductAnalyticalConstituent[]
 
+  @Field(() => [ProductIngredient])
   @OneToMany(() => ProductIngredient, (productIngredient) => productIngredient.product)
   ingredients!: ProductIngredient[]
 
@@ -65,12 +73,15 @@ export default class Product extends BaseEntity {
   @JoinColumn({ name: 'brandId' })
   brand!: Brand
 
+  @Field()
   @CreateDateColumn()
   createdAt!: Date
 
+  @Field()
   @UpdateDateColumn()
   updatedAt!: Date
 
+  @Field()
   @DeleteDateColumn()
   deletedAt!: Date
 }

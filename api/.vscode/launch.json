@@ -11,11 +11,29 @@
       "autoAttachChildProcesses": false
     },
     {
+      "name": "Start GraphQL API",
+      "request": "launch",
+      "type": "node",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["dev:graphql"],
+      "skipFiles": ["<node_internals>/**"],
+      "autoAttachChildProcesses": false
+    },
+    {
       "name": "Debug API",
       "request": "launch",
       "type": "node",
       "runtimeExecutable": "yarn",
       "runtimeArgs": ["dev"],
+      "skipFiles": ["<node_internals>/**"],
+      "autoAttachChildProcesses": true
+    },
+    {
+      "name": "Debug GraphQL API",
+      "request": "launch",
+      "type": "node",
+      "runtimeExecutable": "yarn",
+      "runtimeArgs": ["dev:graphql"],
       "skipFiles": ["<node_internals>/**"],
       "autoAttachChildProcesses": true
     }

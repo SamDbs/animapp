@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { TextInput } from 'react-native-gesture-handler'
 
-type Props = { onChangePage: Function; pagination: PaginationDetails }
+type Props = { onChangePage: (page: number) => number | void; pagination: PaginationDetails }
 
 export default function Pagination({ onChangePage, pagination }: Props) {
   const [currentPageText, setCurrentPageText] = useState('')
@@ -14,7 +14,7 @@ export default function Pagination({ onChangePage, pagination }: Props) {
 
   const debouncedChangePage = useCallback(
     debounce(500, async (text: string) => {
-      onChangePage(parseInt(text) - 1)
+      onChangePage(parseInt(text, 10) - 1)
       setCurrentPageText('')
     }),
     [],
@@ -28,7 +28,7 @@ export default function Pagination({ onChangePage, pagination }: Props) {
     <View style={{ flexDirection: 'row', marginTop: 16 }}>
       <Pressable
         disabled={pagination.page === 0}
-        onPress={() => onChangePage((page: number) => page - 1)}
+        onPress={() => onChangePage(pagination.page - 1)}
         style={[style.button, isFirstPage && style.disabled]}>
         <Text>Previous</Text>
       </Pressable>
@@ -55,7 +55,7 @@ export default function Pagination({ onChangePage, pagination }: Props) {
 
       <Pressable
         disabled={pagination.page === lastPageNumber - 1}
-        onPress={() => onChangePage((page: number) => page + 1)}
+        onPress={() => onChangePage(pagination.page + 1)}
         style={[style.button, isLastPage && style.disabled]}>
         <Text>Next</Text>
       </Pressable>

@@ -1,3 +1,4 @@
+import { ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   Column,
@@ -14,6 +15,7 @@ import Ingredient from './ingredient'
 import Language from './language'
 
 @Entity()
+@ObjectType()
 export default class IngredientTranslation extends BaseEntity {
   @PrimaryColumn()
   ingredientId!: number

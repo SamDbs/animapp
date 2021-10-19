@@ -2,7 +2,7 @@ import debounce from 'lodash/fp/debounce'
 import { useCallback, useEffect, useState } from 'react'
 import { StateSelector, UseStore } from 'zustand'
 
-export type PaginationDetails = { count: number; limit: number; offset: number; page: number }
+export type PaginationDetails = { count: number; limit: number; page: number }
 
 export default function useSearchableList<StoreShape extends object, EntityShape extends object>(
   useStore: UseStore<
