@@ -1,3 +1,4 @@
+import { useQuery, gql } from '@apollo/client'
 import Card from '@components/Card'
 import NoResult from '@components/NoResult'
 import useLanguageStore from '@hooks/stores/languages'
@@ -5,6 +6,16 @@ import { useNavigation } from '@react-navigation/native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { Text, View, ActivityIndicator } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
+
+const GET_LANGUAGES = gql`
+  query GetLanguages($offset: Int, $limit: Int, $searchTerms: String = "") {
+    languages(limit: $limit, offset: $offset, searchTerms: $searchTerms) {
+      id
+      name
+    }
+    languagesCount(searchTerms: $searchTerms)
+  }
+`
 
 export default function IngredientList({ style }: { style: View['props']['style'] }) {
   const [ids, setIngredientIds] = useState<string[]>([])

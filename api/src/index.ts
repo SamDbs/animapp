@@ -24,6 +24,7 @@ import IngredientResolver from './resolvers/ingredient'
 import ProductResolver from './resolvers/product'
 import ProductIngredientResolver from './resolvers/productIngredient'
 import ContactResolver from './resolvers/contact'
+import LanguageResolver from './resolvers/language'
 
 const PORT = (process.env.PORT as unknown as number) || 8080
 const HOST = '0.0.0.0'
@@ -54,7 +55,13 @@ async function main() {
   }
 
   const schema = await buildSchema({
-    resolvers: [ContactResolver, IngredientResolver, ProductIngredientResolver, ProductResolver],
+    resolvers: [
+      ContactResolver,
+      IngredientResolver,
+      LanguageResolver,
+      ProductIngredientResolver,
+      ProductResolver,
+    ],
   })
 
   const app = express()
