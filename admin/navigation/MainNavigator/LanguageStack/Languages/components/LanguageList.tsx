@@ -1,52 +1,33 @@
 import { useQuery, gql } from '@apollo/client'
 import Card from '@components/Card'
 import NoResult from '@components/NoResult'
-import useLanguageStore from '@hooks/stores/languages'
 import { useNavigation } from '@react-navigation/native'
-import React, { useCallback, useEffect, useState } from 'react'
+import React from 'react'
 import { Text, View, ActivityIndicator } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
 
+type Language = { id: string; name: string }
+
 const GET_LANGUAGES = gql`
-  query GetLanguages($offset: Int, $limit: Int, $searchTerms: String = "") {
-    languages(limit: $limit, offset: $offset, searchTerms: $searchTerms) {
+  query GetLanguages {
+    languages {
       id
       name
     }
-    languagesCount(searchTerms: $searchTerms)
+    languagesCount
   }
 `
 
-export default function IngredientList({ style }: { style: View['props']['style'] }) {
-  const [ids, setIngredientIds] = useState<string[]>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [registerIds, unregisterIds, getIngredients] = useLanguageStore((state) => [
-    state.registerIds,
-    state.unregisterIds,
-    state.getAllLanguages,
-  ])
-  const languages = useLanguageStore(
-    useCallback((state) => ids.map((id) => state.languages[id]), [ids]),
-  )
-
-  useEffect(() => {
-    registerIds(ids)
-    return () => unregisterIds(ids)
-  }, [ids])
-
-  useEffect(() => {
-    async function fn() {
-      setIsLoading(true)
-      const { ids } = await getIngredients()
-      setIngredientIds(ids)
-      setIsLoading(false)
-    }
-    fn()
-  }, [])
+export default function LanguageList({ style }: { style: View['props']['style'] }) {
+  const { data, loading } =
+    useQuery<{
+      languages: Language[]
+      languagesCount: number
+    }>(GET_LANGUAGES)
 
   const { navigate } = useNavigation()
 
-  const noResult = !languages.length
+  const noResult = !data?.languages.length
 
   return (
     <Card style={style}>
@@ -64,7 +45,7 @@ export default function IngredientList({ style }: { style: View['props']['style'
             <DataTable.Title>Name</DataTable.Title>
             <DataTable.Title numeric>Actions</DataTable.Title>
           </DataTable.Header>
-          {languages.filter(Boolean).map((language, i: number) => {
+          {data?.languages.map((language, i) => {
             return (
               <DataTable.Row key={language.id}>
                 <DataTable.Cell>{language.name}</DataTable.Cell>
@@ -83,8 +64,8 @@ export default function IngredientList({ style }: { style: View['props']['style'
               </DataTable.Row>
             )
           })}
-          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
-          {!isLoading && noResult && <NoResult />}
+          {loading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!loading && noResult && <NoResult />}
         </DataTable>
       </View>
     </Card>
