@@ -26,7 +26,6 @@ import ProductIngredientResolver from './resolvers/productIngredient'
 import ContactResolver from './resolvers/contact'
 import LanguageResolver from './resolvers/language'
 import FaqResolver from './resolvers/faq'
-import FaqTranslationResolver from './resolvers/faqTranslation'
 
 const PORT = (process.env.PORT as unknown as number) || 8080
 const HOST = '0.0.0.0'
@@ -60,7 +59,6 @@ async function main() {
     resolvers: [
       ContactResolver,
       FaqResolver,
-      FaqTranslationResolver,
       IngredientResolver,
       LanguageResolver,
       ProductIngredientResolver,

@@ -18,7 +18,6 @@ export default class Faq extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number
 
-  @Field()
   @OneToMany(() => FaqTranslation, (translation) => translation.faq)
   translations!: FaqTranslation[]
 

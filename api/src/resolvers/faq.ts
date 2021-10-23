@@ -1,38 +1,9 @@
-import {
-  Arg,
-  ArgsType,
-  Field,
-  FieldResolver,
-  Info,
-  Int,
-  Mutation,
-  Query,
-  Resolver,
-  Root,
-} from 'type-graphql'
+import { Arg, FieldResolver, Info, Mutation, Query, Resolver, Root } from 'type-graphql'
 import { GraphQLResolveInfo } from 'graphql'
 
 import Faq from '../models/faq'
 import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
 import FaqTranslation from '../models/faqTranslation'
-
-@ArgsType()
-class GetFaqsArgs {
-  @Field(() => Int, { nullable: true })
-  limit?: number
-
-  @Field(() => Int, { nullable: true })
-  offset?: number
-
-  @Field({ nullable: true })
-  searchTerms?: string
-}
-
-@ArgsType()
-class GetFaqsCountArgs {
-  @Field({ nullable: true })
-  searchTerms?: string
-}
 
 @Resolver(() => Faq)
 export default class FaqResolver {
