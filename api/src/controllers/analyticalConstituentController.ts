@@ -2,7 +2,6 @@ import { RequestHandler } from 'express'
 import { FindManyOptions, FindOperator, In } from 'typeorm'
 
 import AnalyticalConstituent from '../models/analyticalConstituent'
-import ConstituentTranslation from '../models/constituentTranslation'
 import {
   viewAnalyticalConstituentClient,
   viewAnalyticalConstituentsClient,

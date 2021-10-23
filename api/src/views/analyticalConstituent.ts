@@ -1,30 +1,41 @@
 import Language from '../models/language'
 import AnalyticalConstituent from '../models/analyticalConstituent'
 import ConstituentTranslation from '../models/constituentTranslation'
+import TranslationService from '../services/TranslationService'
+import { TranslationEntityType } from '../models/translation'
 
-export function viewAnalyticalConstituentClient(
+export async function viewAnalyticalConstituentClient(
   analyticalConstituent: AnalyticalConstituent,
-  language: Language['id'] | undefined = 'EN',
+  languageId: Language['id'] = 'EN',
 ) {
-  let translation = analyticalConstituent.translations.find((t) => t.languageId === language)
+  const t = new TranslationService()
+  const namePromise = t.get(
+    `${analyticalConstituent.id}-name`,
+    languageId,
+    TranslationEntityType.CONSTITUENT,
+    'This name constituent is not translated yet',
+  )
 
-  if (!translation)
-    translation = analyticalConstituent.translations.find((t) => t.languageId === 'FR')
-
+  const descriptionPromise = t.get(
+    `${analyticalConstituent.id}-description`,
+    languageId,
+    TranslationEntityType.CONSTITUENT,
+    'This description constituent is not translated yet',
+  )
   const analyticalConstituentClient = {
     id: analyticalConstituent.id,
-    name: translation?.name ?? 'This analytical is not translated yet',
-    description: translation?.description ?? 'This analytical constituent is not translated yet',
+    name: await namePromise,
+    description: await descriptionPromise,
   }
   return analyticalConstituentClient
 }
 
 export function viewAnalyticalConstituentsClient(
   analyticalConstituents: AnalyticalConstituent[],
-  language: Language['id'] | undefined = 'EN',
+  languageId: Language['id'] | undefined = 'EN',
 ) {
   return analyticalConstituents.map((analyticalConstituent) =>
-    viewAnalyticalConstituentClient(analyticalConstituent, language),
+    viewAnalyticalConstituentClient(analyticalConstituent, languageId),
   )
 }
 

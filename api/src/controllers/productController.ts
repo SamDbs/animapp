@@ -113,7 +113,6 @@ export const getAllProducts: RequestHandler = async (req, res) => {
 export const getProductById: RequestHandler = async (req, res) => {
   const product = await Product.createQueryBuilder('product')
     .where('product.id = :id', { id: req.params.id })
-    .leftJoinAndSelect('product.translations', 'pt')
     .leftJoinAndSelect('product.brand', 'bd')
     .leftJoinAndSelect('product.image', 'img')
     .getOneOrFail()

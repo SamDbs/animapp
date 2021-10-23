@@ -2,7 +2,6 @@ import { FindManyOptions, FindOperator, In } from 'typeorm'
 import { RequestHandler } from 'express'
 
 import Faq from '../models/faq'
-import FaqTranslation from '../models/faqTranslation'
 import { viewFaq, viewFaqs, viewFaqTranslation, viewFaqWithTranslations } from '../views/faq'
 
 // const allowedFaqFilterKeys: (keyof FaqTranslation)[] = ['question', 'answer']

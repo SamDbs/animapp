@@ -1,32 +1,43 @@
 import Language from '../models/language'
 import Ingredient from '../models/ingredient'
-import IngredientTranslation from '../models/ingredientTranslation'
+import TranslationService from '../services/TranslationService'
+import { TranslationEntityType } from '../models/translation'
 
-export function viewIngredient(ingredient: Ingredient, language: Language['id'] = 'EN') {
-  let ingredientTranslation = ingredient.translations.find((t) => t.languageId === language)
+export async function viewIngredient(ingredient: Ingredient, languageId: Language['id'] = 'EN') {
+  const t = new TranslationService()
 
-  if (!ingredientTranslation)
-    ingredientTranslation = ingredient.translations.find((t) => t.languageId === 'EN')
+  const namePromise = t.get(
+    `${ingredient.id}-name`,
+    languageId,
+    TranslationEntityType.INGREDIENT,
+    'This ingredient is not translated yet',
+  )
+
+  const reviewPromise = t.get(
+    `${ingredient.id}-review`,
+    languageId,
+    TranslationEntityType.INGREDIENT,
+    'This ingredient is not translated yet',
+  )
+
+  const descriptionPromise = t.get(
+    `${ingredient.id}-description`,
+    languageId,
+    TranslationEntityType.INGREDIENT,
+    'This ingredient is not translated yet',
+  )
 
   const ingredientClient = {
     id: ingredient.id,
     image: ingredient.image ?? 'This ingredient does not have a picture yet',
-    name: ingredientTranslation?.name ?? 'This ingredient is not translated yet',
-    review: ingredientTranslation?.review ?? 'This ingredient is not translated yet',
-    description: ingredientTranslation?.description ?? 'This ingredient is not translated yet',
+    name: await namePromise,
+    review: await reviewPromise,
+    description: await descriptionPromise,
     rating: ingredient.rating,
   }
   return ingredientClient
 }
 
-export function viewIngredientTranslations(ingredientTranslations: IngredientTranslation[]) {
-  return ingredientTranslations
-}
-
-export function viewIngredients(ingredients: Ingredient[], language: Language['id'] = 'EN') {
-  return ingredients.map((ingredient) => viewIngredient(ingredient, language))
-}
-
-export function viewIngredientTranslation(ingredientTranslation: IngredientTranslation) {
-  return ingredientTranslation
+export function viewIngredients(ingredients: Ingredient[], languageId: Language['id'] = 'EN') {
+  return ingredients.map((ingredient) => viewIngredient(ingredient, languageId))
 }

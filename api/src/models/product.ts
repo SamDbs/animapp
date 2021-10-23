@@ -53,6 +53,10 @@ export default class Product extends BaseEntity {
   @Column({ default: false })
   published!: boolean
 
+  @Field()
+  @Column()
+  description!: string
+
   @Column()
   brandId!: number
 
@@ -65,9 +69,6 @@ export default class Product extends BaseEntity {
   @Field(() => [ProductIngredient])
   @OneToMany(() => ProductIngredient, (productIngredient) => productIngredient.product)
   ingredients!: ProductIngredient[]
-
-  @OneToMany(() => ProductTranslation, (translation) => translation.product)
-  translations!: ProductTranslation[]
 
   @ManyToOne(() => Brand, (brand) => brand.products, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'brandId' })

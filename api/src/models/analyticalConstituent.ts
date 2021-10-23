@@ -1,6 +1,7 @@
-import { ObjectType } from 'type-graphql'
+import { Field, ObjectType } from 'type-graphql'
 import {
   BaseEntity,
+  Column,
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
@@ -10,7 +11,6 @@ import {
 } from 'typeorm'
 
 import ProductAnalyticalConstituent from './productAnalyticalConstituent'
-import ConstituentTranslation from './constituentTranslation'
 
 @Entity()
 @ObjectType()
@@ -24,8 +24,13 @@ export default class AnalyticalConstituent extends BaseEntity {
   )
   products!: ProductAnalyticalConstituent[]
 
-  @OneToMany(() => ConstituentTranslation, (translation) => translation.analyticalConstituent)
-  translations!: ConstituentTranslation[]
+  @Field()
+  @Column()
+  name!: string
+
+  @Field()
+  @Column()
+  description!: string
 
   @CreateDateColumn()
   createdAt!: Date

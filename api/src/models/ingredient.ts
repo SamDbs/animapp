@@ -25,8 +25,17 @@ export default class Ingredient extends BaseEntity {
   @OneToOne(() => Image, (image) => image.ingredient)
   image!: Image
 
-  @OneToMany(() => IngredientTranslation, (translation) => translation.ingredient)
-  translations!: IngredientTranslation[]
+  @Field()
+  @Column()
+  name!: string
+
+  @Field()
+  @Column()
+  review!: string
+
+  @Field()
+  @Column()
+  description!: string
 
   @OneToMany(() => ProductIngredient, (product) => product.ingredient)
   products!: ProductIngredient[]

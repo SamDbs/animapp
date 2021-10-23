@@ -1,11 +1,15 @@
 import Language from '../models/language'
 import Product from '../models/product'
-import ProductTranslation from '../models/productTranslation'
+import { TranslationEntityType } from '../models/translation'
+import TranslationService from '../services/TranslationService'
 
-export function viewProduct(product: Product, language: Language['id'] | undefined = 'EN') {
-  let translation = product.translations.find((t) => t.languageId === language)
-
-  if (!translation) translation = product.translations.find((t) => t.languageId === 'EN')
+export async function viewProduct(product: Product, languageId: Language['id'] | undefined = 'EN') {
+  const descriptionPromise = new TranslationService().get(
+    `${product.id}-description`,
+    languageId,
+    TranslationEntityType.PRODUCT,
+    'This product is not translated yet',
+  )
 
   const productClient = {
     id: product.id,
@@ -16,19 +20,11 @@ export function viewProduct(product: Product, language: Language['id'] | undefin
     brand: product.brand?.name,
     brandId: product.brand?.id,
     published: product.published,
-    description: translation?.description ?? 'This product is not translated yet',
+    description: await descriptionPromise,
   }
   return productClient
 }
 
-export function viewProducts(ingredients: Product[], language: Language['id'] = 'EN') {
-  return ingredients.map((ingredient) => viewProduct(ingredient, language))
-}
-
-export function viewProductTranslations(productTranslations: ProductTranslation[]) {
-  return productTranslations
-}
-
-export function viewProductTranslation(productTranslation: ProductTranslation) {
-  return productTranslation
+export function viewProducts(ingredients: Product[], languageId: Language['id'] = 'EN') {
+  return ingredients.map((ingredient) => viewProduct(ingredient, languageId))
 }

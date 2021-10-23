@@ -1,21 +1,34 @@
+import { TranslationEntityType } from '../models/translation'
 import Faq from '../models/faq'
-import Language from '../models/language'
 import FaqTranslation from '../models/faqTranslation'
+import Language from '../models/language'
+import TranslationService from '../services/TranslationService'
 
 export function viewFaqs(faqs: Faq[], language: Language['id'] = 'EN') {
   return faqs.map((faq) => viewFaq(faq, language))
 }
 
-export function viewFaq(faq: Faq, language: Language['id'] = 'EN') {
-  let faqTranslation = faq.translations.find((t) => t.languageId === language)
-
-  if (!faqTranslation) faqTranslation = faq.translations.find((t) => t.languageId === 'FR')
+export async function viewFaq(faq: Faq, languageId: Language['id'] = 'EN') {
+  const t = new TranslationService()
+  const questionPromise = t.get(
+    `${faq.id}-question`,
+    languageId,
+    TranslationEntityType.FAQ,
+    'This question is not translated yet',
+  )
+  const answerPromise = t.get(
+    `${faq.id}-answer`,
+    languageId,
+    TranslationEntityType.FAQ,
+    'This answer is not translated yet',
+  )
 
   const faqClient = {
     id: faq.id,
-    question: faqTranslation?.question ?? 'This question is not translated yet',
-    answer: faqTranslation?.answer ?? 'This answer is not translated yet',
+    question: await questionPromise,
+    answer: await answerPromise,
   }
+
   return faqClient
 }
 
