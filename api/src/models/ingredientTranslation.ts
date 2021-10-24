@@ -1,4 +1,4 @@
-import { ObjectType } from 'type-graphql'
+import { Field, ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   Column,
@@ -23,13 +23,16 @@ export default class IngredientTranslation extends BaseEntity {
   @PrimaryColumn()
   languageId!: string
 
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   name!: string
 
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   review!: string
 
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   description!: string
 
   @ManyToOne(() => Ingredient, (ingredient) => ingredient.translations, { onDelete: 'CASCADE' })

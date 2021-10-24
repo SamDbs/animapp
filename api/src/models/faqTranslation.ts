@@ -25,12 +25,12 @@ export default class FaqTranslation extends BaseEntity {
   @PrimaryColumn()
   languageId!: string
 
-  @Field()
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   question!: string
 
-  @Field()
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   answer!: string
 
   @ManyToOne(() => Faq, (faq) => faq.translations, { onDelete: 'CASCADE' })

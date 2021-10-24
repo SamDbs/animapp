@@ -1,11 +1,11 @@
 import { useQuery } from '@apollo/client'
 import Card from '@components/Card'
-import FieldTranslatableQL from '@components/FieldTransatableQL'
+import FieldTranslatableQL, { EntityKind } from '@components/FieldTransatableQL'
 import { PageHeader } from '@components/Themed'
 import { StackScreenProps } from '@react-navigation/stack'
 import gql from 'graphql-tag'
 import React from 'react'
-import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native'
+import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
 
 import { FaqStackParamList } from '../../../../types'
 
@@ -62,17 +62,12 @@ export default function FaqComponent(props: StackScreenProps<FaqStackParamList, 
             <View>
               {data?.faq.translations && (
                 <FieldTranslatableQL
-                  translations={data?.faq.translations.map(({ languageId, question }) => ({
+                  entityId={props.route.params.id}
+                  kind={EntityKind.faq}
+                  fields={['question', 'answer']}
+                  translations={data?.faq.translations.map(({ languageId, question, answer }) => ({
                     languageId,
-                    str: question,
-                  }))}
-                />
-              )}
-              {data?.faq.translations && (
-                <FieldTranslatableQL
-                  translations={data?.faq.translations.map(({ languageId, answer }) => ({
-                    languageId,
-                    str: answer,
+                    strings: { question, answer },
                   }))}
                 />
               )}
