@@ -4,6 +4,9 @@ import { debounce } from 'lodash/fp'
 import React, { useCallback, useEffect } from 'react'
 import { Text, TextInput, View } from 'react-native'
 
+import { GET_FAQ } from '../navigation/MainNavigator/FaqStack/Faq'
+import { GET_FAQS } from '../navigation/MainNavigator/FaqStack/Faqs/components/FaqList'
+
 export enum EntityKind {
   'ingredient' = 'ingredient',
   'product' = 'product',
@@ -47,7 +50,9 @@ export default function FieldTranslatableQL(props: Props) {
     state.getAllLanguages,
   ])
 
-  const [updateTranslation] = useMutation(UPDATE_TRANSLATION)
+  const [updateTranslation] = useMutation(UPDATE_TRANSLATION, {
+    refetchQueries: [GET_FAQS, GET_FAQ],
+  })
 
   const debouncedUpdate = useCallback(
     debounce(500, async (params: any) => {

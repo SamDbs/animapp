@@ -11,7 +11,7 @@ import { DataTable, IconButton } from 'react-native-paper'
 
 const LIMIT = 5
 
-type Faq = { id: string; question: string; asnwer: string }
+type Faq = { id: string; question: string; answer: string }
 
 export const GET_FAQS = gql`
   query GetFAQs($offset: Int, $limit: Int, $searchTerms: String = "") {
@@ -83,7 +83,7 @@ export default function FaqList({ style }: { style: View['props']['style'] }) {
             return (
               <DataTable.Row key={faq.id}>
                 <DataTable.Cell>{faq.question}</DataTable.Cell>
-                <DataTable.Cell>{faq.asnwer}</DataTable.Cell>
+                <DataTable.Cell>{faq.answer}</DataTable.Cell>
                 <DataTable.Cell numeric>
                   <IconButton
                     icon="pencil"
