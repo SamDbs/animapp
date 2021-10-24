@@ -26,7 +26,7 @@ export default function App() {
     () =>
       new ApolloClient({
         uri: `${Constants.manifest?.extra?.API_URL}/graphql`,
-        cache: new InMemoryCache(),
+        cache: new InMemoryCache({ addTypename: false }),
         headers: { Authorization: jwt },
       }),
     [jwt],

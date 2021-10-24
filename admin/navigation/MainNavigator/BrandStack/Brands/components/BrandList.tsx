@@ -8,12 +8,12 @@ import React, { useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
 
-type Brand = { id: string; name: string }
-
 const LIMIT = 5
 
+type Brand = { id: string; name: string }
+
 export const GET_BRANDS = gql`
-  query GetBrands($offset: Int, $limit: Int = ${LIMIT}, $searchTerms: String = "") {
+  query GetBrands($offset: Int, $limit: Int, $searchTerms: String = "") {
     brands(limit: $limit, offset: $offset, searchTerms: $searchTerms) {
       id
       name
@@ -127,7 +127,7 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
         </DataTable>
       </View>
       <Pagination
-        onChangePage={(i) => setPagination((x) => ({ ...x, page: i, offset: LIMIT * i }))}
+        onChangePage={(i) => setPagination({ page: i, offset: LIMIT * i })}
         pagination={{
           count: data?.brandsCount ?? 0,
           limit: LIMIT,

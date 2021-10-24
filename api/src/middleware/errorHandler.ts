@@ -9,7 +9,7 @@ export class MissingParamError extends Error {}
 export class ConflictError extends Error {}
 
 export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
-  console.log(error)
+  console.error(error)
   if (error instanceof EntityColumnNotFound) {
     res.status(500).json({ message: 'Bad request' })
     return

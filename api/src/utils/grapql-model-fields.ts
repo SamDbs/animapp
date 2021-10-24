@@ -6,6 +6,11 @@ function excludeFieldFromSelection(modelName: string, field: string) {
   return true
 }
 
+function mandatoryFields(modelName: string) {
+  if (modelName === 'faq') return ['id']
+  return []
+}
+
 export default function getSelectedFieldsFromForModel(info: any, model: typeof BaseEntity): any[] {
   const modelNameLowercase = model.name.toLowerCase()
 
@@ -13,4 +18,5 @@ export default function getSelectedFieldsFromForModel(info: any, model: typeof B
     .find((y: any) => y.name.value === modelNameLowercase)
     ?.selectionSet.selections.map((x: any) => x.name.value)
     .filter((x: any) => excludeFieldFromSelection(modelNameLowercase, x))
+    .concat(mandatoryFields(modelNameLowercase))
 }

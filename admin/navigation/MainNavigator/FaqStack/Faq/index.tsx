@@ -1,49 +1,43 @@
+import { useQuery } from '@apollo/client'
 import Card from '@components/Card'
-import FieldTranslatable from '@components/FieldTranslatable'
+import FieldTranslatableQL from '@components/FieldTransatableQL'
 import { PageHeader } from '@components/Themed'
-import useFaqStore, { Faq as FaqEntity } from '@hooks/stores/faq'
-import useFaqTranslationStore, {
-  FaqTranslation,
-  FaqTranslationStore,
-} from '@hooks/stores/faqTranslation'
 import { StackScreenProps } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
-import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
+import gql from 'graphql-tag'
+import React from 'react'
+import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native'
 
 import { FaqStackParamList } from '../../../../types'
 
-export default function Faq(props: StackScreenProps<FaqStackParamList, 'Faq'>) {
-  const [id, setId] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const faq = useFaqStore((state) => state.faqs[props.route.params.id])
-  const [registerIds, unregisterIds, getFaqById] = useFaqStore((state) => [
-    state.registerIds,
-    state.unregisterIds,
-    state.getFaqById,
-  ])
+type Faq = { id: string; translations: { question: string; answer: string; languageId: string }[] }
 
-  useEffect(() => {
-    if (!faq) return
-    registerIds([id])
-    return () => unregisterIds([id])
-  }, [id])
-
-  useEffect(() => {
-    async function fn() {
-      setIsLoading(true)
-      const { id } = await getFaqById(props.route.params.id)
-      setId(id)
-      setIsLoading(false)
+const GET_FAQ = gql`
+  query GetFaq($id: String!) {
+    faq(id: $id) {
+      id
+      translations {
+        languageId
+        question
+        answer
+      }
     }
-    fn()
-  }, [])
+  }
+`
+
+export default function FaqComponent(props: StackScreenProps<FaqStackParamList, 'Faq'>) {
+  const { data, loading, error } = useQuery<{ faq: Faq }>(GET_FAQ, {
+    variables: { id: props.route.params.id },
+  })
+
+  console.log('error', error)
+  console.log('faq', data)
 
   return (
     <ScrollView style={{ padding: 16 }}>
       <PageHeader>Question &amp; Answer</PageHeader>
       <Card>
-        {isLoading && !faq && <ActivityIndicator />}
-        {faq && (
+        {loading && <ActivityIndicator />}
+        {data && (
           <>
             <View
               style={{
@@ -66,7 +60,24 @@ export default function Faq(props: StackScreenProps<FaqStackParamList, 'Faq'>) {
               />
             </View>
             <View>
-              <FieldTranslatable<FaqEntity, FaqTranslation, FaqTranslationStore>
+              {data?.faq.translations && (
+                <FieldTranslatableQL
+                  translations={data?.faq.translations.map(({ languageId, question }) => ({
+                    languageId,
+                    str: question,
+                  }))}
+                />
+              )}
+              {data?.faq.translations && (
+                <FieldTranslatableQL
+                  translations={data?.faq.translations.map(({ languageId, answer }) => ({
+                    languageId,
+                    str: answer,
+                  }))}
+                />
+              )}
+
+              {/* <FieldTranslatable<FaqEntity, FaqTranslation, FaqTranslationStore>
                 fields={{ question: 'Question', answer: 'Answer' }}
                 baseEntityId={faq.id}
                 useStore={useFaqTranslationStore}
@@ -74,7 +85,7 @@ export default function Faq(props: StackScreenProps<FaqStackParamList, 'Faq'>) {
                 translationUpdaterSelector={(state) => state.updateFaqTranslation}
                 translationsSelectorCreator={(ids) => (state) =>
                   ids.map((id) => state.faqTranslations[id])}
-              />
+              /> */}
             </View>
           </>
         )}

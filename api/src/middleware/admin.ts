@@ -1,9 +1,12 @@
 import { RequestHandler } from 'express'
 import { verify } from 'jsonwebtoken'
+import NodeCache from 'node-cache'
 
 import Admin from '../models/admin'
 
 import { NotAuthorizedError } from './errorHandler'
+
+const authAdminCache = new NodeCache({ stdTTL: 600, checkperiod: 600 })
 
 const introspectionQueries = [
   '{\n        __schema {\n          queryType {\n            kind\n          }\n        }\n      }',
@@ -33,7 +36,11 @@ export const isConnected: RequestHandler = async (req, res, next) => {
   const authorize = req.header('Authorization')
   if (authorize) {
     const adminId = verify(authorize, process.env.AUTH_SECRET_KEY as string) as string
-    const admin = await Admin.findOneOrFail(adminId)
+    let admin = authAdminCache.get(adminId)
+    if (typeof admin === 'undefined') {
+      admin = await Admin.findOneOrFail(adminId)
+      authAdminCache.set(adminId, admin ?? null)
+    }
     res.locals.admin = admin
   }
   next()
