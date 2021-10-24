@@ -16,7 +16,7 @@ type Contact = {
 const LIMIT = 5
 
 const GET_CONTACTS = gql`
-  query GetContacts($offset: Int, $limit: Int = ${LIMIT}, $searchTerms: String = "") {
+  query GetContacts($offset: Int, $limit: Int, $searchTerms: String = "") {
     contacts(limit: $limit, offset: $offset, searchTerms: $searchTerms) {
       id
       name
