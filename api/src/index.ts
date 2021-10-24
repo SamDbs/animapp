@@ -26,6 +26,7 @@ import ProductIngredientResolver from './resolvers/productIngredient'
 import ContactResolver from './resolvers/contact'
 import LanguageResolver from './resolvers/language'
 import FaqResolver from './resolvers/faq'
+import BrandResolver from './resolvers/brand'
 
 const PORT = (process.env.PORT as unknown as number) || 8080
 const HOST = '0.0.0.0'
@@ -57,6 +58,7 @@ async function main() {
 
   const schema = await buildSchema({
     resolvers: [
+      BrandResolver,
       ContactResolver,
       FaqResolver,
       IngredientResolver,

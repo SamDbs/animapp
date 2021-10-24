@@ -1,21 +1,34 @@
+import { gql, useMutation } from '@apollo/client'
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
-import useBrandStore from '@hooks/stores/brand'
 import React, { useState } from 'react'
 import { Button, Text } from 'react-native'
+import { GET_BRANDS } from './BrandList'
 
 const initialState = { name: '' }
+
+const CREATE_BRAND = gql`
+  mutation CreateBrand($name: String!) {
+    createBrand(name: $name) {
+      id
+      name
+    }
+  }
+`
 
 export default function BrandCreator({ style }: any) {
   const [brand, setBrand] = useState({ ...initialState })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const createBrand = useBrandStore((state) => state.createBrand)
+  const [createBrand] = useMutation(CREATE_BRAND, {
+    refetchQueries: [GET_BRANDS],
+  })
+
   const create = async () => {
     setLoading(true)
     setError('')
     try {
-      await createBrand(brand)
+      await createBrand({ variables: { name: brand.name } })
       setBrand({ ...initialState })
     } catch (e) {
       setError(e?.response?.data?.message ?? 'An unknown error occured.')

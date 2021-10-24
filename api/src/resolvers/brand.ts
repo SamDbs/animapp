@@ -1,6 +1,6 @@
 import { Arg, Args, ArgsType, Field, Info, Int, Mutation, Query, Resolver } from 'type-graphql'
 import { GraphQLResolveInfo } from 'graphql'
-import { FindManyOptions } from 'typeorm'
+import { FindManyOptions, FindOperator } from 'typeorm'
 
 import Brand from '../models/brand'
 import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
@@ -9,6 +9,24 @@ import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
 class CreateBrandArgs implements Partial<Brand> {
   @Field()
   name!: string
+}
+
+@ArgsType()
+class GetBrandsArgs {
+  @Field(() => Int, { nullable: true })
+  limit?: number
+
+  @Field(() => Int, { nullable: true })
+  offset?: number
+
+  @Field({ nullable: true })
+  searchTerms?: string
+}
+
+@ArgsType()
+class GetBrandsCountArgs {
+  @Field({ nullable: true })
+  searchTerms?: string
 }
 
 @Resolver(() => Brand)
@@ -21,14 +39,20 @@ export default class BrandResolver {
   }
 
   @Query(() => [Brand])
-  brands(): Promise<Brand[]> {
+  brands(@Args() args: GetBrandsArgs): Promise<Brand[]> {
     const options: FindManyOptions<Brand> = { order: { id: 'ASC' } }
+    if (args.limit) options.take = args.limit
+    if (args.limit && args.offset) options.skip = args.offset
+    if (args.searchTerms)
+      options.where = { name: new FindOperator('ilike', `%${args.searchTerms}%`) }
     return Brand.find(options)
   }
 
   @Query(() => Int)
-  brandsCount(): Promise<number> {
+  brandsCount(@Args() args: GetBrandsCountArgs): Promise<number> {
     const options: FindManyOptions<Brand> = {}
+    if (args.searchTerms)
+      options.where = { name: new FindOperator('ilike', `%${args.searchTerms}%`) }
     return Brand.count(options)
   }
 

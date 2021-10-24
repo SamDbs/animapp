@@ -1,4 +1,4 @@
-import { useQuery, gql } from '@apollo/client'
+import { useQuery, gql, useMutation } from '@apollo/client'
 import Card from '@components/Card'
 import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
@@ -12,7 +12,7 @@ type Brand = { id: string; name: string }
 
 const LIMIT = 5
 
-const GET_BRANDS = gql`
+export const GET_BRANDS = gql`
   query GetBrands($offset: Int, $limit: Int = ${LIMIT}, $searchTerms: String = "") {
     brands(limit: $limit, offset: $offset, searchTerms: $searchTerms) {
       id
@@ -28,8 +28,10 @@ const initialPagination = {
 }
 
 const DELETE_BRAND = gql`
-  mutation DeleteBrand($id: Int){
-    
+  mutation DeleteBrand($id: String!) {
+    deleteBrand(id: $id) {
+      id
+    }
   }
 `
 
@@ -41,6 +43,10 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
     brandsCount: number
   }>(GET_BRANDS, {
     variables: { limit: LIMIT, offset: pagination.offset },
+  })
+
+  const [deleteBrand] = useMutation(DELETE_BRAND, {
+    refetchQueries: [GET_BRANDS],
   })
 
   const { navigate } = useNavigation()
@@ -106,8 +112,7 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
                     style={{ margin: 0 }}
                     onPress={async () => {
                       try {
-                        await deleteBrand(brand.id)
-                        location.reload()
+                        await deleteBrand({ variables: { id: brand.id } })
                       } catch (error: any) {
                         alert(error.response.data.message)
                       }
