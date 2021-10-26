@@ -8,36 +8,24 @@ import { ActivityIndicator, ScrollView, View } from 'react-native'
 
 import { IngredientStackParamList } from '../../../../types'
 
-export default function Ingredient(
+export default function LanguageComponent(
   props: StackScreenProps<IngredientStackParamList, 'Ingredient'>,
 ) {
-  const [id, setId] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const language = useLanguageStore((state) => state.languages[props.route.params.id])
-  const [registerIds, unregisterIds, getLanguageById, updateLanguage] = useLanguageStore(
-    (state) => [
-      state.registerIds,
-      state.unregisterIds,
-      state.getLanguageById,
-      state.updateLanguage,
-    ],
-  )
-
-  useEffect(() => {
-    if (!language) return
-    registerIds([id])
-    return () => unregisterIds([id])
-  }, [id])
+  const [getLanguageById, updateLanguage] = useLanguageStore((state) => [
+    state.getLanguageById,
+    state.updateLanguage,
+  ])
 
   useEffect(() => {
     async function fn() {
       setIsLoading(true)
-      const { id } = await getLanguageById(props.route.params.id)
-      setId(id)
+      await getLanguageById(props.route.params.id)
       setIsLoading(false)
     }
     fn()
-  }, [])
+  }, [props.route.params.id])
 
   return (
     <ScrollView style={{ padding: 16 }}>

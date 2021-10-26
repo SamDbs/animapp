@@ -2,7 +2,9 @@ import { Args, ArgsType, Field, Mutation, Resolver } from 'type-graphql'
 
 import ConstituentTranslation from '../models/constituentTranslation'
 import FaqTranslation from '../models/faqTranslation'
+import IngredientTranslation from '../models/ingredientTranslation'
 import Language from '../models/language'
+import ProductTranslation from '../models/productTranslation'
 
 export enum EntityKind {
   'ingredient' = 'ingredient',
@@ -74,8 +76,28 @@ export default class TranslationResolver {
         await translation.save()
         return 'ok'
       }
-      case EntityKind.product:
-      case EntityKind.ingredient:
+      case EntityKind.product: {
+        const existingTranslation = await ProductTranslation.findOne({
+          where: { analyticalConstituentId: id, languageId },
+        })
+        const translation =
+          existingTranslation || ProductTranslation.create({ productId: id, languageId })
+        if (typeof args.description === 'string') translation.description = args.description
+        await translation.save()
+        return 'ok'
+      }
+      case EntityKind.ingredient: {
+        const existingTranslation = await IngredientTranslation.findOne({
+          where: { analyticalConstituentId: id, languageId },
+        })
+        const translation =
+          existingTranslation || IngredientTranslation.create({ ingredientId: id, languageId })
+        if (typeof args.description === 'string') translation.description = args.description
+        if (typeof args.name === 'string') translation.name = args.name
+        if (typeof args.review === 'string') translation.review = args.review
+        await translation.save()
+        return 'ok'
+      }
       default:
         throw new Error()
     }

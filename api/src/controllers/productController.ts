@@ -164,7 +164,6 @@ export const createProduct: RequestHandler = async (req, res) => {
 export const patchProduct: RequestHandler = async (req, res) => {
   await Product.update(req.params.id, req.body)
   const product = await Product.findOneOrFail(req.params.id)
-  console.log('ok', product)
   res.status(200).json(product)
 }
 
