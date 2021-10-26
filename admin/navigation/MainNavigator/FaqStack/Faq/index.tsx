@@ -8,6 +8,7 @@ import React from 'react'
 import { ActivityIndicator, ScrollView } from 'react-native'
 
 import { FaqStackParamList } from '../../../../types'
+import { GET_FAQS } from '../Faqs/components/FaqList'
 
 type Faq = { id: string; translations: { question: string; answer: string; languageId: string }[] }
 
@@ -24,6 +25,9 @@ export const GET_FAQ = gql`
   }
 `
 
+const queriesToRefresh = [GET_FAQ, GET_FAQS]
+const fieldsToTranslate = ['question', 'answer']
+
 export default function FaqComponent(props: StackScreenProps<FaqStackParamList, 'Faq'>) {
   const { data, loading } = useQuery<{ faq: Faq }>(GET_FAQ, {
     variables: { id: props.route.params.id },
@@ -37,8 +41,9 @@ export default function FaqComponent(props: StackScreenProps<FaqStackParamList, 
         {data?.faq.translations && (
           <FieldTranslatableQL
             entityId={props.route.params.id}
+            fields={fieldsToTranslate}
             kind={EntityKind.faq}
-            fields={['question', 'answer']}
+            refreshQueries={queriesToRefresh}
             translations={data?.faq.translations.map(({ languageId, question, answer }) => ({
               languageId,
               strings: { question, answer },

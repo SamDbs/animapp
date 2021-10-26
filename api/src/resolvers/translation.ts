@@ -22,17 +22,23 @@ class UpdateTranslationArgs {
   @Field()
   entityId!: string
 
+  // FAQ
   @Field({ nullable: true })
-  description?: string
+  answer?: string
+  @Field({ nullable: true })
+  question?: string
 
+  // Ingredient
+  @Field({ nullable: true })
+  review?: string
+
+  // Constituent + Ingredient
   @Field({ nullable: true })
   name?: string
 
+  // Constituent + Ingredient + Products
   @Field({ nullable: true })
-  answer?: string
-
-  @Field({ nullable: true })
-  question?: string
+  description?: string
 }
 
 @Resolver()

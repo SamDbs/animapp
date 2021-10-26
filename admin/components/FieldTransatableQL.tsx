@@ -1,11 +1,8 @@
-import { gql, useMutation } from '@apollo/client'
+import { DocumentNode, gql, useMutation } from '@apollo/client'
 import useLanguagesStore from '@hooks/stores/languages'
 import { debounce } from 'lodash/fp'
 import React, { useCallback, useEffect } from 'react'
 import { Text, TextInput, View } from 'react-native'
-
-import { GET_FAQ } from '../navigation/MainNavigator/FaqStack/Faq'
-import { GET_FAQS } from '../navigation/MainNavigator/FaqStack/Faqs/components/FaqList'
 
 export enum EntityKind {
   'ingredient' = 'ingredient',
@@ -19,6 +16,7 @@ type Props = {
   fields: string[]
   kind: EntityKind
   translations: { languageId: string; strings: Record<Props['fields'][number], string> }[]
+  refreshQueries?: DocumentNode[]
 }
 
 const UPDATE_TRANSLATION = gql`
@@ -51,7 +49,7 @@ export default function FieldTranslatableQL(props: Props) {
   ])
 
   const [updateTranslation] = useMutation(UPDATE_TRANSLATION, {
-    refetchQueries: [GET_FAQS, GET_FAQ],
+    refetchQueries: props.refreshQueries,
   })
 
   const debouncedUpdate = useCallback(
@@ -94,7 +92,7 @@ export default function FieldTranslatableQL(props: Props) {
                 borderRadius: 3,
                 paddingHorizontal: 8,
               }}>
-              <View>{l.name}</View>
+              <Text style={{ marginVertical: 8, fontWeight: 'bold' }}>{l.name}</Text>
               {props.fields.map((field, i) => {
                 const currentTranslation = props.translations.find(
                   (translation) => translation.languageId === l.id,
