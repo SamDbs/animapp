@@ -8,7 +8,7 @@ import { DataTable, IconButton } from 'react-native-paper'
 
 type Language = { id: string; name: string }
 
-const GET_LANGUAGES = gql`
+export const GET_LANGUAGES = gql`
   query GetLanguages {
     languages {
       id
