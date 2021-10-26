@@ -3,6 +3,7 @@ import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
 import React, { useState } from 'react'
 import { Button, Text } from 'react-native'
+
 import { GET_BRANDS } from './BrandList'
 
 const initialState = { name: '' }
