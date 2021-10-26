@@ -1,21 +1,34 @@
+import { gql, useMutation } from '@apollo/client'
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
-import useLanguageStore from '@hooks/stores/languages'
 import React, { useState } from 'react'
 import { Button, Text } from 'react-native'
 
+import { GET_LANGUAGES } from './LanguageList'
+
 const initialState = { id: '', name: '' }
+
+const CREATE_LANGUAGE = gql`
+  mutation CreateLanguage($id: String!, $name: String!) {
+    createLanguage(id: $id, name: $name) {
+      id
+      name
+    }
+  }
+`
 
 export default function LanguageCreator() {
   const [language, setLanguage] = useState({ ...initialState })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const createLanguage = useLanguageStore((state) => state.createLanguage)
+  const [createLanguage] = useMutation(CREATE_LANGUAGE, {
+    refetchQueries: [GET_LANGUAGES],
+  })
   const create = async () => {
     setLoading(true)
     setError('')
     try {
-      await createLanguage(language)
+      await createLanguage({ variables: { id: language.id, name: language.name } })
       setLanguage({ ...initialState })
     } catch (e) {
       setError(e?.response?.data?.message ?? 'An unknown error occured.')
