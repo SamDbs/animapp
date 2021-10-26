@@ -9,7 +9,7 @@ function excludeFieldFromSelection(modelName: string, field: string) {
 }
 
 function mandatoryFields(modelName: string) {
-  if (modelName === 'faq') return ['id']
+  if (['product', 'faq', 'ingredient', 'analyticalconstituent'].includes(modelName)) return ['id']
   return []
 }
 

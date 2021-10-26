@@ -1,26 +1,43 @@
+import { gql, useQuery } from '@apollo/client'
 import Card from '@components/Card'
 import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
-import useConstituentsStore, { ConstituentStoreState, Constituent } from '@hooks/stores/constituent'
-import useSearchableList from '@hooks/useSearchableList'
+import useSearch from '@hooks/useSearch'
 import { useNavigation } from '@react-navigation/native'
-import React from 'react'
+import React, { useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
 
+const LIMIT = 5
+type Constituent = { id: string; name: string; description: string }
+export const GET_CONSTITUENTS = gql`
+  query GetConstituents($offset: Int, $limit: Int, $searchTerms: String = "") {
+    analyticalConstituents(limit: $limit, offset: $offset, searchTerms: $searchTerms) {
+      id
+      name
+      description
+    }
+    analyticalConstituentsCount
+  }
+`
+const initialPagination = {
+  page: 0,
+  offset: 0,
+}
+
 export default function ConstituentList({ style }: { style: View['props']['style'] }) {
-  const {
-    changePage,
-    isLoading,
-    items: constituents,
-    noResult,
-    pagination,
-    searchDebounced,
-  } = useSearchableList<ConstituentStoreState, Constituent>(
-    useConstituentsStore,
-    (state) => state.searchConstituents,
-    (ids) => (state) => ids.map((id) => state.constituents[id]),
-  )
+  const [pagination, setPagination] = useState(initialPagination)
+  const { data, loading, refetch } = useQuery<{
+    analyticalConstituents: Constituent[]
+    analyticalConstituentsCount: number
+  }>(GET_CONSTITUENTS, {
+    variables: { limit: LIMIT, offset: pagination.offset },
+  })
+
+  const search = useSearch((searchTerms) => {
+    setPagination(initialPagination)
+    refetch({ offset: 0, searchTerms })
+  })
 
   const { navigate } = useNavigation()
 
@@ -43,7 +60,7 @@ export default function ConstituentList({ style }: { style: View['props']['style
               height: 30,
               paddingHorizontal: 8,
             }}
-            onChangeText={searchDebounced}
+            onChangeText={search}
           />
         </View>
       </View>
@@ -61,7 +78,7 @@ export default function ConstituentList({ style }: { style: View['props']['style
             <DataTable.Title>Description</DataTable.Title>
             <DataTable.Title numeric>Actions</DataTable.Title>
           </DataTable.Header>
-          {constituents.filter(Boolean).map((constituent, i: number) => {
+          {data?.analyticalConstituents.filter(Boolean).map((constituent, i: number) => {
             return (
               <DataTable.Row key={constituent.id}>
                 <DataTable.Cell>{constituent.name}</DataTable.Cell>
@@ -81,11 +98,18 @@ export default function ConstituentList({ style }: { style: View['props']['style
               </DataTable.Row>
             )
           })}
-          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
-          {!isLoading && noResult && <NoResult />}
+          {loading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!loading && data?.analyticalConstituents.length === 0 && <NoResult />}
         </DataTable>
       </View>
-      <Pagination onChangePage={changePage} pagination={pagination} />
+      <Pagination
+        onChangePage={(i) => setPagination({ page: i, offset: LIMIT * i })}
+        pagination={{
+          count: data?.analyticalConstituentsCount ?? 0,
+          limit: LIMIT,
+          page: pagination.page,
+        }}
+      />
     </Card>
   )
 }

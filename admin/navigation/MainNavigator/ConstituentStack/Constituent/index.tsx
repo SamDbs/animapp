@@ -6,6 +6,7 @@ import React from 'react'
 import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
 
 import { ConstituentStackParamList } from '../../../../types'
+import { GET_CONSTITUENTS } from '../Constituents/components/ConstituentList'
 
 type Constituent = {
   id: number
@@ -26,6 +27,7 @@ const GET_CONSTITUENT = gql`
 `
 
 const fieldsToTranslate = ['name', 'description']
+const refreshQueries = [GET_CONSTITUENT, GET_CONSTITUENTS]
 
 export default function ConstituentComponent(
   props: StackScreenProps<ConstituentStackParamList, 'Constituent'>,
@@ -65,6 +67,7 @@ export default function ConstituentComponent(
                 entityId={props.route.params.id}
                 fields={fieldsToTranslate}
                 kind={EntityKind.constituent}
+                refreshQueries={refreshQueries}
                 translations={data?.analyticalConstituent.translations.map(
                   ({ languageId, name, description }) => ({
                     languageId,

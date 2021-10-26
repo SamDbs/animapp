@@ -19,7 +19,7 @@ import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
 import ConstituentTranslation from '../models/constituentTranslation'
 
 @ArgsType()
-class GetFAQsArgs {
+class GetConstituentsArgs {
   @Field(() => Int, { nullable: true })
   limit?: number
 
@@ -42,7 +42,9 @@ export default class AnalyticalConstituentResolver {
   }
 
   @Query(() => [AnalyticalConstituent])
-  async analyticalConstituents(@Args() args: GetFAQsArgs): Promise<AnalyticalConstituent[]> {
+  async analyticalConstituents(
+    @Args() args: GetConstituentsArgs,
+  ): Promise<AnalyticalConstituent[]> {
     const options: FindManyOptions<AnalyticalConstituent> = { order: { id: 'ASC' } }
     if (args.limit) options.take = args.limit
     if (args.limit && args.offset) options.skip = args.offset
@@ -54,7 +56,7 @@ export default class AnalyticalConstituentResolver {
           { languageId: 'EN', description: new FindOperator('ilike', `%${args.searchTerms}%`) },
         ],
       })
-      options.where = { id: In(analyticalConstituents) }
+      options.where = { id: In(analyticalConstituents.map((x) => x.analyticalConstituentId)) }
     }
     return AnalyticalConstituent.find(options)
   }
@@ -84,19 +86,19 @@ export default class AnalyticalConstituentResolver {
   }
 
   @Query(() => Int)
-  async analyticalConstituentsCount(@Args() args: GetFAQsArgs) {
+  async analyticalConstituentsCount(@Args() args: GetConstituentsArgs) {
     const options: FindManyOptions<AnalyticalConstituent> = { order: { id: 'ASC' } }
     if (args.limit) options.take = args.limit
     if (args.limit && args.offset) options.skip = args.offset
     if (args.searchTerms) {
-      const faqIds = await ConstituentTranslation.find({
+      const analyticalConstituents = await ConstituentTranslation.find({
         select: ['analyticalConstituentId'],
         where: [
           { languageId: 'EN', name: new FindOperator('ilike', `%${args.searchTerms}%`) },
           { languageId: 'EN', description: new FindOperator('ilike', `%${args.searchTerms}%`) },
         ],
       })
-      options.where = { id: In(faqIds) }
+      options.where = { id: In(analyticalConstituents.map((x) => x.analyticalConstituentId)) }
     }
     return AnalyticalConstituent.count(options)
   }

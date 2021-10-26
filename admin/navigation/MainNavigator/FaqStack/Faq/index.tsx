@@ -25,7 +25,7 @@ export const GET_FAQ = gql`
   }
 `
 
-const queriesToRefresh = [GET_FAQ, GET_FAQS]
+const refreshQueries = [GET_FAQ, GET_FAQS]
 const fieldsToTranslate = ['question', 'answer']
 
 export default function FaqComponent(props: StackScreenProps<FaqStackParamList, 'Faq'>) {
@@ -43,7 +43,7 @@ export default function FaqComponent(props: StackScreenProps<FaqStackParamList, 
             entityId={props.route.params.id}
             fields={fieldsToTranslate}
             kind={EntityKind.faq}
-            refreshQueries={queriesToRefresh}
+            refreshQueries={refreshQueries}
             translations={data?.faq.translations.map(({ languageId, question, answer }) => ({
               languageId,
               strings: { question, answer },

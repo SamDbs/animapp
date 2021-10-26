@@ -51,7 +51,7 @@ export default class FaqResolver {
           { answer: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
         ],
       })
-      options.where = { id: In(faqIds) }
+      options.where = { id: In(faqIds.map((x) => x.faqId)) }
     }
     return Faq.find(options)
   }
@@ -90,7 +90,7 @@ export default class FaqResolver {
           { answer: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
         ],
       })
-      options.where = { id: In(faqIds) }
+      options.where = { id: In(faqIds.map((x) => x.faqId)) }
     }
     return Faq.count(options)
   }
