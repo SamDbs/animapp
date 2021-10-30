@@ -1,28 +1,61 @@
+import { gql, useMutation, useQuery } from '@apollo/client'
 import Card from '@components/Card'
 import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
-import { FontAwesome5 } from '@expo/vector-icons'
-import useIngredientsStore, { Ingredient, IngredientStore } from '@hooks/stores/ingredient'
-import useSearchableList from '@hooks/useSearchableList'
-import React from 'react'
-import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
+import useSearch from '@hooks/useSearch'
+import React, { useState } from 'react'
+import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
 
-export default function IngredientDeletedList({ style }: { style?: View['props']['style'] }) {
-  const {
-    changePage,
-    isLoading,
-    items: ingredients,
-    noResult,
-    pagination,
-    searchDebounced,
-  } = useSearchableList<IngredientStore, Ingredient>(
-    useIngredientsStore,
-    (state) => state.searchDeletedIngredients,
-    (ids) => (state) => ids.map((id) => state.ingredients[id]),
-  )
+import { GET_INGREDIENTS } from './IngredientList'
 
-  const restoreIngredient = useIngredientsStore((state) => state.restoreIngredient)
+const LIMIT = 5
+
+type Ingredient = { id: string; name: string; review: string; description: string }
+
+export const GET_DELETE_INGREDIENTS = gql`
+  query GetDeletedIngredients($offset: Int, $limit: Int, $searchTerms: String = "") {
+    ingredients(
+      limit: $limit
+      offset: $offset
+      searchTerms: $searchTerms
+      filters: { deleted: true }
+    ) {
+      id
+      name
+      review
+      description
+    }
+    ingredientsCount(searchTerms: $searchTerms, filters: { deleted: true })
+  }
+`
+const initialPagination = {
+  page: 0,
+  offset: 0,
+}
+
+const RESTORE_INGREDIENT = gql`
+  mutation RestoreIngredient($id: String!) {
+    restoreIngredient(id: $id)
+  }
+`
+
+export default function IngredientDeletedList({ style }: { style?: View['props']['style'] }) {
+  const [restoreIngredient] = useMutation(RESTORE_INGREDIENT, {
+    refetchQueries: [GET_INGREDIENTS, GET_DELETE_INGREDIENTS],
+  })
+  const [pagination, setPagination] = useState(initialPagination)
+  const { data, loading, refetch } = useQuery<{
+    ingredients: Ingredient[]
+    ingredientsCount: number
+  }>(GET_DELETE_INGREDIENTS, {
+    variables: { limit: LIMIT, offset: pagination.offset },
+  })
+
+  const search = useSearch((searchTerms) => {
+    setPagination(initialPagination)
+    refetch({ offset: 0, searchTerms })
+  })
 
   return (
     <Card style={style}>
@@ -43,7 +76,7 @@ export default function IngredientDeletedList({ style }: { style?: View['props']
               height: 30,
               paddingHorizontal: 8,
             }}
-            onChangeText={searchDebounced}
+            onChangeText={search}
           />
         </View>
       </View>
@@ -63,7 +96,7 @@ export default function IngredientDeletedList({ style }: { style?: View['props']
             <DataTable.Title numeric>Actions</DataTable.Title>
           </DataTable.Header>
 
-          {ingredients.filter(Boolean).map((ingredient, i: number) => {
+          {data?.ingredients.map((ingredient, i: number) => {
             return (
               <DataTable.Row key={ingredient.id}>
                 <DataTable.Cell>{ingredient.name}</DataTable.Cell>
@@ -75,8 +108,7 @@ export default function IngredientDeletedList({ style }: { style?: View['props']
                     style={{ margin: 0 }}
                     onPress={async () => {
                       try {
-                        await restoreIngredient(ingredient.id)
-                        location.reload()
+                        restoreIngredient({ variables: { id: ingredient.id } })
                       } catch (error: any) {
                         alert(error.response.data.message)
                       }
@@ -86,11 +118,18 @@ export default function IngredientDeletedList({ style }: { style?: View['props']
               </DataTable.Row>
             )
           })}
-          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
-          {!isLoading && noResult && <NoResult />}
+          {loading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!loading && data?.ingredients.length === 0 && <NoResult />}
         </DataTable>
       </View>
-      <Pagination onChangePage={changePage} pagination={pagination} />
+      <Pagination
+        onChangePage={(i) => setPagination({ page: i, offset: LIMIT * i })}
+        pagination={{
+          count: data?.ingredientsCount ?? 0,
+          limit: LIMIT,
+          page: pagination.page,
+        }}
+      />
     </Card>
   )
 }

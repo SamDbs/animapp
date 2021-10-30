@@ -19,7 +19,7 @@ export const GET_FAQS = gql`
       question
       answer
     }
-    faqsCount
+    faqsCount(searchTerms: $searchTerms)
   }
 `
 

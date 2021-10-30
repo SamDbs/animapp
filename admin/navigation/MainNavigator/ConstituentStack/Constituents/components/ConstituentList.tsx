@@ -17,7 +17,7 @@ export const GET_CONSTITUENTS = gql`
       name
       description
     }
-    analyticalConstituentsCount
+    analyticalConstituentsCount(searchTerms: $searchTerms)
   }
 `
 const initialPagination = {
@@ -78,7 +78,7 @@ export default function ConstituentList({ style }: { style: View['props']['style
             <DataTable.Title>Description</DataTable.Title>
             <DataTable.Title numeric>Actions</DataTable.Title>
           </DataTable.Header>
-          {data?.analyticalConstituents.filter(Boolean).map((constituent, i: number) => {
+          {data?.analyticalConstituents.map((constituent, i: number) => {
             return (
               <DataTable.Row key={constituent.id}>
                 <DataTable.Cell>{constituent.name}</DataTable.Cell>

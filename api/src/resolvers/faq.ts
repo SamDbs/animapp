@@ -80,8 +80,6 @@ export default class FaqResolver {
   @Query(() => Int)
   async faqsCount(@Args() args: GetFAQsArgs) {
     const options: FindManyOptions<Faq> = { order: { id: 'ASC' } }
-    if (args.limit) options.take = args.limit
-    if (args.limit && args.offset) options.skip = args.offset
     if (args.searchTerms) {
       const faqIds = await FaqTranslation.find({
         select: ['faqId'],

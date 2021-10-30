@@ -88,14 +88,12 @@ export default class AnalyticalConstituentResolver {
   @Query(() => Int)
   async analyticalConstituentsCount(@Args() args: GetConstituentsArgs) {
     const options: FindManyOptions<AnalyticalConstituent> = { order: { id: 'ASC' } }
-    if (args.limit) options.take = args.limit
-    if (args.limit && args.offset) options.skip = args.offset
     if (args.searchTerms) {
       const analyticalConstituents = await ConstituentTranslation.find({
         select: ['analyticalConstituentId'],
         where: [
-          { languageId: 'EN', name: new FindOperator('ilike', `%${args.searchTerms}%`) },
-          { languageId: 'EN', description: new FindOperator('ilike', `%${args.searchTerms}%`) },
+          { name: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
+          { description: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
         ],
       })
       options.where = { id: In(analyticalConstituents.map((x) => x.analyticalConstituentId)) }

@@ -1,30 +1,58 @@
+import { gql, useMutation, useQuery } from '@apollo/client'
 import Card from '@components/Card'
 import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
-import useIngredientsStore, { Ingredient, IngredientStore } from '@hooks/stores/ingredient'
-import useSearchableList from '@hooks/useSearchableList'
+import useSearch from '@hooks/useSearch'
 import { useNavigation } from '@react-navigation/native'
-import React from 'react'
+import React, { useState } from 'react'
 import { ActivityIndicator, Text, TextInput, View } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
 
+import { GET_DELETE_INGREDIENTS } from './IngredientDeletedList'
+
+const LIMIT = 5
+
+type Ingredient = { id: string; name: string; review: string; description: string }
+
+export const GET_INGREDIENTS = gql`
+  query GetIngredients($offset: Int, $limit: Int, $searchTerms: String = "") {
+    ingredients(limit: $limit, offset: $offset, searchTerms: $searchTerms) {
+      id
+      name
+      review
+      description
+    }
+    ingredientsCount(searchTerms: $searchTerms)
+  }
+`
+
+const DELETE_INGREDIENT = gql`
+  mutation DeleteIngredient($id: String!) {
+    deleteIngredient(id: $id)
+  }
+`
+const initialPagination = {
+  page: 0,
+  offset: 0,
+}
 export default function IngredientList({ style }: { style?: View['props']['style'] }) {
-  const {
-    changePage,
-    isLoading,
-    items: ingredients,
-    noResult,
-    pagination,
-    searchDebounced,
-  } = useSearchableList<IngredientStore, Ingredient>(
-    useIngredientsStore,
-    (state) => state.searchIngredients,
-    (ids) => (state) => ids.map((id) => state.ingredients[id]),
-  )
+  const [deleteIngredient] = useMutation(DELETE_INGREDIENT, {
+    refetchQueries: [GET_INGREDIENTS, GET_DELETE_INGREDIENTS],
+  })
 
+  const [pagination, setPagination] = useState(initialPagination)
+  const { data, loading, refetch } = useQuery<{
+    ingredients: Ingredient[]
+    ingredientsCount: number
+  }>(GET_INGREDIENTS, {
+    variables: { limit: LIMIT, offset: pagination.offset },
+  })
+
+  const search = useSearch((searchTerms) => {
+    setPagination(initialPagination)
+    refetch({ offset: 0, searchTerms })
+  })
   const { navigate } = useNavigation()
-
-  const deleteIngredient = useIngredientsStore((state) => state.deleteIngredient)
 
   return (
     <Card style={style}>
@@ -45,7 +73,7 @@ export default function IngredientList({ style }: { style?: View['props']['style
               height: 30,
               paddingHorizontal: 8,
             }}
-            onChangeText={searchDebounced}
+            onChangeText={search}
           />
         </View>
       </View>
@@ -64,7 +92,7 @@ export default function IngredientList({ style }: { style?: View['props']['style
             <DataTable.Title>Description</DataTable.Title>
             <DataTable.Title numeric>Actions</DataTable.Title>
           </DataTable.Header>
-          {ingredients.filter(Boolean).map((ingredient: any, i: number) => {
+          {data?.ingredients.map((ingredient: any, i: number) => {
             return (
               <DataTable.Row key={ingredient.id}>
                 <DataTable.Cell>{ingredient.name}</DataTable.Cell>
@@ -86,8 +114,7 @@ export default function IngredientList({ style }: { style?: View['props']['style
                     style={{ margin: 0 }}
                     onPress={async () => {
                       try {
-                        await deleteIngredient(ingredient.id)
-                        location.reload()
+                        deleteIngredient({ variables: { id: ingredient.id } })
                       } catch (error: any) {
                         alert(error.response.data.message)
                       }
@@ -97,11 +124,18 @@ export default function IngredientList({ style }: { style?: View['props']['style
               </DataTable.Row>
             )
           })}
-          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
-          {!isLoading && noResult && <NoResult />}
+          {loading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!loading && data?.ingredients.length === 0 && <NoResult />}
         </DataTable>
       </View>
-      <Pagination onChangePage={changePage} pagination={pagination} />
+      <Pagination
+        onChangePage={(i) => setPagination({ page: i, offset: LIMIT * i })}
+        pagination={{
+          count: data?.ingredientsCount ?? 0,
+          limit: LIMIT,
+          page: pagination.page,
+        }}
+      />
     </Card>
   )
 }
