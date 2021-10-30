@@ -50,15 +50,17 @@ class GetIngredientsArgs {
 export default class IngredientResolver {
   @Query(() => Ingredient)
   ingredient(@Arg('id') id: string, @Info() info: GraphQLResolveInfo): Promise<Ingredient> {
-    return Ingredient.findOneOrFail(id, {
-      select: getSelectedFieldsFromForModel(info, Ingredient),
-    })
+    return Ingredient.findOneOrFail(id, { select: getSelectedFieldsFromForModel(info, Ingredient) })
   }
 
   @Query(() => [Ingredient])
-  async ingredients(@Args() args: GetIngredientsArgs): Promise<Ingredient[]> {
+  async ingredients(
+    @Args() args: GetIngredientsArgs,
+    @Info() info: GraphQLResolveInfo,
+  ): Promise<Ingredient[]> {
     const deletedAt = args.filters?.deleted === true ? Not(IsNull()) : IsNull()
     const options: FindManyOptions<Ingredient> = {
+      select: getSelectedFieldsFromForModel(info, Ingredient),
       order: { id: 'ASC' },
       where: { deletedAt },
       withDeleted: true,

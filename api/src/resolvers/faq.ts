@@ -39,8 +39,11 @@ export default class FaqResolver {
   }
 
   @Query(() => [Faq])
-  async faqs(@Args() args: GetFAQsArgs): Promise<Faq[]> {
-    const options: FindManyOptions<Faq> = { order: { id: 'ASC' } }
+  async faqs(@Args() args: GetFAQsArgs, @Info() info: GraphQLResolveInfo): Promise<Faq[]> {
+    const options: FindManyOptions<Faq> = {
+      select: getSelectedFieldsFromForModel(info, Faq),
+      order: { id: 'ASC' },
+    }
     if (args.limit) options.take = args.limit
     if (args.limit && args.offset) options.skip = args.offset
     if (args.searchTerms) {
