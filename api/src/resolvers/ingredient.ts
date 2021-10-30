@@ -74,8 +74,7 @@ export default class IngredientResolver {
           { description: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
         ],
       })
-      console.log('ingre', ingredientIds)
-      // Object.assign(options.where, { id: In(ingredientIds.map((x) => x.ingredientId)) })
+      Object.assign(options.where, { id: In(ingredientIds.map((x) => x.ingredientId)) })
     }
 
     return Ingredient.find(options)
@@ -90,7 +89,7 @@ export default class IngredientResolver {
       withDeleted: true,
     }
     if (args.searchTerms) {
-      const faqIds = await IngredientTranslation.find({
+      const ingredientIds = await IngredientTranslation.find({
         select: ['ingredientId'],
         where: [
           { name: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
@@ -98,8 +97,9 @@ export default class IngredientResolver {
           { description: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
         ],
       })
-      options.where = { id: In(faqIds.map((x) => x.ingredientId)) }
+      Object.assign(options.where, { id: In(ingredientIds.map((x) => x.ingredientId)) })
     }
+
     return Ingredient.count(options)
   }
 
