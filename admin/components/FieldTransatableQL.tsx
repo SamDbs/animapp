@@ -1,7 +1,7 @@
 import { DocumentNode, gql, useMutation } from '@apollo/client'
-import useLanguagesStore from '@hooks/stores/languages'
+import useLanguages from '@hooks/useLanguages'
 import { debounce } from 'lodash/fp'
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback } from 'react'
 import { Text, TextInput, View } from 'react-native'
 
 export enum EntityKind {
@@ -43,10 +43,7 @@ const UPDATE_TRANSLATION = gql`
 
 export default function FieldTranslatableQL(props: Props) {
   const { entityId, kind } = props
-  const [languages, getAllLanguages] = useLanguagesStore((state) => [
-    Object.keys(state.languages).map((langId) => state.languages[langId]),
-    state.getAllLanguages,
-  ])
+  const languages = useLanguages()
 
   const [updateTranslation] = useMutation(UPDATE_TRANSLATION, {
     refetchQueries: props.refreshQueries,
@@ -59,11 +56,7 @@ export default function FieldTranslatableQL(props: Props) {
     [],
   )
 
-  useEffect(() => {
-    if (!languages.length) getAllLanguages()
-  }, [])
-
-  if (!languages.length)
+  if (!languages?.length)
     return (
       <View>
         <Text>Loading languages...</Text>

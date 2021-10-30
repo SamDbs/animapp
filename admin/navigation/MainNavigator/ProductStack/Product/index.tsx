@@ -1,64 +1,83 @@
+import { gql, useMutation, useQuery } from '@apollo/client'
 import Card from '@components/Card'
 import FieldSelectWithLabel from '@components/FieldSelectWithlabel'
-import FieldTranslatable from '@components/FieldTranslatable'
+import FieldTranslatableQL, { EntityKind } from '@components/FieldTransatableQL'
 import FieldWithLabel from '@components/FieldWithLabel'
-import ManyToMany from '@components/ManyToMany'
 import OneToMany from '@components/OneToMany'
 import { PageHeader } from '@components/Themed'
 import UploadSingleImage from '@components/UploadSingleImage'
 import useBrandStore, { Brand, BrandStore } from '@hooks/stores/brand'
-import useConstituentsStore from '@hooks/stores/constituent'
-import useIngredientStore from '@hooks/stores/ingredient'
 import useProductsStore, {
   Product as ProductEntity,
   ProductStore,
   ProductType,
 } from '@hooks/stores/product'
-import useProductTranslationStore, {
-  ProductTranslation,
-  ProductTranslationStore,
-} from '@hooks/stores/productTranslation'
 import { StackScreenProps } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { ActivityIndicator, Image, ScrollView, Switch, Text, View } from 'react-native'
 
 import { ProductStackParamList } from '../../../../types'
 
-export default function Product(props: StackScreenProps<ProductStackParamList, 'Product'>) {
-  const [id, setId] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [product, registerIds, unregisterIds, getProductById, updateProduct] = useProductsStore(
-    (state) => [
-      state.products[props.route.params.id],
-      state.registerIds,
-      state.unregisterIds,
-      state.getProductById,
-      state.updateProduct,
-    ],
-  )
+type Product = {
+  barCode: string
+  id: string
+  image: string
+  name: string
+  published: boolean
+  type: string
+  translations: { languageId: string; description: string }[]
+}
 
-  useEffect(() => {
-    if (!product) return
-    registerIds([id])
-    return () => unregisterIds([id])
-  }, [id])
-
-  useEffect(() => {
-    async function fn() {
-      setIsLoading(true)
-      const { id } = await getProductById(props.route.params.id)
-      setId(id)
-      setIsLoading(false)
+const GET_PRODUCT = gql`
+  query GetProduct($id: String!) {
+    product(id: $id) {
+      barCode
+      id
+      image
+      name
+      published
+      type
+      translations {
+        languageId
+        description
+      }
     }
-    fn()
-  }, [])
+  }
+`
+
+const UPDATE_PRODUCT = gql`
+  mutation UpdateProduct(
+    $id: String!
+    $name: String
+    $barCode: String
+    $type: String
+    $published: Boolean
+  ) {
+    updateProduct(id: $id, barCode: $barCode, name: $name, type: $type, published: $published) {
+      id
+    }
+  }
+`
+
+const fieldsToTranslate = ['description']
+
+export default function ProductComponent(
+  props: StackScreenProps<ProductStackParamList, 'Product'>,
+) {
+  const { data, loading } = useQuery<{ product: Product }>(GET_PRODUCT, {
+    variables: { id: props.route.params.id },
+  })
+  const [updateProduct] = useMutation<{ updateProduct: { id: string } }>(UPDATE_PRODUCT, {
+    variables: { id: props.route.params.id },
+  })
+  const product = data?.product
 
   return (
     <ScrollView style={{ padding: 16 }}>
       <PageHeader>Product</PageHeader>
       <Card>
         <Text style={{ fontSize: 18 }}>Product</Text>
-        {isLoading && !product && <ActivityIndicator />}
+        {loading && <ActivityIndicator />}
         {product && (
           <>
             <View
@@ -105,11 +124,11 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
               <FieldWithLabel
                 label="Name"
                 value={product.name}
-                onChangeValue={(val) => updateProduct(product.id, { name: val })}
+                onChangeValue={(val) => updateProduct({ variables: { name: val } })}
               />
               <FieldSelectWithLabel
                 label="Type"
-                onChangeValue={(val) => updateProduct(product.id, { type: val })}
+                onChangeValue={(val) => updateProduct({ variables: { type: val } })}
                 options={Object.keys(ProductType) as ProductType[]}
                 translationKey="ProductType"
                 value={product.type}
@@ -117,7 +136,7 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
               <FieldWithLabel
                 label="Bar code"
                 value={product.barCode}
-                onChangeValue={(val) => updateProduct(product.id, { barCode: val })}
+                onChangeValue={(val) => updateProduct({ variables: { barCode: val } })}
               />
               <View
                 style={{
@@ -129,23 +148,23 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
                 <Switch
                   style={{ marginLeft: 16 }}
                   value={product.published}
-                  onValueChange={(value) => updateProduct(product.id, { published: value })}
+                  onValueChange={(value) => updateProduct({ variables: { published: value } })}
                 />
               </View>
-              <FieldTranslatable<ProductEntity, ProductTranslation, ProductTranslationStore>
-                fields={{ description: 'Description' }}
-                baseEntityId={product.id}
-                useStore={useProductTranslationStore}
-                translationGetterSelector={(state) => state.getProductTranslations}
-                translationUpdaterSelector={(state) => state.updateProductTranslation}
-                translationsSelectorCreator={(ids) => (state) =>
-                  ids.map((id) => state.productTranslations[id])}
+              <FieldTranslatableQL
+                entityId={product.id}
+                fields={fieldsToTranslate}
+                kind={EntityKind.product}
+                translations={data.product.translations.map(({ languageId, description }) => ({
+                  languageId,
+                  strings: { description },
+                }))}
               />
             </View>
           </>
         )}
       </Card>
-      <Card style={{ marginVertical: 16 }}>
+      {/* <Card style={{ marginVertical: 16 }}>
         <Text style={{ fontSize: 18 }}>Attached ingredients</Text>
         {isLoading && !product && <ActivityIndicator />}
         {product && (
@@ -174,8 +193,8 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             setOrderSelector={(state) => state.setIngredientsOrder}
           />
         )}
-      </Card>
-      <Card style={{ marginVertical: 16 }}>
+      </Card> */}
+      {/* <Card style={{ marginVertical: 16 }}>
         <Text style={{ fontSize: 18 }}>Attached Analytical Constituent</Text>
         {isLoading && !product && <ActivityIndicator />}
         {product && (
@@ -194,7 +213,7 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
             ownedItemsRelationGetterSelector={(state) => state.productConstituents}
           />
         )}
-      </Card>
+      </Card> */}
     </ScrollView>
   )
 }
