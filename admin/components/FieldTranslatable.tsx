@@ -1,9 +1,5 @@
 import type { Constituent } from '@hooks/stores/constituent'
 import type { ConstituentTranslation } from '@hooks/stores/constituentTranslation'
-import type { Faq } from '@hooks/stores/faq'
-import type { FaqTranslation } from '@hooks/stores/faqTranslation'
-import type { Ingredient } from '@hooks/stores/ingredient'
-import type { IngredientTranslation } from '@hooks/stores/ingredientTranslation'
 import useLanguagesStore, { Language } from '@hooks/stores/languages'
 import type { Product } from '@hooks/stores/product'
 import type { ProductTranslation } from '@hooks/stores/productTranslation'
@@ -12,12 +8,8 @@ import { Text, TextInput, View } from 'react-native'
 import type { StateSelector, UseStore } from 'zustand'
 
 type Props<
-  Item extends Product | Ingredient | Faq | Constituent,
-  ItemTranslation extends
-    | ProductTranslation
-    | IngredientTranslation
-    | FaqTranslation
-    | ConstituentTranslation,
+  Item extends Product | Constituent,
+  ItemTranslation extends ProductTranslation | ConstituentTranslation,
   StoreShape extends object,
 > = {
   baseEntityId: Item['id']
@@ -41,12 +33,8 @@ type Props<
 }
 
 export default function FieldTranslatable<
-  Item extends Product | Ingredient | Faq | Constituent,
-  ItemTranslation extends
-    | ProductTranslation
-    | IngredientTranslation
-    | FaqTranslation
-    | ConstituentTranslation,
+  Item extends Product | Constituent,
+  ItemTranslation extends ProductTranslation | ConstituentTranslation,
   StoreShape extends object,
 >({
   baseEntityId,

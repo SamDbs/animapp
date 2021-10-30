@@ -1,87 +1,99 @@
+import { gql, useMutation, useQuery } from '@apollo/client'
 import Card from '@components/Card'
-import FieldTranslatable from '@components/FieldTranslatable'
+import FieldTranslatableQL, { EntityKind } from '@components/FieldTransatableQL'
 import FieldWithLabel from '@components/FieldWithLabel'
 import { PageHeader } from '@components/Themed'
-import useIngredientsStore, { Ingredient as IngredientEntity } from '@hooks/stores/ingredient'
-import useIngredientTranslationStore, {
-  IngredientTranslation,
-  IngredientTranslationStore,
-} from '@hooks/stores/ingredientTranslation'
 import { StackScreenProps } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { ActivityIndicator, ScrollView, Text, View } from 'react-native'
 
 import { IngredientStackParamList } from '../../../../types'
+import { GET_INGREDIENTS } from '../Ingredients/components/IngredientList'
 
-export default function Ingredient(
+type Ingredient = {
+  id: number
+  rating: number
+  translations: { name: string; review: string; description: string; languageId: string }[]
+}
+const GET_INGREDIENT = gql`
+  query GetIngredient($id: String!) {
+    ingredient(id: $id) {
+      id
+      rating
+      translations {
+        languageId
+        name
+        review
+        description
+      }
+    }
+  }
+`
+
+const UPDATE_INGREDIENT = gql`
+  mutation UpdateIngredient($id: String!, $rating: Int!) {
+    updateIngredient(id: $id, rating: $rating) {
+      id
+    }
+  }
+`
+
+const fieldsToTranslate = ['name', 'review', 'description']
+const refreshQueries = [GET_INGREDIENT, GET_INGREDIENTS]
+
+export default function IngredientComponent(
   props: StackScreenProps<IngredientStackParamList, 'Ingredient'>,
 ) {
-  const [id, setId] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+  const { data, loading } = useQuery<{ ingredient: Ingredient }>(GET_INGREDIENT, {
+    variables: { id: props.route.params.id },
+  })
+  const [updateIngredient] =
+    useMutation<{ updateIngredient: { id: number } }, { id: number; rating?: number }>(
+      UPDATE_INGREDIENT,
+    )
+
   const [error, setError] = useState('')
-  const ingredient = useIngredientsStore((state) => state.ingredients[props.route.params?.id])
-  const [registerIds, unregisterIds, getIngredientById, updateIngredient] = useIngredientsStore(
-    (state) => [
-      state.registerIds,
-      state.unregisterIds,
-      state.getIngredientById,
-      state.updateIngredient,
-    ],
-  )
-
-  useEffect(() => {
-    if (!ingredient) return
-    registerIds([id])
-    return () => unregisterIds([id])
-  }, [id])
-
-  useEffect(() => {
-    if (!props.route.params?.id) return
-    async function fn() {
-      setIsLoading(true)
-      const { id } = await getIngredientById(props.route.params.id)
-      setId(id)
-      setIsLoading(false)
-    }
-    fn()
-  }, [props.route.params?.id])
 
   return (
     <ScrollView style={{ padding: 16 }}>
       <PageHeader>Ingredient</PageHeader>
       <Card>
-        {isLoading && !ingredient && <ActivityIndicator />}
-        {ingredient && (
+        {loading && <ActivityIndicator />}
+        {data?.ingredient && (
           <>
             <View>
               <FieldWithLabel
+                delay={250}
                 label="Rating (0 = neutral, 1 = good, 2 = bad)"
-                value={ingredient.rating}
+                value={data.ingredient.rating?.toString() ?? ''}
                 onChangeValue={async (val) => {
                   try {
-                    await updateIngredient(ingredient.id, { rating: val })
+                    await updateIngredient({
+                      variables: { id: data.ingredient.id, rating: Number(val) },
+                    })
                     setError('')
-                  } catch (e) {
-                    setError('The number might be between 0 and 2')
+                  } catch {
+                    setError('Invalid rating, please choose a number between 0 and 2.')
                   }
                 }}
               />
-              <Text style={{ color: 'red' }}>{error}</Text>
+              {error !== '' && <Text style={{ color: 'red' }}>{error}</Text>}
             </View>
             <View>
-              <FieldTranslatable<
-                IngredientEntity,
-                IngredientTranslation,
-                IngredientTranslationStore
-              >
-                fields={{ name: 'Name', description: 'Description', review: 'Review' }}
-                baseEntityId={ingredient.id}
-                useStore={useIngredientTranslationStore}
-                translationGetterSelector={(state) => state.getIngredientTranslations}
-                translationUpdaterSelector={(state) => state.updateIngredientTranslation}
-                translationsSelectorCreator={(ids) => (state) =>
-                  ids.map((id) => state.ingredientTranslations[id])}
-              />
+              {data.ingredient.translations && (
+                <FieldTranslatableQL
+                  entityId={props.route.params.id}
+                  fields={fieldsToTranslate}
+                  kind={EntityKind.ingredient}
+                  refreshQueries={refreshQueries}
+                  translations={data.ingredient.translations.map(
+                    ({ languageId, name, description, review }) => ({
+                      languageId,
+                      strings: { name, description, review },
+                    }),
+                  )}
+                />
+              )}
             </View>
           </>
         )}

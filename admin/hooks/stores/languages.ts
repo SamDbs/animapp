@@ -1,4 +1,4 @@
-import { keyBy, omit, debounce } from 'lodash/fp'
+import { keyBy, debounce } from 'lodash/fp'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
 
