@@ -7,6 +7,7 @@ import { useNavigation } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
+import { GET_DELETE_BRANDS } from './BrandDeletedList'
 
 const LIMIT = 5
 
@@ -46,7 +47,7 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
   })
 
   const [deleteBrand] = useMutation(DELETE_BRAND, {
-    refetchQueries: [GET_BRANDS],
+    refetchQueries: [GET_BRANDS, GET_DELETE_BRANDS],
   })
 
   const { navigate } = useNavigation()

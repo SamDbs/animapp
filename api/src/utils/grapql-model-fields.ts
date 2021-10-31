@@ -6,6 +6,9 @@ function useFieldForSelection(modelName: string, field: string) {
   if (modelName === 'ingredient' && ['name', 'review', 'description'].includes(field)) return false
   if (modelName === 'analyticalconstituent' && ['name', 'description'].includes(field)) return false
   if (modelName === 'faq' && ['question', 'answer'].includes(field)) return false
+  if (modelName === 'contact' && ['name', 'email', 'createdAt', 'message'].includes(field))
+    return false
+
   return true
 }
 

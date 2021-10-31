@@ -11,6 +11,7 @@ type Contact = {
   id: string
   name: string
   message: string
+  createdAt: Date
 }
 
 const LIMIT = 5
@@ -21,6 +22,7 @@ const GET_CONTACTS = gql`
       id
       name
       message
+      createdAt
     }
     contactsCount(searchTerms: $searchTerms)
   }
@@ -40,7 +42,6 @@ export default function ContactList({ style }: { style?: View['props']['style'] 
   }>(GET_CONTACTS, {
     variables: { limit: LIMIT, offset: pagination.offset },
   })
-
   const search = useSearch((searchTerms) => {
     setPagination(initialPagination)
     refetch({ offset: 0, searchTerms })
@@ -81,12 +82,16 @@ export default function ContactList({ style }: { style?: View['props']['style'] 
           <DataTable.Header>
             <DataTable.Title>Name</DataTable.Title>
             <DataTable.Title>Message</DataTable.Title>
+            <DataTable.Title numeric>Date</DataTable.Title>
           </DataTable.Header>
           {data?.contacts.map((contact) => {
             return (
               <DataTable.Row key={contact.id}>
                 <DataTable.Cell>{contact.name}</DataTable.Cell>
                 <DataTable.Cell>{contact.message}</DataTable.Cell>
+                <DataTable.Cell numeric>
+                  {new Date(contact.createdAt).toLocaleString()}
+                </DataTable.Cell>
               </DataTable.Row>
             )
           })}

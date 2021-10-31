@@ -46,7 +46,7 @@ export default class ContactResolver {
 
   @Query(() => [Contact])
   contacts(@Args() args: GetContactsArgs): Promise<Contact[]> {
-    const options: FindManyOptions<Contact> = { order: { id: 'ASC' } }
+    const options: FindManyOptions<Contact> = { order: { createdAt: 'ASC' } }
     if (args.limit) options.take = args.limit
     if (args.limit && args.offset) options.skip = args.offset
     if (args.searchTerms)
@@ -66,6 +66,7 @@ export default class ContactResolver {
         { email: new FindOperator('ilike', `%${args.searchTerms}%`) },
         { name: new FindOperator('ilike', `%${args.searchTerms}%`) },
         { message: new FindOperator('ilike', `%${args.searchTerms}%`) },
+        { createdAt: new FindOperator('ilike', `%${args.searchTerms}%`) },
       ]
     return Contact.count(options)
   }
