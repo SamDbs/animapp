@@ -1,57 +1,64 @@
-import { useQuery, gql, useMutation } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import Card from '@components/Card'
 import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
 import useSearch from '@hooks/useSearch'
-import { useNavigation } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
 
-import { GET_DELETE_BRANDS } from './BrandDeletedList'
+import { GET_CONTACTS } from './ContactsList'
 
 const LIMIT = 5
 
-type Brand = { id: string; name: string }
+type Contact = {
+  id: string
+  name: string
+  message: string
+  createdAt: Date
+}
 
-export const GET_BRANDS = gql`
-  query GetBrands($offset: Int, $limit: Int, $searchTerms: String = "") {
-    brands(limit: $limit, offset: $offset, searchTerms: $searchTerms) {
+export const GET_DELETE_CONTACTS = gql`
+  query GetDeletedContacts($offset: Int, $limit: Int, $searchTerms: String = "") {
+    contacts(
+      limit: $limit
+      offset: $offset
+      searchTerms: $searchTerms
+      filters: { deleted: true }
+    ) {
       id
       name
+      email
+      message
+      createdAt
     }
-    brandsCount(searchTerms: $searchTerms)
+    contactsCount(searchTerms: $searchTerms, filters: { deleted: true })
   }
 `
-
 const initialPagination = {
   page: 0,
   offset: 0,
 }
 
-const DELETE_BRAND = gql`
-  mutation DeleteBrand($id: String!) {
-    deleteBrand(id: $id) {
+const RESTORE_CONTACT = gql`
+  mutation RestoreContact($id: String!) {
+    restoreContact(id: $id) {
       id
     }
   }
 `
 
-export default function BrandList({ style }: { style?: View['props']['style'] }) {
+export default function ContactDeletedList({ style }: { style?: View['props']['style'] }) {
+  const [restoreContact] = useMutation(RESTORE_CONTACT, {
+    refetchQueries: [GET_CONTACTS, GET_DELETE_CONTACTS],
+  })
   const [pagination, setPagination] = useState(initialPagination)
-
   const { data, loading, refetch } = useQuery<{
-    brands: Brand[]
-    brandsCount: number
-  }>(GET_BRANDS, {
+    contacts: Contact[]
+    contactsCount: number
+  }>(GET_DELETE_CONTACTS, {
     variables: { limit: LIMIT, offset: pagination.offset },
   })
-
-  const [deleteBrand] = useMutation(DELETE_BRAND, {
-    refetchQueries: [GET_BRANDS, GET_DELETE_BRANDS],
-  })
-
-  const { navigate } = useNavigation()
 
   const search = useSearch((searchTerms) => {
     setPagination(initialPagination)
@@ -60,7 +67,7 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
 
   return (
     <Card style={style}>
-      <Text style={{ fontSize: 18 }}>Brand list</Text>
+      <Text style={{ fontSize: 18 }}>Deleted contacts</Text>
       <View
         style={{
           flexDirection: 'row',
@@ -92,29 +99,28 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
         <DataTable>
           <DataTable.Header>
             <DataTable.Title>Name</DataTable.Title>
+            <DataTable.Title>Email</DataTable.Title>
+            <DataTable.Title>Message</DataTable.Title>
+            <DataTable.Title numeric>Date</DataTable.Title>
             <DataTable.Title numeric>Actions</DataTable.Title>
           </DataTable.Header>
-          {data?.brands.map((brand) => {
+
+          {data?.contacts.filter(Boolean).map((contact: any, i: number) => {
             return (
-              <DataTable.Row key={brand.id}>
-                <DataTable.Cell>{brand.name}</DataTable.Cell>
+              <DataTable.Row key={contact.id}>
+                <DataTable.Cell>{contact.name}</DataTable.Cell>
+                <DataTable.Cell>{contact.email}</DataTable.Cell>
+                <DataTable.Cell>{contact.message}</DataTable.Cell>
+                <DataTable.Cell numeric>
+                  {new Date(contact.createdAt).toLocaleString()}
+                </DataTable.Cell>
                 <DataTable.Cell numeric>
                   <IconButton
-                    icon="pencil"
-                    style={{ margin: 0 }}
-                    onPress={() =>
-                      navigate('BrandStack', {
-                        screen: 'Brand',
-                        params: { id: brand.id },
-                      })
-                    }
-                  />
-                  <IconButton
-                    icon="delete"
+                    icon="delete-restore"
                     style={{ margin: 0 }}
                     onPress={async () => {
                       try {
-                        await deleteBrand({ variables: { id: brand.id } })
+                        await restoreContact({ variables: { id: contact.id } })
                       } catch (error: any) {
                         alert(error.response.data.message)
                       }
@@ -125,13 +131,13 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
             )
           })}
           {loading && <ActivityIndicator style={{ margin: 8 }} />}
-          {!loading && data?.brands.length === 0 && <NoResult />}
+          {!loading && data?.contacts.length === 0 && <NoResult />}
         </DataTable>
       </View>
       <Pagination
         onChangePage={(i) => setPagination({ page: i, offset: LIMIT * i })}
         pagination={{
-          count: data?.brandsCount ?? 0,
+          count: data?.contactsCount ?? 0,
           limit: LIMIT,
           page: pagination.page,
         }}
