@@ -55,6 +55,7 @@ const UPDATE_PRODUCT = gql`
   ) {
     updateProduct(id: $id, barCode: $barCode, name: $name, type: $type, published: $published) {
       id
+      published
     }
   }
 `

@@ -53,7 +53,7 @@ export default class BrandResolver {
   }
 
   @Query(() => [Brand])
-  async brands(@Args() args: GetBrandsArgs, @Info() info: GraphQLResolveInfo): Promise<Brand[]> {
+  brands(@Args() args: GetBrandsArgs, @Info() info: GraphQLResolveInfo): Promise<Brand[]> {
     const deletedAt = args.filters?.deleted === true ? Not(IsNull()) : IsNull()
     const options: FindManyOptions<Brand> = {
       select: getSelectedFieldsFromForModel(info, Brand),
