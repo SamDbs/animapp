@@ -33,9 +33,9 @@ export default class Brand extends BaseEntity {
   @UpdateDateColumn()
   updatedAt!: Date
 
-  @Field()
+  @Field(() => Date, { nullable: true })
   @DeleteDateColumn()
-  deletedAt!: Date
+  deletedAt!: Date | null
 
   @OneToMany(() => Product, (product) => product.brand)
   products!: Product[]

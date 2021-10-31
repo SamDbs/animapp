@@ -1,6 +1,17 @@
-import { Arg, Args, ArgsType, Field, Info, Int, Mutation, Query, Resolver } from 'type-graphql'
+import {
+  Arg,
+  Args,
+  ArgsType,
+  Field,
+  Info,
+  InputType,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+} from 'type-graphql'
 import { GraphQLResolveInfo } from 'graphql'
-import { FindManyOptions, FindOperator } from 'typeorm'
+import { FindManyOptions, FindOperator, IsNull, Not } from 'typeorm'
 
 import Brand from '../models/brand'
 import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
@@ -9,6 +20,12 @@ import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
 class CreateBrandArgs implements Partial<Brand> {
   @Field()
   name!: string
+}
+
+@InputType()
+class BrandFilters {
+  @Field(() => Boolean)
+  deleted?: boolean
 }
 
 @ArgsType()
@@ -21,12 +38,9 @@ class GetBrandsArgs {
 
   @Field({ nullable: true })
   searchTerms?: string
-}
 
-@ArgsType()
-class GetBrandsCountArgs {
   @Field({ nullable: true })
-  searchTerms?: string
+  filters?: BrandFilters
 }
 
 @Resolver(() => Brand)
@@ -39,8 +53,14 @@ export default class BrandResolver {
   }
 
   @Query(() => [Brand])
-  brands(@Args() args: GetBrandsArgs): Promise<Brand[]> {
-    const options: FindManyOptions<Brand> = { order: { id: 'ASC' } }
+  async brands(@Args() args: GetBrandsArgs, @Info() info: GraphQLResolveInfo): Promise<Brand[]> {
+    const deletedAt = args.filters?.deleted === true ? Not(IsNull()) : IsNull()
+    const options: FindManyOptions<Brand> = {
+      select: getSelectedFieldsFromForModel(info, Brand),
+      order: { id: 'ASC' },
+      where: { deletedAt },
+      withDeleted: true,
+    }
     if (args.limit) options.take = args.limit
     if (args.limit && args.offset) options.skip = args.offset
     if (args.searchTerms)
@@ -49,8 +69,13 @@ export default class BrandResolver {
   }
 
   @Query(() => Int)
-  brandsCount(@Args() args: GetBrandsCountArgs): Promise<number> {
-    const options: FindManyOptions<Brand> = {}
+  brandsCount(@Args() args: GetBrandsArgs): Promise<number> {
+    const deletedAt = args.filters?.deleted === true ? Not(IsNull()) : IsNull()
+    const options: FindManyOptions<Brand> = {
+      order: { id: 'ASC' },
+      where: { deletedAt },
+      withDeleted: true,
+    }
     if (args.searchTerms)
       options.where = { name: new FindOperator('ilike', `%${args.searchTerms}%`) }
     return Brand.count(options)
@@ -66,5 +91,13 @@ export default class BrandResolver {
   async deleteBrand(@Arg('id') id: string): Promise<Brand> {
     const brand = await Brand.findOneOrFail(id)
     return brand.softRemove()
+  }
+
+  @Mutation(() => String)
+  async restoreBrand(@Arg('id') id: string) {
+    const brand = await Brand.findOneOrFail(id, { withDeleted: true })
+    brand.deletedAt = null
+    await brand.save()
+    return brand.id
   }
 }
