@@ -78,7 +78,7 @@ export default class TranslationResolver {
       }
       case EntityKind.product: {
         const existingTranslation = await ProductTranslation.findOne({
-          where: { analyticalConstituentId: id, languageId },
+          where: { productId: id, languageId },
         })
         const translation =
           existingTranslation || ProductTranslation.create({ productId: id, languageId })
@@ -88,7 +88,7 @@ export default class TranslationResolver {
       }
       case EntityKind.ingredient: {
         const existingTranslation = await IngredientTranslation.findOne({
-          where: { analyticalConstituentId: id, languageId },
+          where: { ingredientId: id, languageId },
         })
         const translation =
           existingTranslation || IngredientTranslation.create({ ingredientId: id, languageId })

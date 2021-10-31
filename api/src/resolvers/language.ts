@@ -8,10 +8,16 @@ import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
 @ArgsType()
 class CreateLanguageArgs implements Partial<Language> {
   @Field()
-  name!: string
+  id!: string
 
   @Field()
-  id!: string
+  name!: string
+}
+
+@ArgsType()
+class UpdateLanguageArgs implements Partial<Language> {
+  @Field()
+  name!: string
 }
 
 @Resolver(() => Language)
@@ -45,5 +51,11 @@ export default class LanguageResolver {
   async deleteLanguage(@Arg('id') id: string): Promise<Language> {
     const language = await Language.findOneOrFail(id)
     return language.softRemove()
+  }
+
+  @Mutation(() => Language)
+  async updateLanguage(@Arg('id') id: string, @Args() args: UpdateLanguageArgs): Promise<Language> {
+    await Language.update(id, args)
+    return Language.findOneOrFail(id)
   }
 }

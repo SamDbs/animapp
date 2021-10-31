@@ -21,7 +21,7 @@ import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
 
 @ArgsType()
 class UpdateIngredientArgs implements Partial<Ingredient> {
-  @Field()
+  @Field(() => Int, { nullable: true })
   rating?: number
 }
 
@@ -131,6 +131,11 @@ export default class IngredientResolver {
       where: { ingredientId: ingredient.id, languageId: 'EN' },
     })
     return ingredientTranslation?.description ?? '-'
+  }
+
+  @FieldResolver(() => [IngredientTranslation])
+  async translations(@Root() root: Ingredient) {
+    return (await Ingredient.findOneOrFail(root.id, { relations: ['translations'] })).translations
   }
 
   @Mutation(() => Ingredient)

@@ -1,6 +1,6 @@
 import { Picker } from '@react-native-picker/picker'
 import enumStrings from '@utils/enum-strings'
-import React from 'react'
+import React, { useState } from 'react'
 import { Text, View } from 'react-native'
 
 const statusColor = {
@@ -26,12 +26,16 @@ export default function FieldSelectWithLabel({
   translationKey,
   value,
 }: Props) {
+  const [selected, setSelected] = useState(value)
   return (
     <View style={{ marginBottom: 16 }}>
       <Text style={{ marginBottom: 8 }}>{label}</Text>
       <Picker
-        onValueChange={onChangeValue}
-        selectedValue={value}
+        onValueChange={(x) => {
+          setSelected(x)
+          onChangeValue(x)
+        }}
+        selectedValue={selected}
         style={{
           borderColor: statusColor[status],
           borderRadius: 3,
