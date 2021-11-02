@@ -1,12 +1,11 @@
 import { gql, useQuery } from '@apollo/client'
 import SubItem from '@components/SubItem'
-import { View } from '@components/Themed'
 import useSearch from '@hooks/useSearch'
 import React from 'react'
-import { ActivityIndicator, Button, TextInput } from 'react-native'
+import { ActivityIndicator, Button, TextInput, View } from 'react-native'
 
 const GET_POSSIBLE_BRANDS_FOR_PRODUCT = gql`
-  query GetPossibleBrandsForProducts($searchTerms: String = "") {
+  query GetPossibleBrandsForProduct($searchTerms: String = "") {
     brands(offset: 0, limit: 5, searchTerms: $searchTerms) {
       id
       name

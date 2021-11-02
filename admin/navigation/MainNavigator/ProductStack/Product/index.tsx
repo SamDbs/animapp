@@ -3,44 +3,53 @@ import Card from '@components/Card'
 import FieldSelectWithLabel from '@components/FieldSelectWithlabel'
 import FieldTranslatableQL, { EntityKind } from '@components/FieldTransatableQL'
 import FieldWithLabel from '@components/FieldWithLabel'
-import OneToMany from '@components/OneToMany'
 import { PageHeader } from '@components/Themed'
 import UploadSingleImage from '@components/UploadSingleImage'
-import useBrandStore, { Brand, BrandStore } from '@hooks/stores/brand'
-import useProductsStore, {
-  Product as ProductEntity,
-  ProductStore,
-  ProductType,
-} from '@hooks/stores/product'
+import useProductsStore, { ProductType } from '@hooks/stores/product'
 import { StackScreenProps } from '@react-navigation/stack'
-import React from 'react'
+import React, { useState } from 'react'
 import { ActivityIndicator, Image, ScrollView, Switch, Text, View } from 'react-native'
 
 import { ProductStackParamList } from '../../../../types'
+import ProductBrand from '../Products/components/ProductBrand'
+import ProductBrandSelector from '../Products/components/ProductBrandSelector'
 
 type Product = {
   barCode: string
+  brandId: string
   id: string
   image: string
   name: string
   published: boolean
+  translations: {
+    description: string
+    languageId: string
+  }[]
   type: string
-  translations: { languageId: string; description: string }[]
+}
+type Variables = {
+  id?: string
+  name?: string
+  barCode?: string
+  type?: ProductType
+  published?: boolean
+  brandId?: string
 }
 
 const GET_PRODUCT = gql`
   query GetProduct($id: String!) {
     product(id: $id) {
       barCode
+      brandId
       id
       image
       name
       published
-      type
       translations {
-        languageId
         description
+        languageId
       }
+      type
     }
   }
 `
@@ -52,10 +61,19 @@ const UPDATE_PRODUCT = gql`
     $barCode: String
     $type: String
     $published: Boolean
+    $brandId: String
   ) {
-    updateProduct(id: $id, barCode: $barCode, name: $name, type: $type, published: $published) {
+    updateProduct(
+      id: $id
+      barCode: $barCode
+      name: $name
+      type: $type
+      published: $published
+      brandId: $brandId
+    ) {
       id
       published
+      brandId
     }
   }
 `
@@ -68,9 +86,15 @@ export default function ProductComponent(
   const { data, loading } = useQuery<{ product: Product }>(GET_PRODUCT, {
     variables: { id: props.route.params.id },
   })
-  const [updateProduct] = useMutation<{ updateProduct: { id: string } }>(UPDATE_PRODUCT, {
-    variables: { id: props.route.params.id },
-  })
+  const [updateProduct] = useMutation<{ updateProduct: { id: string } }, Variables>(
+    UPDATE_PRODUCT,
+    {
+      variables: { id: props.route.params.id },
+    },
+  )
+
+  const [editBrand, setEditBrand] = useState(false)
+
   const product = data?.product
 
   return (
@@ -109,19 +133,15 @@ export default function ProductComponent(
               />
             </View>
             <View>
-              <OneToMany<Brand, BrandStore, ProductEntity, ProductStore>
-                getOwnerByOwnedIdSelect={(state) => state.getBrandByProductId}
-                ownedId={product.id}
-                ownerEntityLinkCreator={(brand) => `/brands/${brand.id}`}
-                ownerSelectorCreator={(id) => (state) => state.brands[id]}
-                ownersSelectorCreator={(ids) => (state) => ids.map((id) => state.brands[id])}
-                registerOwnerIdsSelector={(state) => state.registerIds}
-                searchOwnersSelector={(state) => state.searchBrands}
-                unregisterOwnerIdsSelector={(state) => state.unregisterIds}
-                updateOwnerInOwnedSelector={(state) => state.updateProductBrand}
-                useOwnedStore={useProductsStore}
-                useOwnerStore={useBrandStore}
-              />
+              <ProductBrand id={product.brandId} onRemove={() => setEditBrand(true)} />
+              {editBrand && (
+                <ProductBrandSelector
+                  onSelect={(brandId) => {
+                    updateProduct({ variables: { brandId } })
+                    setEditBrand(false)
+                  }}
+                />
+              )}
               <FieldWithLabel
                 label="Name"
                 value={product.name}

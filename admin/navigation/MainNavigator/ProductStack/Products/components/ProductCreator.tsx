@@ -6,8 +6,8 @@ import { ProductType } from '@hooks/stores/product'
 import { useNavigation } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { Button, Text, View } from 'react-native'
-import ProductBrand from './ProductBrand'
 
+import ProductBrand from './ProductBrand'
 import ProductBrandSelector from './ProductBrandSelector'
 import { GET_PRODUCTS } from './ProductsList'
 
@@ -16,20 +16,18 @@ const CREATE_PRODUCT = gql`
     createProduct(name: $name, brandId: $brandId, barCode: $barCode, type: $type) {
       id
       name
-      brand {
-        id
-      }
+      brandId
     }
   }
 `
-type MutationReturnType = { createProduct: { id: number; name: string; brand: { id: number } } }
-type MutationVariables = { name: string; brandId: number; barCode: string; type: string }
+type MutationReturnType = { createProduct: { id: string; name: string; brandId: string } }
+type MutationVariables = { name: string; brandId: string; barCode: string; type: string }
 
 const initialState: MutationVariables = {
   type: ProductType.DRY_FOOD,
   name: '',
   barCode: '',
-  brandId: 0,
+  brandId: '',
 }
 
 export default function ProductCreator({ style }: { style?: View['props']['style'] }) {
@@ -62,11 +60,11 @@ export default function ProductCreator({ style }: { style?: View['props']['style
       <Text>{product.brandId ? 'Brand' : 'Select a brand'}</Text>
       <ProductBrand
         id={product.brandId}
-        onRemove={() => setProduct((state) => ({ ...state, brandId: 0 }))}
+        onRemove={() => setProduct((state) => ({ ...state, brandId: '' }))}
       />
       {!product.brandId && (
         <ProductBrandSelector
-          onSelect={(brandId) => setProduct((state) => ({ ...state, brandId: Number(brandId) }))}
+          onSelect={(brandId) => setProduct((state) => ({ ...state, brandId }))}
         />
       )}
       <View style={{ marginBottom: 16 }} />

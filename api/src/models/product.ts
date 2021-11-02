@@ -53,6 +53,7 @@ export default class Product extends BaseEntity {
   @Column({ default: false })
   published!: boolean
 
+  @Field(() => String)
   @Column()
   brandId!: number
 

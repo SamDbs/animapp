@@ -1,10 +1,10 @@
 import { gql, useQuery } from '@apollo/client'
 import SubItem from '@components/SubItem'
-import { Text, View } from '@components/Themed'
+import { View } from '@components/Themed'
 import React from 'react'
 import { Button } from 'react-native'
 
-type Brand = { id: number; name: string }
+type Brand = { id: string; name: string }
 
 export const GET_BRAND = gql`
   query GetBrandProduct($id: String!) {
@@ -17,15 +17,13 @@ export const GET_BRAND = gql`
 
 type QueryReturnType = { brand: Brand }
 type QueryVariables = { id: string }
-type Props = { id: number; onRemove: () => void }
+type Props = { id: string; onRemove: () => void }
 
 export default function ProductBrand(props: Props) {
   const { data } = useQuery<QueryReturnType, QueryVariables>(GET_BRAND, {
-    variables: { id: props.id.toString() },
-    skip: props.id === 0,
+    variables: { id: props.id },
+    skip: !props.id,
   })
-
-  if (!data) return null
 
   return (
     <View
@@ -36,9 +34,18 @@ export default function ProductBrand(props: Props) {
         borderRadius: 3,
         overflow: 'hidden',
       }}>
-      <SubItem<Brand> entityLinkCreator={() => 'lol'} even item={data.brand} nameProp="name">
-        <Button title="Change" onPress={() => props.onRemove()} color="#c00" />
-      </SubItem>
+      {!data && (
+        <SubItem<Brand> entityLinkCreator={() => ''} even item={{ id: '' }} nameProp="id" />
+      )}
+      {data && (
+        <SubItem<Brand>
+          entityLinkCreator={() => data.brand.id}
+          even
+          item={data.brand}
+          nameProp="name">
+          <Button title="Change" onPress={() => props.onRemove()} color="#c00" />
+        </SubItem>
+      )}
     </View>
   )
 }
