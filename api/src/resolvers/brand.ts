@@ -93,11 +93,10 @@ export default class BrandResolver {
     return brand.softRemove()
   }
 
-  @Mutation(() => String)
+  @Mutation(() => Brand)
   async restoreBrand(@Arg('id') id: string) {
     const brand = await Brand.findOneOrFail(id, { withDeleted: true })
     brand.deletedAt = null
-    await brand.save()
-    return brand.id
+    return brand.save()
   }
 }

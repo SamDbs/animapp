@@ -29,7 +29,9 @@ const initialPagination = {
 
 const RESTORE_BRAND = gql`
   mutation RestoreBrand($id: String!) {
-    restoreBrand(id: $id)
+    restoreBrand(id: $id) {
+      id
+    }
   }
 `
 

@@ -1,30 +1,43 @@
-import { useQuery, gql } from '@apollo/client'
+import { useQuery, useMutation, gql } from '@apollo/client'
 import Card from '@components/Card'
 import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
 import useSearch from '@hooks/useSearch'
+import { useNavigation } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
-import { DataTable } from 'react-native-paper'
+import { DataTable, IconButton } from 'react-native-paper'
+
+import { GET_DELETE_CONTACTS } from './ContactDeletedList'
 
 type Contact = {
   id: string
   name: string
+  email: string
   message: string
   createdAt: Date
 }
 
 const LIMIT = 5
 
-const GET_CONTACTS = gql`
+export const GET_CONTACTS = gql`
   query GetContacts($offset: Int, $limit: Int, $searchTerms: String = "") {
     contacts(limit: $limit, offset: $offset, searchTerms: $searchTerms) {
       id
       name
+      email
       message
       createdAt
     }
     contactsCount(searchTerms: $searchTerms)
+  }
+`
+
+const DELETE_CONTACT = gql`
+  mutation DeleteContact($id: String!) {
+    deleteContact(id: $id) {
+      id
+    }
   }
 `
 
@@ -34,6 +47,10 @@ const initialPagination = {
 }
 
 export default function ContactList({ style }: { style?: View['props']['style'] }) {
+  const [deleteContact] = useMutation(DELETE_CONTACT, {
+    refetchQueries: [GET_CONTACTS, GET_DELETE_CONTACTS],
+  })
+
   const [pagination, setPagination] = useState(initialPagination)
 
   const { data, loading, refetch } = useQuery<{
@@ -46,6 +63,7 @@ export default function ContactList({ style }: { style?: View['props']['style'] 
     setPagination(initialPagination)
     refetch({ offset: 0, searchTerms })
   })
+  const { navigate } = useNavigation()
 
   return (
     <Card style={style}>
@@ -81,6 +99,7 @@ export default function ContactList({ style }: { style?: View['props']['style'] 
         <DataTable>
           <DataTable.Header>
             <DataTable.Title>Name</DataTable.Title>
+            <DataTable.Title>Email</DataTable.Title>
             <DataTable.Title>Message</DataTable.Title>
             <DataTable.Title numeric>Date</DataTable.Title>
           </DataTable.Header>
@@ -88,9 +107,23 @@ export default function ContactList({ style }: { style?: View['props']['style'] 
             return (
               <DataTable.Row key={contact.id}>
                 <DataTable.Cell>{contact.name}</DataTable.Cell>
+                <DataTable.Cell>{contact.email}</DataTable.Cell>
                 <DataTable.Cell>{contact.message}</DataTable.Cell>
                 <DataTable.Cell numeric>
                   {new Date(contact.createdAt).toLocaleString()}
+                </DataTable.Cell>
+                <DataTable.Cell numeric>
+                  <IconButton
+                    icon="delete"
+                    style={{ margin: 0 }}
+                    onPress={async () => {
+                      try {
+                        deleteContact({ variables: { id: contact.id } })
+                      } catch (error: any) {
+                        alert(error.response.data.message)
+                      }
+                    }}
+                  />
                 </DataTable.Cell>
               </DataTable.Row>
             )

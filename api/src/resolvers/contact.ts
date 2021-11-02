@@ -1,10 +1,26 @@
-import { Arg, Args, ArgsType, Field, Info, Int, Mutation, Query, Resolver } from 'type-graphql'
+import {
+  Arg,
+  Args,
+  ArgsType,
+  Field,
+  Info,
+  InputType,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+} from 'type-graphql'
 import { GraphQLResolveInfo } from 'graphql'
-import { FindManyOptions, FindOperator } from 'typeorm'
+import { FindManyOptions, FindOperator, IsNull, Not } from 'typeorm'
 
 import Contact from '../models/contact'
 import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
 
+@InputType()
+class ContactFilters {
+  @Field(() => Boolean)
+  deleted?: boolean
+}
 @ArgsType()
 class GetContactsArgs {
   @Field(() => Int, { nullable: true })
@@ -15,12 +31,9 @@ class GetContactsArgs {
 
   @Field({ nullable: true })
   searchTerms?: string
-}
 
-@ArgsType()
-class GetContactsCountArgs {
   @Field({ nullable: true })
-  searchTerms?: string
+  filters?: ContactFilters
 }
 
 @ArgsType()
@@ -45,8 +58,17 @@ export default class ContactResolver {
   }
 
   @Query(() => [Contact])
-  contacts(@Args() args: GetContactsArgs): Promise<Contact[]> {
-    const options: FindManyOptions<Contact> = { order: { createdAt: 'ASC' } }
+  async contacts(
+    @Args() args: GetContactsArgs,
+    @Info() info: GraphQLResolveInfo,
+  ): Promise<Contact[]> {
+    const deletedAt = args.filters?.deleted === true ? Not(IsNull()) : IsNull()
+    const options: FindManyOptions<Contact> = {
+      select: getSelectedFieldsFromForModel(info, Contact),
+      order: { createdAt: 'ASC' },
+      where: { deletedAt },
+      withDeleted: true,
+    }
     if (args.limit) options.take = args.limit
     if (args.limit && args.offset) options.skip = args.offset
     if (args.searchTerms)
@@ -59,14 +81,18 @@ export default class ContactResolver {
   }
 
   @Query(() => Int)
-  contactsCount(@Args() args: GetContactsCountArgs): Promise<number> {
-    const options: FindManyOptions<Contact> = {}
+  contactsCount(@Args() args: GetContactsArgs): Promise<number> {
+    const deletedAt = args.filters?.deleted === true ? Not(IsNull()) : IsNull()
+    const options: FindManyOptions<Contact> = {
+      order: { createdAt: 'ASC' },
+      where: { deletedAt },
+      withDeleted: true,
+    }
     if (args.searchTerms)
       options.where = [
         { email: new FindOperator('ilike', `%${args.searchTerms}%`) },
         { name: new FindOperator('ilike', `%${args.searchTerms}%`) },
         { message: new FindOperator('ilike', `%${args.searchTerms}%`) },
-        { createdAt: new FindOperator('ilike', `%${args.searchTerms}%`) },
       ]
     return Contact.count(options)
   }
@@ -78,8 +104,15 @@ export default class ContactResolver {
   }
 
   @Mutation(() => Contact)
-  async deleteContact(@Arg('id') id: string): Promise<Contact> {
+  async deleteContact(@Arg('id') id: string) {
     const contact = await Contact.findOneOrFail(id)
     return contact.softRemove()
+  }
+
+  @Mutation(() => Contact)
+  async restoreContact(@Arg('id') id: string) {
+    const contact = await Contact.findOneOrFail(id, { withDeleted: true })
+    contact.deletedAt = null
+    return contact.save()
   }
 }
