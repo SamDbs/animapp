@@ -33,6 +33,21 @@ class ProductsFilters {
 }
 
 @ArgsType()
+class CreateProductArgs implements Partial<Product> {
+  @Field()
+  barCode!: string
+
+  @Field(() => Int)
+  brandId!: number
+
+  @Field()
+  name!: string
+
+  @Field({ nullable: true })
+  type?: ProductType
+}
+
+@ArgsType()
 class GetProductsArgs {
   @Field(() => Int, { nullable: true })
   limit?: number
@@ -167,5 +182,11 @@ export default class ProductResolver {
   async updateProduct(@Arg('id') id: string, @Args() args: UpdateProductArgs) {
     await Product.update(id, removeUndefineds(args))
     return Product.findOneOrFail(id)
+  }
+
+  @Mutation(() => Product)
+  async createProduct(@Args() args: CreateProductArgs) {
+    const product = Product.create(args)
+    return product.save()
   }
 }

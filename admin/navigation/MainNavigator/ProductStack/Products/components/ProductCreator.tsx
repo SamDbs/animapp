@@ -1,83 +1,74 @@
+import { gql, useMutation } from '@apollo/client'
 import Card from '@components/Card'
 import FieldSelectWithLabel from '@components/FieldSelectWithlabel'
 import FieldWithLabel from '@components/FieldWithLabel'
-import OneToMany from '@components/OneToMany'
-import SubItem from '@components/SubItem'
-import useBrandStore, { Brand, BrandStore } from '@hooks/stores/brand'
-import useProductsStore, { Product, ProductStore, ProductType } from '@hooks/stores/product'
+import { ProductType } from '@hooks/stores/product'
 import { useNavigation } from '@react-navigation/native'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Button, Text, View } from 'react-native'
+import ProductBrand from './ProductBrand'
 
-const initialState: { type: ProductType; name: string; barCode: string; brandId: string } = {
+import ProductBrandSelector from './ProductBrandSelector'
+import { GET_PRODUCTS } from './ProductsList'
+
+const CREATE_PRODUCT = gql`
+  mutation CreateProduct($name: String!, $brandId: Int!, $barCode: String!, $type: String!) {
+    createProduct(name: $name, brandId: $brandId, barCode: $barCode, type: $type) {
+      id
+      name
+      brand {
+        id
+      }
+    }
+  }
+`
+type MutationReturnType = { createProduct: { id: number; name: string; brand: { id: number } } }
+type MutationVariables = { name: string; brandId: number; barCode: string; type: string }
+
+const initialState: MutationVariables = {
   type: ProductType.DRY_FOOD,
   name: '',
   barCode: '',
-  brandId: '',
+  brandId: 0,
 }
 
 export default function ProductCreator({ style }: { style?: View['props']['style'] }) {
-  const [product, setProduct] = useState({ ...initialState })
+  const [createProduct, { loading }] = useMutation<MutationReturnType, MutationVariables>(
+    CREATE_PRODUCT,
+    { refetchQueries: [GET_PRODUCTS] },
+  )
+  const [product, setProduct] = useState<MutationVariables>(initialState)
   const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
   const navigation = useNavigation()
-  const createProduct = useProductsStore((state) => state.createProduct)
-  const [brands, registerBrandIds, unregisterBrandIds] = useBrandStore((state) => [
-    state.brands,
-    state.registerIds,
-    state.unregisterIds,
-  ])
-
-  useEffect(() => {
-    if (!product.brandId) return
-    registerBrandIds([product.brandId])
-    return () => unregisterBrandIds([product.brandId])
-  }, [product.brandId])
-
-  const brand = brands[product.brandId]
 
   const create = async () => {
-    setLoading(true)
-    setError('')
     try {
-      const id = await createProduct(product)
-      navigation.navigate('ProductStack', { screen: 'Product', params: { id } })
+      const { data, errors } = await createProduct({ variables: product })
+      if (errors?.length) setError(errors[0].message)
+      else
+        navigation.navigate('ProductStack', {
+          screen: 'Product',
+          params: { id: data?.createProduct.id },
+        })
+      setError('')
     } catch (e: any) {
-      setError(e?.response?.data?.message ?? 'An unknown error occured.')
-    } finally {
-      setLoading(false)
+      setError(e?.networkError?.result?.errors?.[0]?.message ?? 'Error !')
     }
   }
 
   return (
     <Card style={style}>
       <Text style={{ fontSize: 18, marginBottom: 16 }}>Create a product</Text>
-      {brand && (
-        <View
-          style={{
-            marginTop: 16,
-            borderColor: '#ccc',
-            borderWidth: 1,
-            borderRadius: 3,
-            overflow: 'hidden',
-          }}>
-          <SubItem<Brand> even entityLinkCreator={(id) => 'osef'} item={brand} />
-        </View>
-      )}
-      <Text>Select a brand</Text>
-      <OneToMany<Brand, BrandStore, Product, ProductStore>
-        getOwnerByOwnedIdSelect={(state) => state.getBrandByProductId}
-        ownerEntityLinkCreator={(brand) => `/brands/${brand.id}`}
-        ownerSelectorCreator={(id) => (state) => state.brands[id]}
-        ownersSelectorCreator={(ids) => (state) => ids.map((id) => state.brands[id])}
-        registerOwnerIdsSelector={(state) => state.registerIds}
-        searchOwnersSelector={(state) => state.searchBrands}
-        setOwnerId={(brandId) => setProduct((state) => ({ ...state, brandId }))}
-        unregisterOwnerIdsSelector={(state) => state.unregisterIds}
-        updateOwnerInOwnedSelector={(state) => state.updateProductBrand}
-        useOwnedStore={useProductsStore}
-        useOwnerStore={useBrandStore}
+      <Text>{product.brandId ? 'Brand' : 'Select a brand'}</Text>
+      <ProductBrand
+        id={product.brandId}
+        onRemove={() => setProduct((state) => ({ ...state, brandId: 0 }))}
       />
+      {!product.brandId && (
+        <ProductBrandSelector
+          onSelect={(brandId) => setProduct((state) => ({ ...state, brandId: Number(brandId) }))}
+        />
+      )}
       <View style={{ marginBottom: 16 }} />
       <FieldWithLabel
         label="Name"

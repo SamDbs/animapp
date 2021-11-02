@@ -4,13 +4,11 @@ import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
 import useSearch from '@hooks/useSearch'
 import { useNavigation } from '@react-navigation/native'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
 
 const LIMIT = 5
-
-type Product = { id: string; name: string; brand: { name: string } }
 
 export const GET_PRODUCTS = gql`
   query GetProducts(
@@ -23,6 +21,10 @@ export const GET_PRODUCTS = gql`
       id
       name
       description
+      published
+      brand {
+        name
+      }
     }
     productsCount(searchTerms: $searchTerms, filters: $filters)
   }
@@ -32,8 +34,13 @@ const initialPagination = {
   page: 0,
   offset: 0,
 }
-type GetProductsReturnType = { products: Product[]; productsCount: number }
-type GetProductsVars = {
+
+type QueryReturnType = {
+  products: { id: string; name: string; published: boolean; brand: { name: string } }[]
+  productsCount: number
+}
+
+type QueryVariables = {
   limit: number
   offset: number
   filters?: ProductFilters
@@ -44,13 +51,10 @@ type ProductFilters = { published?: boolean }
 export default function ProductList({ style }: { style?: View['props']['style'] }) {
   const [filters, setFilters] = useState<ProductFilters>({})
   const [pagination, setPagination] = useState(initialPagination)
-  const { data, loading, refetch } = useQuery<GetProductsReturnType, GetProductsVars>(
-    GET_PRODUCTS,
-    {
-      fetchPolicy: 'cache-and-network',
-      variables: { limit: LIMIT, offset: pagination.offset, filters },
-    },
-  )
+  const { data, loading, refetch } = useQuery<QueryReturnType, QueryVariables>(GET_PRODUCTS, {
+    fetchPolicy: 'cache-and-network',
+    variables: { limit: LIMIT, offset: pagination.offset, filters },
+  })
 
   const search = useSearch((searchTerms) => {
     setPagination(initialPagination)
@@ -157,7 +161,7 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
             <DataTable.Title>Brand</DataTable.Title>
             <DataTable.Title numeric>Actions</DataTable.Title>
           </DataTable.Header>
-          {data?.products.filter(Boolean).map((product: any, i: number) => {
+          {data?.products.map((product) => {
             return (
               <DataTable.Row key={product.id}>
                 <DataTable.Cell style={{ flex: 0, flexBasis: 50 }}>
@@ -171,7 +175,7 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
                   />
                 </DataTable.Cell>
                 <DataTable.Cell>{product.name}</DataTable.Cell>
-                <DataTable.Cell>{product.brand}</DataTable.Cell>
+                <DataTable.Cell>{product.brand.name}</DataTable.Cell>
                 <DataTable.Cell numeric>
                   <IconButton
                     icon="pencil"

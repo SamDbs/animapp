@@ -1,20 +1,18 @@
-import { Brand } from '@hooks/stores/brand'
-import { Constituent } from '@hooks/stores/constituent'
-import { Ingredient } from '@hooks/stores/ingredient'
-import { Link } from '@react-navigation/native'
 import { MaterialIcons } from '@expo/vector-icons'
-import { PanGestureHandler, State } from 'react-native-gesture-handler'
-import { Text, View } from 'react-native'
-import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
+import { Link } from '@react-navigation/native'
 import React, { useState } from 'react'
+import { Text, View } from 'react-native'
+import { PanGestureHandler, State } from 'react-native-gesture-handler'
+import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated'
 
 export const ITEM_HEIGHT = 50
 
-type Props<OwnedItem extends Brand | Ingredient | Constituent> = {
+type Props<OwnedItem> = {
   children?: View['props']['children']
   entityLinkCreator: (entity: Partial<OwnedItem>) => string
   even: boolean
   item: Partial<OwnedItem>
+  nameProp?: keyof Props<OwnedItem>['item']
 } & (
   | { withOrder?: false }
   | {
@@ -24,9 +22,7 @@ type Props<OwnedItem extends Brand | Ingredient | Constituent> = {
     }
 )
 
-export default function SubItem<OwnedItem extends Brand | Ingredient | Constituent>(
-  props: Props<OwnedItem>,
-) {
+export default function SubItem<OwnedItem>(props: Props<OwnedItem>) {
   const [taken, take] = useState(false)
   const y = useSharedValue(0)
   const animatedStyle = useAnimatedStyle(
@@ -75,7 +71,7 @@ export default function SubItem<OwnedItem extends Brand | Ingredient | Constitue
           </PanGestureHandler>
         )}
         <Link to={props.entityLinkCreator(props.item)}>
-          <Text>{props.item.name}</Text>
+          <Text>{props.nameProp ? props.item[props.nameProp] : props.item?.name}</Text>
         </Link>
       </View>
       {props.children && <View style={{ flexDirection: 'row' }}>{props.children}</View>}
