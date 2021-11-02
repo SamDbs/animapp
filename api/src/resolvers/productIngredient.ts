@@ -20,8 +20,8 @@ export default class ProductIngredientResolver {
   }
 
   @Query(() => [ProductIngredient])
-  productIngredients(): Promise<ProductIngredient[]> {
-    return ProductIngredient.find()
+  productIngredients(@Arg('productId') productId: string): Promise<ProductIngredient[]> {
+    return ProductIngredient.find({ where: { productId } })
   }
 
   @FieldResolver()

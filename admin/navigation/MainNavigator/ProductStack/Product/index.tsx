@@ -13,6 +13,7 @@ import { ActivityIndicator, Image, ScrollView, Switch, Text, View } from 'react-
 import { ProductStackParamList } from '../../../../types'
 import ProductBrand from '../Products/components/ProductBrand'
 import ProductBrandSelector from '../Products/components/ProductBrandSelector'
+import ProductIngredients from './components/ProductIngredients'
 
 type Product = {
   barCode: string
@@ -185,6 +186,7 @@ export default function ProductComponent(
           </>
         )}
       </Card>
+      {data?.product && <ProductIngredients productId={data.product.id} />}
       {/* <Card style={{ marginVertical: 16 }}>
         <Text style={{ fontSize: 18 }}>Attached ingredients</Text>
         {isLoading && !product && <ActivityIndicator />}
