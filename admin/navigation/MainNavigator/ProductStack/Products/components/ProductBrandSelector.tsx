@@ -6,7 +6,7 @@ import React from 'react'
 import { ActivityIndicator, Button, TextInput } from 'react-native'
 
 const GET_POSSIBLE_BRANDS_FOR_PRODUCT = gql`
-  query GetPossibleBrandsForProducts($searchTerms: String = "") {
+  query GetPossibleBrandsForProduct($searchTerms: String = "") {
     brands(offset: 0, limit: 5, searchTerms: $searchTerms) {
       id
       name

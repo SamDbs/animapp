@@ -75,6 +75,9 @@ class UpdateProductArgs {
 
   @Field({ nullable: true })
   published?: boolean
+
+  @Field({ nullable: true })
+  brandId?: string
 }
 
 @Resolver(() => Product)
