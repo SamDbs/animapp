@@ -37,7 +37,7 @@ class CreateProductArgs implements Partial<Product> {
   @Field()
   barCode!: string
 
-  @Field(() => Int)
+  @Field(() => String)
   brandId!: number
 
   @Field()

@@ -12,7 +12,7 @@ import ProductBrandSelector from './ProductBrandSelector'
 import { GET_PRODUCTS } from './ProductsList'
 
 const CREATE_PRODUCT = gql`
-  mutation CreateProduct($name: String!, $brandId: Int!, $barCode: String!, $type: String!) {
+  mutation CreateProduct($name: String!, $brandId: String!, $barCode: String!, $type: String!) {
     createProduct(name: $name, brandId: $brandId, barCode: $barCode, type: $type) {
       id
       name
