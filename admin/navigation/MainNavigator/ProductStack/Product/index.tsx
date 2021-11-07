@@ -13,6 +13,7 @@ import { ActivityIndicator, Image, ScrollView, Switch, Text, View } from 'react-
 import { ProductStackParamList } from '../../../../types'
 import ProductBrand from '../Products/components/ProductBrand'
 import ProductBrandSelector from '../Products/components/ProductBrandSelector'
+import ProductConstituents from './components/ProductConstituents'
 import ProductIngredients from './components/ProductIngredients'
 
 type Product = {
@@ -187,56 +188,7 @@ export default function ProductComponent(
         )}
       </Card>
       {data?.product && <ProductIngredients productId={data.product.id} />}
-      {/* <Card style={{ marginVertical: 16 }}>
-        <Text style={{ fontSize: 18 }}>Attached ingredients</Text>
-        {isLoading && !product && <ActivityIndicator />}
-        {product && (
-          <ManyToMany
-            useOwnedStore={useIngredientStore}
-            ownerEntityId={product.id}
-            ownedItemsGetterSelector={(state) => state.getIngredientsByProductId}
-            ownedItemsUpdaterSelector={(state) => state.updateIngredientsByProductId}
-            relationParams
-            ownedItemsDeletorSelector={(state) => state.deleteIngredientFromProductId}
-            ownedItemsSelectorCreator={(ids) => (state) =>
-              ids
-                .map((id) => state.ingredients[id])
-                .sort((a, b) => {
-                  return (state?.productIngredients[`${product.id}-${a.id}`]?.order ?? 0) >
-                    (state?.productIngredients[`${product.id}-${b.id}`]?.order ?? 0)
-                    ? 1
-                    : -1
-                })}
-            registerOwnedIdsSelector={(state) => state.registerIds}
-            unregisterOwnedIdsSelector={(state) => state.unregisterIds}
-            searchItemsSelector={(state) => state.searchIngredients}
-            ownedEntityLinkCreator={(item) => `/ingredients/${item.id}`}
-            ownedItemsRelationGetterSelector={(state) => state.productIngredients}
-            withOrder
-            setOrderSelector={(state) => state.setIngredientsOrder}
-          />
-        )}
-      </Card> */}
-      {/* <Card style={{ marginVertical: 16 }}>
-        <Text style={{ fontSize: 18 }}>Attached Analytical Constituent</Text>
-        {isLoading && !product && <ActivityIndicator />}
-        {product && (
-          <ManyToMany
-            useOwnedStore={useConstituentsStore}
-            ownerEntityId={product.id}
-            ownedItemsGetterSelector={(state) => state.getConstituentsByProductId}
-            ownedItemsUpdaterSelector={(state) => state.updateConstituentsByProductId}
-            relationParams
-            ownedItemsDeletorSelector={(state) => state.deleteConstituentFromProductId}
-            ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.constituents[id])}
-            registerOwnedIdsSelector={(state) => state.registerIds}
-            unregisterOwnedIdsSelector={(state) => state.unregisterIds}
-            searchItemsSelector={(state) => state.searchConstituents}
-            ownedEntityLinkCreator={(item) => `/constituents/${item.id}`}
-            ownedItemsRelationGetterSelector={(state) => state.productConstituents}
-          />
-        )}
-      </Card> */}
+      {data?.product && <ProductConstituents productId={data.product.id} />}
     </ScrollView>
   )
 }

@@ -61,7 +61,7 @@ export default class ProductIngredientResolver {
     return ProductIngredient.find({ where: { productId } })
   }
 
-  @FieldResolver()
+  @FieldResolver(() => Ingredient)
   async ingredient(@Root() productIngredient: ProductIngredient): Promise<Ingredient> {
     return Ingredient.findOneOrFail({ where: { id: productIngredient.ingredientId } })
   }

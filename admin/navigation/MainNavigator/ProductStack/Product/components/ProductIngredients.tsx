@@ -1,6 +1,8 @@
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { gql, useMutation } from '@apollo/client'
 import Card from '@components/Card'
 import SubItem from '@components/SubItem'
+import useGetProductIngredients, { Ingredient } from '@hooks/queries/GetProductIngredients'
+import GET_PRODUCT_INGREDIENTS from '@hooks/queries/GetProductIngredients/query'
 import React, { useState } from 'react'
 import { Button, Text, View } from 'react-native'
 
@@ -24,49 +26,16 @@ type MutationVariables = {
   ingredientId?: string
   productId?: string
 }
-
-export const GET_PRODUCT_INGREDIENTS = gql`
-  query GetProductIngredients($productId: String!) {
-    productIngredients(productId: $productId) {
-      quantity
-      order
-      ingredient {
-        description
-        id
-        name
-        review
-      }
-    }
-  }
-`
-
-type Ingredient = {
-  description: string
-  id: string
-  name: string
-  review: string
-}
-
-type QueryReturnType = {
-  productIngredients: {
-    quantity: number
-    order: number
-    ingredient: Ingredient
-  }[]
-}
-
-type QueryVariables = { productId: string }
+const refetchQueries = [GET_INGREDIENTS, GET_PRODUCT_INGREDIENTS]
 
 export default function ProductIngredients(props: Props) {
-  const { data } = useQuery<QueryReturnType, QueryVariables>(GET_PRODUCT_INGREDIENTS, {
-    variables: { productId: props.productId },
-  })
+  const { data } = useGetProductIngredients(props.productId)
 
   const [removeIngredientFromProduct] = useMutation<any, MutationVariables>(
     REMOVE_PRODUCT_INGREDIENT,
     {
       variables: { productId: props.productId },
-      refetchQueries: [GET_INGREDIENTS, GET_PRODUCT_INGREDIENTS],
+      refetchQueries,
     },
   )
 

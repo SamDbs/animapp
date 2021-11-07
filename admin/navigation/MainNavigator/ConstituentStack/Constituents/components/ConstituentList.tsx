@@ -9,7 +9,12 @@ import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
 
 const LIMIT = 5
-type Constituent = { id: string; name: string; description: string }
+export type Constituent = { id: string; name: string; description: string }
+export type QueryReturnType = {
+  analyticalConstituents: Constituent[]
+  analyticalConstituentsCount: number
+}
+
 export const GET_CONSTITUENTS = gql`
   query GetConstituents($offset: Int, $limit: Int, $searchTerms: String = "") {
     analyticalConstituents(limit: $limit, offset: $offset, searchTerms: $searchTerms) {
@@ -27,10 +32,7 @@ const initialPagination = {
 
 export default function ConstituentList({ style }: { style: View['props']['style'] }) {
   const [pagination, setPagination] = useState(initialPagination)
-  const { data, loading, refetch } = useQuery<{
-    analyticalConstituents: Constituent[]
-    analyticalConstituentsCount: number
-  }>(GET_CONSTITUENTS, {
+  const { data, loading, refetch } = useQuery<QueryReturnType>(GET_CONSTITUENTS, {
     variables: { limit: LIMIT, offset: pagination.offset },
   })
 

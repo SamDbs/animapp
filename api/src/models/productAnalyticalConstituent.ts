@@ -1,4 +1,4 @@
-import { ObjectType } from 'type-graphql'
+import { Field, ID, ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   Column,
@@ -17,14 +17,17 @@ import Product from './product'
 @Entity()
 @ObjectType()
 export default class ProductAnalyticalConstituent extends BaseEntity {
+  @Field(() => ID)
   @PrimaryColumn()
   productId!: number
 
+  @Field(() => ID)
   @PrimaryColumn()
   analyticalConstituentId!: number
 
+  @Field({ nullable: true })
   @Column({ type: 'varchar', nullable: true })
-  quantity!: string | null
+  quantity!: string
 
   @ManyToOne(() => Product, (product) => product.analyticalConstituents)
   @JoinColumn({ name: 'productId' })

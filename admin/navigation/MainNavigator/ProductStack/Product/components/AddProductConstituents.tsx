@@ -1,15 +1,15 @@
 import { gql, useMutation, useQuery } from '@apollo/client'
 import SubItem from '@components/SubItem'
-import GET_PRODUCT_INGREDIENTS from '@hooks/queries/GetProductIngredients/query'
+import GET_PRODUCT_CONSTITUENTS from '@hooks/queries/GetProductConstituents/query'
 import useSearch from '@hooks/useSearch'
 import React, { useState } from 'react'
 import { Button, TextInput, View } from 'react-native'
 
 import {
-  GET_INGREDIENTS,
+  GET_CONSTITUENTS,
   QueryReturnType,
-  Ingredient,
-} from '../../../IngredientStack/Ingredients/components/IngredientList'
+  Constituent,
+} from '../../../ConstituentStack/Constituents/components/ConstituentList'
 
 const LIMIT = 5
 
@@ -31,30 +31,23 @@ type MutationVariables = {
 }
 
 const ADD_PRODUCT_INGREDIENT = gql`
-  mutation AddIngredientToProduct(
-    $ingredientId: ID!
-    $productId: ID!
-    $order: Int!
-    $quantity: String
-  ) {
-    addIngredientToProduct(
-      ingredientId: $ingredientId
+  mutation AddConstituentTToProduct($ingredientId: ID!, $productId: ID!, $quantity: String) {
+    addConstituentToProduct(
+      analyticalConstituentId: $ingredientId
       productId: $productId
-      order: $order
       quantity: $quantity
     ) {
       productId
-      ingredientId
+      analyticalConstituentId
       quantity
-      order
     }
   }
 `
 
-const refetchQueries = [GET_PRODUCT_INGREDIENTS]
+const refetchQueries = [GET_PRODUCT_CONSTITUENTS]
 
 export default function AddProductIngredients(props: Props) {
-  const { data, refetch } = useQuery<QueryReturnType>(GET_INGREDIENTS, {
+  const { data, refetch } = useQuery<QueryReturnType>(GET_CONSTITUENTS, {
     variables: { limit: LIMIT, offset: 0 },
   })
 
@@ -62,12 +55,12 @@ export default function AddProductIngredients(props: Props) {
     refetch({ searchTerms })
   })
 
-  const [addIngredientToProduct] = useMutation<MutationReturnType, MutationVariables>(
+  const [addConstituentToProduct] = useMutation<MutationReturnType, MutationVariables>(
     ADD_PRODUCT_INGREDIENT,
     { refetchQueries },
   )
 
-  const [quantities, setQuantites] = useState<Record<Ingredient['id'], string>>({})
+  const [quantities, setQuantites] = useState<Record<Constituent['id'], string>>({})
 
   return (
     <>
@@ -91,13 +84,13 @@ export default function AddProductIngredients(props: Props) {
           overflow: 'hidden',
           marginBottom: 8,
         }}>
-        {data?.ingredients
-          .filter((ingredient) => !props.alreadyAddedIds.includes(ingredient.id))
-          .map((ingredient, i) => (
-            <SubItem<Ingredient>
-              key={ingredient.id}
+        {data?.analyticalConstituents
+          .filter((constituent) => !props.alreadyAddedIds.includes(constituent.id))
+          .map((constituent, i) => (
+            <SubItem<Constituent>
+              key={constituent.id}
               entityLinkCreator={() => 'lol'}
-              item={ingredient}
+              item={constituent}
               even={i % 2 === 0}>
               <TextInput
                 style={{
@@ -109,19 +102,19 @@ export default function AddProductIngredients(props: Props) {
                   marginRight: 8,
                 }}
                 onChangeText={(text) =>
-                  setQuantites((prev) => ({ ...prev, [ingredient.id]: text }))
+                  setQuantites((prev) => ({ ...prev, [constituent.id]: text }))
                 }
                 placeholder="quantity"
               />
               <Button
                 title="Add"
                 onPress={() =>
-                  addIngredientToProduct({
+                  addConstituentToProduct({
                     variables: {
                       productId: props.productId,
-                      ingredientId: ingredient.id,
-                      order: data.ingredients.length,
-                      quantity: quantities[ingredient.id],
+                      ingredientId: constituent.id,
+                      order: data.analyticalConstituents.length,
+                      quantity: quantities[constituent.id],
                     },
                   })
                 }
