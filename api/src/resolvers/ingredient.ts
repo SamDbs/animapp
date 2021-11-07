@@ -159,18 +159,17 @@ export default class IngredientResolver {
     return Ingredient.findOneOrFail(id)
   }
 
-  @Mutation(() => String)
+  @Mutation(() => Ingredient)
   async deleteIngredient(@Arg('id') id: string) {
     const ingredient = await Ingredient.findOneOrFail(id)
     ingredient.softRemove()
-    return id
+    return ingredient
   }
 
-  @Mutation(() => String)
+  @Mutation(() => Ingredient)
   async restoreIngredient(@Arg('id') id: string) {
     const ingredient = await Ingredient.findOneOrFail(id, { withDeleted: true })
     ingredient.deletedAt = null
-    await ingredient.save()
-    return ingredient.id
+    return ingredient.save()
   }
 }
