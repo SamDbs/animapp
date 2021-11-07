@@ -25,7 +25,7 @@ export default class ProductAnalyticalConstituent extends BaseEntity {
   @PrimaryColumn()
   analyticalConstituentId!: number
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   @Column({ type: 'varchar', nullable: true })
   quantity!: string | null
 
