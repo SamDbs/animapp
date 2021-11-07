@@ -101,7 +101,8 @@ export default function ContactList({ style }: { style?: View['props']['style'] 
             <DataTable.Title>Name</DataTable.Title>
             <DataTable.Title>Email</DataTable.Title>
             <DataTable.Title>Message</DataTable.Title>
-            <DataTable.Title numeric>Date</DataTable.Title>
+            <DataTable.Title numeric>Date of receipt</DataTable.Title>
+            <DataTable.Title numeric>Action</DataTable.Title>
           </DataTable.Header>
           {data?.contacts.map((contact) => {
             return (
@@ -113,6 +114,16 @@ export default function ContactList({ style }: { style?: View['props']['style'] 
                   {new Date(contact.createdAt).toLocaleString()}
                 </DataTable.Cell>
                 <DataTable.Cell numeric>
+                  <IconButton
+                    icon="eye"
+                    style={{ margin: 0 }}
+                    onPress={() =>
+                      navigate('ContactStack', {
+                        screen: 'Contact',
+                        params: { id: contact.id },
+                      })
+                    }
+                  />
                   <IconButton
                     icon="delete"
                     style={{ margin: 0 }}
