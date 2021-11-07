@@ -26,7 +26,7 @@ export default class ProductIngredient extends BaseEntity {
   ingredientId!: number
 
   @Field(() => String, { nullable: true })
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   quantity!: string | null
 
   @Field({ defaultValue: 0 })
