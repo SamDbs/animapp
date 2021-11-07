@@ -23,6 +23,7 @@ export const GET_PRODUCTS = gql`
       description
       published
       brand {
+        id
         name
       }
     }

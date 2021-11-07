@@ -4,6 +4,7 @@ import { FindManyOptions } from 'typeorm'
 
 import Language from '../models/language'
 import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
+import removeUndefineds from '../utils/remove-undefined-fields'
 
 @ArgsType()
 class CreateLanguageArgs implements Partial<Language> {
@@ -55,7 +56,7 @@ export default class LanguageResolver {
 
   @Mutation(() => Language)
   async updateLanguage(@Arg('id') id: string, @Args() args: UpdateLanguageArgs): Promise<Language> {
-    await Language.update(id, args)
+    await Language.update(id, removeUndefineds(args))
     return Language.findOneOrFail(id)
   }
 }

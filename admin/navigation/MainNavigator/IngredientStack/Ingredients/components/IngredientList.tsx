@@ -12,7 +12,7 @@ import { GET_DELETE_INGREDIENTS } from './IngredientDeletedList'
 
 const LIMIT = 5
 
-type Ingredient = { id: string; name: string; review: string; description: string }
+export type Ingredient = { id: string; name: string; review: string; description: string }
 
 export const GET_INGREDIENTS = gql`
   query GetIngredients($offset: Int, $limit: Int, $searchTerms: String = "") {
@@ -25,6 +25,11 @@ export const GET_INGREDIENTS = gql`
     ingredientsCount(searchTerms: $searchTerms)
   }
 `
+
+export type QueryReturnType = {
+  ingredients: Ingredient[]
+  ingredientsCount: number
+}
 
 const DELETE_INGREDIENT = gql`
   mutation DeleteIngredient($id: String!) {
@@ -41,10 +46,7 @@ export default function IngredientList({ style }: { style?: View['props']['style
   })
 
   const [pagination, setPagination] = useState(initialPagination)
-  const { data, loading, refetch } = useQuery<{
-    ingredients: Ingredient[]
-    ingredientsCount: number
-  }>(GET_INGREDIENTS, {
+  const { data, loading, refetch } = useQuery<QueryReturnType>(GET_INGREDIENTS, {
     variables: { limit: LIMIT, offset: pagination.offset },
   })
 

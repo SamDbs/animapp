@@ -28,12 +28,15 @@ export default class AnalyticalConstituent extends BaseEntity {
   @OneToMany(() => ConstituentTranslation, (translation) => translation.analyticalConstituent)
   translations!: ConstituentTranslation[]
 
+  @Field()
   @CreateDateColumn()
   createdAt!: Date
 
+  @Field()
   @UpdateDateColumn()
   updatedAt!: Date
 
+  @Field(() => Date, { nullable: true })
   @DeleteDateColumn()
-  deletedAt!: Date
+  deletedAt?: Date | null
 }

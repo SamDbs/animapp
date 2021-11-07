@@ -102,13 +102,13 @@ export default class AnalyticalConstituentResolver {
   }
 
   @Mutation(() => AnalyticalConstituent)
-  createAnalyticalConstituent(): Promise<AnalyticalConstituent> {
+  createConstituent(): Promise<AnalyticalConstituent> {
     const faq = AnalyticalConstituent.create()
     return faq.save()
   }
 
   @Mutation(() => AnalyticalConstituent)
-  async deleteAnalyticalConstituent(@Arg('id') id: string): Promise<AnalyticalConstituent> {
+  async deleteConstituent(@Arg('id') id: string): Promise<AnalyticalConstituent> {
     const faq = await AnalyticalConstituent.findOneOrFail(id)
     return faq.softRemove()
   }

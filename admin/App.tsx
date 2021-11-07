@@ -28,6 +28,7 @@ export default function App() {
         uri: `${Constants.manifest?.extra?.API_URL}/graphql`,
         cache: new InMemoryCache(),
         headers: { Authorization: jwt },
+        connectToDevTools: true,
       }),
     [jwt],
   )
