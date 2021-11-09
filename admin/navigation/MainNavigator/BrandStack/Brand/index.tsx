@@ -1,45 +1,54 @@
+import { gql, useMutation, useQuery } from '@apollo/client'
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
 import { PageHeader } from '@components/Themed'
-import useBrandStore from '@hooks/stores/brand'
 import { StackScreenProps } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
 
 import { BrandStackParamList } from '../../../../types'
 
-export default function Brand(props: StackScreenProps<BrandStackParamList, 'Brand'>) {
-  const [id, setId] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const brand = useBrandStore((state) => state.brands[props.route.params.id])
-  const [registerIds, unregisterIds, getBrandById, updateBrand] = useBrandStore((state) => [
-    state.registerIds,
-    state.unregisterIds,
-    state.getBrandById,
-    state.updateBrand,
-  ])
+type Brand = {
+  id: string
+  name: string
+}
 
-  useEffect(() => {
-    if (!brand) return
-    registerIds([id])
-    return () => unregisterIds([id])
-  }, [id])
+type Variables = {
+  id?: string
+  name?: string
+}
 
-  useEffect(() => {
-    async function fn() {
-      setIsLoading(true)
-      const { id } = await getBrandById(props.route.params.id)
-      setId(id)
-      setIsLoading(false)
+const GET_BRAND = gql`
+  query GetBrand($id: String!) {
+    brand(id: $id) {
+      id
+      name
     }
-    fn()
-  }, [])
+  }
+`
+const UPDATE_BRAND = gql`
+  mutation UpdateBrand($id: String!, $name: String!) {
+    updateBrand(id: $id, name: $name) {
+      id
+      name
+    }
+  }
+`
+export default function BrandComponent(props: StackScreenProps<BrandStackParamList, 'Brand'>) {
+  const { data, loading } = useQuery<{ brand: Brand }>(GET_BRAND, {
+    variables: { id: props.route.params.id },
+  })
+  const [updateBrand] = useMutation<{ updateBrand: { id: string } }, Variables>(UPDATE_BRAND, {
+    variables: { id: props.route.params.id },
+  })
+
+  const brand = data?.brand
 
   return (
     <ScrollView style={{ padding: 16 }}>
       <PageHeader>Brand</PageHeader>
       <Card>
-        {isLoading && !brand && <ActivityIndicator />}
+        {loading && !brand && <ActivityIndicator />}
         {brand && (
           <>
             <View
@@ -66,7 +75,7 @@ export default function Brand(props: StackScreenProps<BrandStackParamList, 'Bran
               <FieldWithLabel
                 label="Name"
                 value={brand.name}
-                onChangeValue={(val) => updateBrand(brand.id, { name: val })}
+                onChangeValue={(val) => updateBrand({ variables: { name: val } })}
               />
             </View>
           </>

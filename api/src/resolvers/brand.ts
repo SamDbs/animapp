@@ -15,9 +15,16 @@ import { FindManyOptions, FindOperator, IsNull, Not } from 'typeorm'
 
 import Brand from '../models/brand'
 import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
+import removeUndefineds from '../utils/remove-undefined-fields'
 
 @ArgsType()
 class CreateBrandArgs implements Partial<Brand> {
+  @Field()
+  name!: string
+}
+
+@ArgsType()
+class UpdateBrandArgs implements Partial<Brand> {
   @Field()
   name!: string
 }
@@ -85,6 +92,12 @@ export default class BrandResolver {
   createBrand(@Args() args: CreateBrandArgs): Promise<Brand> {
     const brand = Brand.create(args)
     return brand.save()
+  }
+
+  @Mutation(() => Brand)
+  async updateBrand(@Arg('id') id: string, @Args() args: UpdateBrandArgs) {
+    await Brand.update(id, removeUndefineds(args))
+    return Brand.findOneOrFail(id)
   }
 
   @Mutation(() => Brand)
