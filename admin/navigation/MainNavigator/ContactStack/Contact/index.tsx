@@ -4,7 +4,7 @@ import { PageHeader } from '@components/Themed'
 import { StackScreenProps } from '@react-navigation/stack'
 import gql from 'graphql-tag'
 import React, { Fragment } from 'react'
-import { ActivityIndicator, ScrollView } from 'react-native'
+import { ActivityIndicator, ScrollView, Text } from 'react-native'
 import { DataTable } from 'react-native-paper'
 
 import { ContactStackParamList } from '../../../../types'
@@ -68,7 +68,9 @@ export default function ContactComponent(
                 {contactWithMessages?.map((c) => {
                   return (
                     <DataTable.Row key={contact.id}>
-                      <DataTable.Cell>{c.message}</DataTable.Cell>
+                      <DataTable.Cell>
+                        <Text style={{ whiteSpace: 'pre-line' }}>{c.message}</Text>
+                      </DataTable.Cell>
                       <DataTable.Cell>{new Date(c.createdAt).toLocaleString()}</DataTable.Cell>
                     </DataTable.Row>
                   )
