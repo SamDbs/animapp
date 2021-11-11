@@ -24,8 +24,6 @@ export const GET_CONTACT = gql`
   }
 `
 
-const refreshQueries = [GET_CONTACTS]
-
 export default function ContactComponent(
   props: StackScreenProps<ContactStackParamList, 'Contact'>,
 ) {
@@ -41,7 +39,6 @@ export default function ContactComponent(
   const contact = data?.contact
   const allContacts = contacts?.contacts
   const contactWithMessages = allContacts?.filter((c) => c.email === contact?.email)
-  console.log(contactWithMessages)
   return (
     <ScrollView style={{ padding: 16 }}>
       <PageHeader>Contact Info</PageHeader>
@@ -67,7 +64,7 @@ export default function ContactComponent(
                 </DataTable.Header>
                 {contactWithMessages?.map((c) => {
                   return (
-                    <DataTable.Row key={contact.id}>
+                    <DataTable.Row key={c.id}>
                       <DataTable.Cell>
                         <Text style={{ whiteSpace: 'pre-line' }}>{c.message}</Text>
                       </DataTable.Cell>
