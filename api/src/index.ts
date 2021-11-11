@@ -30,6 +30,7 @@ import BrandResolver from './resolvers/brand'
 import TranslationResolver from './resolvers/translation'
 import AnalyticalConstituentResolver from './resolvers/constituent'
 import ProductConstituentResolver from './resolvers/productConstituent'
+import SearchResolver from './resolvers/search'
 
 const PORT = (process.env.PORT as unknown as number) || 8080
 const HOST = '0.0.0.0'
@@ -70,6 +71,7 @@ async function main() {
       ProductConstituentResolver,
       ProductIngredientResolver,
       ProductResolver,
+      SearchResolver,
       TranslationResolver,
     ],
   })
