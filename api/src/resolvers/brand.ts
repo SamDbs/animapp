@@ -3,16 +3,19 @@ import {
   Args,
   ArgsType,
   Field,
+  FieldResolver,
   Info,
   InputType,
   Int,
   Mutation,
   Query,
   Resolver,
+  Root,
 } from 'type-graphql'
 import { GraphQLResolveInfo } from 'graphql'
 import { FindManyOptions, FindOperator, IsNull, Not } from 'typeorm'
 
+import Product from '../models/product'
 import Brand from '../models/brand'
 import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
 import removeUndefineds from '../utils/remove-undefined-fields'
@@ -111,5 +114,13 @@ export default class BrandResolver {
     const brand = await Brand.findOneOrFail(id, { withDeleted: true })
     brand.deletedAt = null
     return brand.save()
+  }
+
+  @FieldResolver(() => [Product])
+  async products(@Root() brand: Brand) {
+    const brandProducts = await Product.find({
+      where: { brandId: brand.id },
+    })
+    return brandProducts
   }
 }
