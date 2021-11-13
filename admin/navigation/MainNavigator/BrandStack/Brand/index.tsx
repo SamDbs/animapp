@@ -2,15 +2,22 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import Card from '@components/Card'
 import FieldWithLabel from '@components/FieldWithLabel'
 import { PageHeader } from '@components/Themed'
+import { useNavigation } from '@react-navigation/core'
 import { StackScreenProps } from '@react-navigation/stack'
 import React from 'react'
 import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
+import { DataTable, IconButton } from 'react-native-paper'
 
 import { BrandStackParamList } from '../../../../types'
 
 type Brand = {
   id: string
   name: string
+  products: {
+    id: string
+    name: string
+    type: string
+  }[]
 }
 
 type Variables = {
@@ -23,9 +30,15 @@ const GET_BRAND = gql`
     brand(id: $id) {
       id
       name
+      products {
+        id
+        name
+        type
+      }
     }
   }
 `
+
 const UPDATE_BRAND = gql`
   mutation UpdateBrand($id: String!, $name: String!) {
     updateBrand(id: $id, name: $name) {
@@ -43,11 +56,11 @@ export default function BrandComponent(props: StackScreenProps<BrandStackParamLi
   })
 
   const brand = data?.brand
-
+  const { navigate } = useNavigation()
   return (
     <ScrollView style={{ padding: 16 }}>
       <PageHeader>Brand</PageHeader>
-      <Card>
+      <Card style={{ marginBottom: 10 }}>
         {loading && !brand && <ActivityIndicator />}
         {brand && (
           <>
@@ -78,6 +91,38 @@ export default function BrandComponent(props: StackScreenProps<BrandStackParamLi
                 onChangeValue={(val) => updateBrand({ variables: { name: val } })}
               />
             </View>
+          </>
+        )}
+      </Card>
+      <Card>
+        {loading && !brand && <ActivityIndicator />}
+        {brand?.products && (
+          <>
+            <DataTable>
+              <DataTable.Header>
+                <DataTable.Title>Name</DataTable.Title>
+                <DataTable.Title>Type</DataTable.Title>
+              </DataTable.Header>
+              {brand?.products.map((product) => {
+                return (
+                  <DataTable.Row key={product.id}>
+                    <DataTable.Cell>{product.name}</DataTable.Cell>
+                    <DataTable.Cell>{product.type}</DataTable.Cell>
+                    <DataTable.Cell numeric>
+                      <IconButton
+                        icon="eye"
+                        onPress={() =>
+                          navigate('ProductStack', {
+                            screen: 'Product',
+                            params: { id: product.id },
+                          })
+                        }
+                      />
+                    </DataTable.Cell>
+                  </DataTable.Row>
+                )
+              })}
+            </DataTable>
           </>
         )}
       </Card>
