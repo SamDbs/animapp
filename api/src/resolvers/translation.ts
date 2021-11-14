@@ -1,4 +1,4 @@
-import { Args, ArgsType, Field, Mutation, Resolver } from 'type-graphql'
+import { Args, ArgsType, Authorized, Field, Mutation, Resolver } from 'type-graphql'
 
 import ConstituentTranslation from '../models/constituentTranslation'
 import FaqTranslation from '../models/faqTranslation'
@@ -45,6 +45,7 @@ class UpdateTranslationArgs {
 
 @Resolver()
 export default class TranslationResolver {
+  @Authorized()
   @Mutation(() => String)
   async updateTranslation(@Args() args: UpdateTranslationArgs): Promise<'ok'> {
     const id = Number(args.entityId)
@@ -59,8 +60,7 @@ export default class TranslationResolver {
           where: { analyticalConstituentId: id, languageId },
         })
         const translation =
-          existingTranslation ||
-          ConstituentTranslation.create({ analyticalConstituentId: id, languageId })
+          existingTranslation || ConstituentTranslation.create({ analyticalConstituentId: id, languageId })
         if (typeof args.description === 'string') translation.description = args.description
         if (typeof args.name === 'string') translation.name = args.name
         await translation.save()
@@ -80,8 +80,7 @@ export default class TranslationResolver {
         const existingTranslation = await ProductTranslation.findOne({
           where: { productId: id, languageId },
         })
-        const translation =
-          existingTranslation || ProductTranslation.create({ productId: id, languageId })
+        const translation = existingTranslation || ProductTranslation.create({ productId: id, languageId })
         if (typeof args.description === 'string') translation.description = args.description
         await translation.save()
         return 'ok'
@@ -90,8 +89,7 @@ export default class TranslationResolver {
         const existingTranslation = await IngredientTranslation.findOne({
           where: { ingredientId: id, languageId },
         })
-        const translation =
-          existingTranslation || IngredientTranslation.create({ ingredientId: id, languageId })
+        const translation = existingTranslation || IngredientTranslation.create({ ingredientId: id, languageId })
         if (typeof args.description === 'string') translation.description = args.description
         if (typeof args.name === 'string') translation.name = args.name
         if (typeof args.review === 'string') translation.review = args.review

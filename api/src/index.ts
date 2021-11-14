@@ -19,7 +19,7 @@ import analyticalConstituents from './routes/analyticalConstituents'
 import authentication from './routes/authentication'
 import admin from './routes/admin'
 import { errorHandler } from './middleware/errorHandler'
-import { authAdmin, isConnected } from './middleware/admin'
+import { authChecker, isConnected } from './middleware/admin'
 import IngredientResolver from './resolvers/ingredient'
 import ProductResolver from './resolvers/product'
 import ProductIngredientResolver from './resolvers/productIngredient'
@@ -61,6 +61,8 @@ async function main() {
   }
 
   const schema = await buildSchema({
+    authChecker,
+    authMode: 'error',
     resolvers: [
       AnalyticalConstituentResolver,
       BrandResolver,
@@ -103,7 +105,12 @@ async function main() {
   app.use('/auth', authentication)
   app.use('/admin', admin)
 
-  app.use('/graphql', authAdmin, graphqlHTTP({ schema }))
+  type Res = { locals: { admin: object } }
+
+  app.use(
+    '/graphql',
+    graphqlHTTP((req, res) => ({ schema, context: { admin: (res as unknown as Res).locals?.admin } })),
+  )
 
   app.use(errorHandler)
   app.use((req, res) => {

@@ -2,6 +2,7 @@ import {
   Arg,
   Args,
   ArgsType,
+  Authorized,
   Field,
   FieldResolver,
   Info,
@@ -96,12 +97,14 @@ export default class FaqResolver {
     return Faq.count(options)
   }
 
+  @Authorized()
   @Mutation(() => Faq)
   createFaq(): Promise<Faq> {
     const faq = Faq.create()
     return faq.save()
   }
 
+  @Authorized()
   @Mutation(() => Faq)
   async deleteFaq(@Arg('id') id: string): Promise<Faq> {
     const faq = await Faq.findOneOrFail(id)

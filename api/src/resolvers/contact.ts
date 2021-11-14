@@ -1,15 +1,4 @@
-import {
-  Arg,
-  Args,
-  ArgsType,
-  Field,
-  Info,
-  InputType,
-  Int,
-  Mutation,
-  Query,
-  Resolver,
-} from 'type-graphql'
+import { Arg, Args, ArgsType, Authorized, Field, Info, InputType, Int, Mutation, Query, Resolver } from 'type-graphql'
 import { GraphQLResolveInfo } from 'graphql'
 import { FindManyOptions, FindOperator, IsNull, Not } from 'typeorm'
 
@@ -58,10 +47,7 @@ export default class ContactResolver {
   }
 
   @Query(() => [Contact])
-  async contacts(
-    @Args() args: GetContactsArgs,
-    @Info() info: GraphQLResolveInfo,
-  ): Promise<Contact[]> {
+  async contacts(@Args() args: GetContactsArgs, @Info() info: GraphQLResolveInfo): Promise<Contact[]> {
     const deletedAt = args.filters?.deleted === true ? Not(IsNull()) : IsNull()
     const options: FindManyOptions<Contact> = {
       select: getSelectedFieldsFromForModel(info, Contact),
@@ -97,18 +83,21 @@ export default class ContactResolver {
     return Contact.count(options)
   }
 
+  @Authorized()
   @Mutation(() => Contact)
   createContact(@Args() args: CreateContactArgs): Promise<Contact> {
     const contact = Contact.create(args)
     return contact.save()
   }
 
+  @Authorized()
   @Mutation(() => Contact)
   async deleteContact(@Arg('id') id: string) {
     const contact = await Contact.findOneOrFail(id)
     return contact.softRemove()
   }
 
+  @Authorized()
   @Mutation(() => Contact)
   async restoreContact(@Arg('id') id: string) {
     const contact = await Contact.findOneOrFail(id, { withDeleted: true })

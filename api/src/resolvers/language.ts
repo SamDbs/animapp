@@ -1,4 +1,4 @@
-import { Arg, Args, ArgsType, Field, Info, Int, Mutation, Query, Resolver } from 'type-graphql'
+import { Arg, Args, ArgsType, Authorized, Field, Info, Int, Mutation, Query, Resolver } from 'type-graphql'
 import { GraphQLResolveInfo } from 'graphql'
 import { FindManyOptions } from 'typeorm'
 
@@ -42,18 +42,21 @@ export default class LanguageResolver {
     return Language.count(options)
   }
 
+  @Authorized()
   @Mutation(() => Language)
   createLanguage(@Args() args: CreateLanguageArgs): Promise<Language> {
     const language = Language.create(args)
     return language.save()
   }
 
+  @Authorized()
   @Mutation(() => Language)
   async deleteLanguage(@Arg('id') id: string): Promise<Language> {
     const language = await Language.findOneOrFail(id)
     return language.softRemove()
   }
 
+  @Authorized()
   @Mutation(() => Language)
   async updateLanguage(@Arg('id') id: string, @Args() args: UpdateLanguageArgs): Promise<Language> {
     await Language.update(id, removeUndefineds(args))

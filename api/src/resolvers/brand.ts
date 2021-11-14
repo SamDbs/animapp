@@ -2,6 +2,7 @@ import {
   Arg,
   Args,
   ArgsType,
+  Authorized,
   Field,
   FieldResolver,
   Info,
@@ -73,8 +74,7 @@ export default class BrandResolver {
     }
     if (args.limit) options.take = args.limit
     if (args.limit && args.offset) options.skip = args.offset
-    if (args.searchTerms)
-      options.where = { name: new FindOperator('ilike', `%${args.searchTerms}%`) }
+    if (args.searchTerms) options.where = { name: new FindOperator('ilike', `%${args.searchTerms}%`) }
     return Brand.find(options)
   }
 
@@ -86,29 +86,32 @@ export default class BrandResolver {
       where: { deletedAt },
       withDeleted: true,
     }
-    if (args.searchTerms)
-      options.where = { name: new FindOperator('ilike', `%${args.searchTerms}%`) }
+    if (args.searchTerms) options.where = { name: new FindOperator('ilike', `%${args.searchTerms}%`) }
     return Brand.count(options)
   }
 
+  @Authorized()
   @Mutation(() => Brand)
   createBrand(@Args() args: CreateBrandArgs): Promise<Brand> {
     const brand = Brand.create(args)
     return brand.save()
   }
 
+  @Authorized()
   @Mutation(() => Brand)
   async updateBrand(@Arg('id') id: string, @Args() args: UpdateBrandArgs) {
     await Brand.update(id, removeUndefineds(args))
     return Brand.findOneOrFail(id)
   }
 
+  @Authorized()
   @Mutation(() => Brand)
   async deleteBrand(@Arg('id') id: string): Promise<Brand> {
     const brand = await Brand.findOneOrFail(id)
     return brand.softRemove()
   }
 
+  @Authorized()
   @Mutation(() => Brand)
   async restoreBrand(@Arg('id') id: string) {
     const brand = await Brand.findOneOrFail(id, { withDeleted: true })
@@ -116,6 +119,7 @@ export default class BrandResolver {
     return brand.save()
   }
 
+  @Authorized()
   @FieldResolver(() => [Product])
   async products(@Root() brand: Brand) {
     const brandProducts = await Product.find({
