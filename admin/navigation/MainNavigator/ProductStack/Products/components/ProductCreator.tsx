@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native'
 import React, { useState } from 'react'
 import { Button, Text, View } from 'react-native'
 
-import ProductBrand from './ProductBrand'
+import ProductBrand, { GET_BRAND } from './ProductBrand'
 import ProductBrandSelector from './ProductBrandSelector'
 import { GET_PRODUCTS } from './ProductsList'
 
@@ -33,7 +33,7 @@ const initialState: MutationVariables = {
 export default function ProductCreator({ style }: { style?: View['props']['style'] }) {
   const [createProduct, { loading }] = useMutation<MutationReturnType, MutationVariables>(
     CREATE_PRODUCT,
-    { refetchQueries: [GET_PRODUCTS] },
+    { refetchQueries: [GET_PRODUCTS, GET_BRAND] },
   )
   const [product, setProduct] = useState<MutationVariables>(initialState)
   const [error, setError] = useState('')
