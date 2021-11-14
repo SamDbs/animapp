@@ -10,8 +10,7 @@ function useFieldForSelection(modelName: string, field: string) {
 }
 
 function mandatoryFields(modelName: string) {
-  if (['product', 'faq', 'ingredient', 'analyticalconstituent', 'contact'].includes(modelName))
-    return ['id']
+  if (['product', 'faq', 'ingredient', 'analyticalconstituent', 'contact'].includes(modelName)) return ['id']
   return []
 }
 

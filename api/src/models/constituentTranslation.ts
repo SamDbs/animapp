@@ -33,11 +33,9 @@ export default class ConstituentTranslation extends BaseEntity {
   @Column({ nullable: true })
   description!: string
 
-  @ManyToOne(
-    () => AnalyticalConstituent,
-    (analyticalConstituent) => analyticalConstituent.translations,
-    { onDelete: 'CASCADE' },
-  )
+  @ManyToOne(() => AnalyticalConstituent, (analyticalConstituent) => analyticalConstituent.translations, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'analyticalConstituentId' })
   analyticalConstituent!: AnalyticalConstituent
 

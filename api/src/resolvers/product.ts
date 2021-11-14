@@ -2,6 +2,7 @@ import {
   Arg,
   Args,
   ArgsType,
+  Authorized,
   Field,
   FieldResolver,
   Info,
@@ -90,10 +91,7 @@ export default class ProductResolver {
   }
 
   @Query(() => [Product])
-  async products(
-    @Args() args: GetProductsArgs,
-    @Info() info: GraphQLResolveInfo,
-  ): Promise<Product[]> {
+  async products(@Args() args: GetProductsArgs, @Info() info: GraphQLResolveInfo): Promise<Product[]> {
     const deletedAt = args.filters?.deleted === true ? Not(IsNull()) : IsNull()
     const options: FindManyOptions<Product> = {
       select: getSelectedFieldsFromForModel(info, Product),
@@ -103,8 +101,7 @@ export default class ProductResolver {
     }
     if (args.limit) options.take = args.limit
     if (args.limit && args.offset) options.skip = args.offset
-    if (args.filters?.published !== undefined)
-      Object.assign(options.where, { published: args.filters.published })
+    if (args.filters?.published !== undefined) Object.assign(options.where, { published: args.filters.published })
     if (args.searchTerms) {
       const productIds = await ProductTranslation.find({
         select: ['productId'],
@@ -127,8 +124,7 @@ export default class ProductResolver {
       where: { deletedAt },
       withDeleted: true,
     }
-    if (args.filters?.published !== undefined)
-      Object.assign(options.where, { published: args.filters.published })
+    if (args.filters?.published !== undefined) Object.assign(options.where, { published: args.filters.published })
     if (args.searchTerms) {
       const productIds = await ProductTranslation.find({
         select: ['productId'],
@@ -144,9 +140,7 @@ export default class ProductResolver {
   }
 
   @FieldResolver(() => String, { nullable: true })
-  async description(
-    @Root() product: Product,
-  ): Promise<ProductTranslation['description'] | undefined> {
+  async description(@Root() product: Product): Promise<ProductTranslation['description'] | undefined> {
     const productTranslation = await ProductTranslation.findOne({
       where: { productId: product.id, languageId: 'EN' },
     })
@@ -181,12 +175,14 @@ export default class ProductResolver {
     return productTranslation.translations
   }
 
+  @Authorized()
   @Mutation(() => Product)
   async updateProduct(@Arg('id') id: string, @Args() args: UpdateProductArgs) {
     await Product.update(id, removeUndefineds(args))
     return Product.findOneOrFail(id)
   }
 
+  @Authorized()
   @Mutation(() => Product)
   async createProduct(@Args() args: CreateProductArgs) {
     const product = Product.create(args)

@@ -57,10 +57,7 @@ export default class Product extends BaseEntity {
   @Column()
   brandId!: number
 
-  @OneToMany(
-    () => ProductAnalyticalConstituent,
-    (productAnalyticalConstituent) => productAnalyticalConstituent.product,
-  )
+  @OneToMany(() => ProductAnalyticalConstituent, (productAnalyticalConstituent) => productAnalyticalConstituent.product)
   analyticalConstituents!: ProductAnalyticalConstituent[]
 
   @Field(() => [ProductIngredient])

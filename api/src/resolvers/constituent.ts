@@ -2,6 +2,7 @@ import {
   Arg,
   Args,
   ArgsType,
+  Authorized,
   Field,
   FieldResolver,
   Info,
@@ -32,19 +33,14 @@ class GetConstituentsArgs {
 @Resolver(() => AnalyticalConstituent)
 export default class AnalyticalConstituentResolver {
   @Query(() => AnalyticalConstituent)
-  analyticalConstituent(
-    @Arg('id') id: string,
-    @Info() info: GraphQLResolveInfo,
-  ): Promise<AnalyticalConstituent> {
+  analyticalConstituent(@Arg('id') id: string, @Info() info: GraphQLResolveInfo): Promise<AnalyticalConstituent> {
     return AnalyticalConstituent.findOneOrFail(id, {
       select: getSelectedFieldsFromForModel(info, AnalyticalConstituent),
     })
   }
 
   @Query(() => [AnalyticalConstituent])
-  async analyticalConstituents(
-    @Args() args: GetConstituentsArgs,
-  ): Promise<AnalyticalConstituent[]> {
+  async analyticalConstituents(@Args() args: GetConstituentsArgs): Promise<AnalyticalConstituent[]> {
     const options: FindManyOptions<AnalyticalConstituent> = { order: { id: 'ASC' } }
     if (args.limit) options.take = args.limit
     if (args.limit && args.offset) options.skip = args.offset
@@ -70,9 +66,7 @@ export default class AnalyticalConstituentResolver {
   }
 
   @FieldResolver(() => String, { nullable: true })
-  async description(
-    @Root() root: AnalyticalConstituent,
-  ): Promise<ConstituentTranslation['description']> {
+  async description(@Root() root: AnalyticalConstituent): Promise<ConstituentTranslation['description']> {
     const faqTranslation = await ConstituentTranslation.findOne({
       where: { analyticalConstituentId: root.id, languageId: 'EN' },
     })
@@ -81,8 +75,7 @@ export default class AnalyticalConstituentResolver {
 
   @FieldResolver(() => [ConstituentTranslation])
   async translations(@Root() root: AnalyticalConstituent) {
-    return (await AnalyticalConstituent.findOneOrFail(root.id, { relations: ['translations'] }))
-      .translations
+    return (await AnalyticalConstituent.findOneOrFail(root.id, { relations: ['translations'] })).translations
   }
 
   @Query(() => Int)
@@ -101,12 +94,14 @@ export default class AnalyticalConstituentResolver {
     return AnalyticalConstituent.count(options)
   }
 
+  @Authorized()
   @Mutation(() => AnalyticalConstituent)
   createConstituent(): Promise<AnalyticalConstituent> {
     const faq = AnalyticalConstituent.create()
     return faq.save()
   }
 
+  @Authorized()
   @Mutation(() => AnalyticalConstituent)
   async deleteConstituent(@Arg('id') id: string): Promise<AnalyticalConstituent> {
     const faq = await AnalyticalConstituent.findOneOrFail(id)

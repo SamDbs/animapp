@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express'
 import { verify } from 'jsonwebtoken'
 import NodeCache from 'node-cache'
+import { AuthChecker } from 'type-graphql'
 
 import Admin from '../models/admin'
 
@@ -43,4 +44,12 @@ export const isConnected: RequestHandler = async (req, res, next) => {
     res.locals.admin = admin
   }
   next()
+}
+
+type ContextType = { admin: any }
+
+export const authChecker: AuthChecker<ContextType> = ({ args, context, info, root }, roles) => {
+  if (!context.admin) return false
+
+  return true
 }

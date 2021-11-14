@@ -2,6 +2,7 @@ import {
   Arg,
   Args,
   ArgsType,
+  Authorized,
   Field,
   FieldResolver,
   ID,
@@ -66,16 +67,16 @@ export default class ProductIngredientResolver {
     return Ingredient.findOneOrFail({ where: { id: productIngredient.ingredientId } })
   }
 
+  @Authorized()
   @Mutation(() => ProductIngredient)
   addIngredientToProduct(@Args() args: AddIngredientToProductArgs): Promise<ProductIngredient> {
     const productIngredient = ProductIngredient.create(args)
     return productIngredient.save()
   }
 
+  @Authorized()
   @Mutation(() => ProductIngredient)
-  async removeIngredientFromProduct(
-    @Args() args: RemoveIngredientFromProductArgs,
-  ): Promise<ProductIngredient> {
+  async removeIngredientFromProduct(@Args() args: RemoveIngredientFromProductArgs): Promise<ProductIngredient> {
     const { ingredientId, productId } = args
     const productIngredient = await ProductIngredient.findOneOrFail({
       where: { ingredientId, productId },

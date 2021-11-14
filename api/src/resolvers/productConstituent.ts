@@ -2,6 +2,7 @@ import {
   Arg,
   Args,
   ArgsType,
+  Authorized,
   Field,
   FieldResolver,
   ID,
@@ -62,16 +63,16 @@ export default class ProductConstituentResolver {
     return Constituent.findOneOrFail({ where: { id: productConstituent.analyticalConstituentId } })
   }
 
+  @Authorized()
   @Mutation(() => ProductConstituent)
   addConstituentToProduct(@Args() args: AddConstituentToProductArgs): Promise<ProductConstituent> {
     const productConstituent = ProductConstituent.create(args)
     return productConstituent.save()
   }
 
+  @Authorized()
   @Mutation(() => ProductConstituent)
-  async removeConstituentFromProduct(
-    @Args() args: RemoveConstituentFromProductArgs,
-  ): Promise<ProductConstituent> {
+  async removeConstituentFromProduct(@Args() args: RemoveConstituentFromProductArgs): Promise<ProductConstituent> {
     const { analyticalConstituentId, productId } = args
     const productConstituent = await ProductConstituent.findOneOrFail({
       where: { analyticalConstituentId, productId },

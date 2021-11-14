@@ -2,6 +2,7 @@ import {
   Arg,
   Args,
   ArgsType,
+  Authorized,
   Field,
   FieldResolver,
   Info,
@@ -54,10 +55,7 @@ export default class IngredientResolver {
   }
 
   @Query(() => [Ingredient])
-  async ingredients(
-    @Args() args: GetIngredientsArgs,
-    @Info() info: GraphQLResolveInfo,
-  ): Promise<Ingredient[]> {
+  async ingredients(@Args() args: GetIngredientsArgs, @Info() info: GraphQLResolveInfo): Promise<Ingredient[]> {
     const deletedAt = args.filters?.deleted === true ? Not(IsNull()) : IsNull()
     const options: FindManyOptions<Ingredient> = {
       select: getSelectedFieldsFromForModel(info, Ingredient),
@@ -114,9 +112,7 @@ export default class IngredientResolver {
   }
 
   @FieldResolver(() => String, { nullable: true })
-  async review(
-    @Root() ingredient: Ingredient,
-  ): Promise<IngredientTranslation['review'] | undefined> {
+  async review(@Root() ingredient: Ingredient): Promise<IngredientTranslation['review'] | undefined> {
     const ingredientTranslation = await IngredientTranslation.findOne({
       where: { ingredientId: ingredient.id, languageId: 'EN' },
     })
@@ -124,9 +120,7 @@ export default class IngredientResolver {
   }
 
   @FieldResolver(() => String, { nullable: true })
-  async description(
-    @Root() ingredient: Ingredient,
-  ): Promise<IngredientTranslation['description'] | undefined> {
+  async description(@Root() ingredient: Ingredient): Promise<IngredientTranslation['description'] | undefined> {
     const ingredientTranslation = await IngredientTranslation.findOne({
       where: { ingredientId: ingredient.id, languageId: 'EN' },
     })
@@ -138,17 +132,16 @@ export default class IngredientResolver {
     return (await Ingredient.findOneOrFail(root.id, { relations: ['translations'] })).translations
   }
 
+  @Authorized()
   @Mutation(() => Ingredient)
   createIngredient(): Promise<Ingredient> {
     const ingredient = Ingredient.create()
     return ingredient.save()
   }
 
+  @Authorized()
   @Mutation(() => Ingredient)
-  async updateIngredient(
-    @Arg('id') id: string,
-    @Args() update: UpdateIngredientArgs,
-  ): Promise<Ingredient> {
+  async updateIngredient(@Arg('id') id: string, @Args() update: UpdateIngredientArgs): Promise<Ingredient> {
     if (typeof update.rating === 'number') {
       if (update.rating < 0 || update.rating > 2) {
         throw new Error('Rating must be betwwen 0 or 2.')
@@ -159,6 +152,7 @@ export default class IngredientResolver {
     return Ingredient.findOneOrFail(id)
   }
 
+  @Authorized()
   @Mutation(() => Ingredient)
   async deleteIngredient(@Arg('id') id: string) {
     const ingredient = await Ingredient.findOneOrFail(id)
@@ -166,6 +160,7 @@ export default class IngredientResolver {
     return ingredient
   }
 
+  @Authorized()
   @Mutation(() => Ingredient)
   async restoreIngredient(@Arg('id') id: string) {
     const ingredient = await Ingredient.findOneOrFail(id, { withDeleted: true })
