@@ -28,6 +28,7 @@ const UPDATE_TRANSLATION = gql`
     $name: String
     $answer: String
     $question: String
+    $review: String
   ) {
     updateTranslation(
       kind: $kind
@@ -37,6 +38,7 @@ const UPDATE_TRANSLATION = gql`
       name: $name
       answer: $answer
       question: $question
+      review: $review
     )
   }
 `
