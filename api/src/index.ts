@@ -8,14 +8,8 @@ import { buildSchema } from 'type-graphql'
 config()
 
 import 'express-async-errors'
-import search from './routes/search'
 import products from './routes/products'
-import brands from './routes/brands'
 import ingredients from './routes/ingredients'
-import contacts from './routes/contacts'
-import faq from './routes/faq'
-import languages from './routes/languages'
-import analyticalConstituents from './routes/analyticalConstituents'
 import authentication from './routes/authentication'
 import admin from './routes/admin'
 import { errorHandler } from './middleware/errorHandler'
@@ -94,14 +88,8 @@ async function main() {
     res.send('Hello World!')
   })
 
-  app.use('/search', search)
   app.use('/products', products)
-  app.use('/brands', brands)
   app.use('/ingredients', ingredients)
-  app.use('/contacts', contacts)
-  app.use('/faq', faq)
-  app.use('/languages', languages)
-  app.use('/analytical-constituents', analyticalConstituents)
   app.use('/auth', authentication)
   app.use('/admin', admin)
 
