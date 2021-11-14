@@ -1,4 +1,4 @@
-import { parseQueryToWordArray } from '../../../src/controllers/searchController'
+import parseQueryToWordArray from '../../../src/services/parseQueryToWords'
 
 describe('search multiple ingredients', () => {
   it('should find multiple ingredients', () => {
