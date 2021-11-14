@@ -54,9 +54,7 @@ export const searchByIngredients: RequestHandler = async (req, res) => {
         .getOne()
       return {
         ingredientSearched: mot,
-        ingredientFound: ingredient
-          ? viewIngredient(ingredient.ingredient, language?.toString().toUpperCase())
-          : null,
+        ingredientFound: ingredient ? viewIngredient(ingredient.ingredient, language?.toString().toUpperCase()) : null,
       }
     }),
   )

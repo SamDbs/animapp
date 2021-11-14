@@ -26,11 +26,7 @@ export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
     res.status(409).json({ message: error?.message ?? 'Conflict with entities' })
     return
   }
-  if (
-    error instanceof NotAuthorizedError ||
-    error instanceof JsonWebTokenError ||
-    error instanceof TokenExpiredError
-  ) {
+  if (error instanceof NotAuthorizedError || error instanceof JsonWebTokenError || error instanceof TokenExpiredError) {
     res.status(401).json({ message: 'Not Authorized' })
     return
   }

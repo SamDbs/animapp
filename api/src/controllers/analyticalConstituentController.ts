@@ -37,10 +37,7 @@ export const getAllAnalyticalConstituents: RequestHandler = async (req, res) => 
       skip: offset,
     })
     res.json({
-      constituents: viewAnalyticalConstituentsClient(
-        analyticalConstituents,
-        req.params.lang?.toString().toUpperCase(),
-      ),
+      constituents: viewAnalyticalConstituentsClient(analyticalConstituents, req.params.lang?.toString().toUpperCase()),
       pagination: { count, limit, offset, page },
     })
   }
@@ -51,10 +48,7 @@ export const getAllAnalyticalConstituents: RequestHandler = async (req, res) => 
     skip: offset,
   })
   res.json({
-    constituents: viewAnalyticalConstituentsClient(
-      analyticalConstituents,
-      req.params.lang?.toString().toUpperCase(),
-    ),
+    constituents: viewAnalyticalConstituentsClient(analyticalConstituents, req.params.lang?.toString().toUpperCase()),
     pagination: { count, limit, offset, page },
   })
 }
@@ -70,9 +64,7 @@ export const getAnalyticalConstituentById: RequestHandler = async (req, res) => 
     relations: ['translations'],
   })
   const { language } = req.query
-  res.json(
-    viewAnalyticalConstituentClient(analyticalConstituent, language?.toString().toUpperCase()),
-  )
+  res.json(viewAnalyticalConstituentClient(analyticalConstituent, language?.toString().toUpperCase()))
 }
 
 export const deleteAnalyticalConstituent: RequestHandler = async (req, res) => {

@@ -8,8 +8,7 @@ export function viewAnalyticalConstituentClient(
 ) {
   let translation = analyticalConstituent.translations.find((t) => t.languageId === language)
 
-  if (!translation)
-    translation = analyticalConstituent.translations.find((t) => t.languageId === 'FR')
+  if (!translation) translation = analyticalConstituent.translations.find((t) => t.languageId === 'FR')
 
   const analyticalConstituentClient = {
     id: analyticalConstituent.id,
@@ -28,9 +27,7 @@ export function viewAnalyticalConstituentsClient(
   )
 }
 
-export function viewAnalyticalConstituentWithTranslations(
-  constituentTranslations: ConstituentTranslation[],
-) {
+export function viewAnalyticalConstituentWithTranslations(constituentTranslations: ConstituentTranslation[]) {
   return constituentTranslations
 }
 

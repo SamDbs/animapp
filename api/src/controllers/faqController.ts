@@ -113,10 +113,7 @@ export const createFaqTranslation: RequestHandler = async (req, res) => {
 }
 
 export const patchFaqTranslation: RequestHandler = async (req, res) => {
-  await FaqTranslation.update(
-    { faqId: parseInt(req.params.id), languageId: req.params.lang.toUpperCase() },
-    req.body,
-  )
+  await FaqTranslation.update({ faqId: parseInt(req.params.id), languageId: req.params.lang.toUpperCase() }, req.body)
   const faqTranslation = await FaqTranslation.findOneOrFail({
     where: { faqId: parseInt(req.params.id), languageId: req.params.lang.toUpperCase() },
   })

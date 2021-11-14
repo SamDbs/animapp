@@ -12,21 +12,9 @@ router.get('/:id', analyticalConstituentController.getAnalyticalConstituentById)
 router.delete('/:id', analyticalConstituentController.deleteAnalyticalConstituent)
 
 // CRUD translations
-router.get(
-  '/:id/translations',
-  analyticalConstituentController.getAllAnalyticalConstituentTranslations,
-)
-router.post(
-  '/:id/translations',
-  analyticalConstituentController.createAnalyticalConstituentTranslation,
-)
-router.patch(
-  '/:id/translations/:lang',
-  analyticalConstituentController.patchAnalyticalConstituentTranslation,
-)
-router.delete(
-  '/:id/translations/:lang',
-  analyticalConstituentController.deleteAnalyticalConstituentTranslation,
-)
+router.get('/:id/translations', analyticalConstituentController.getAllAnalyticalConstituentTranslations)
+router.post('/:id/translations', analyticalConstituentController.createAnalyticalConstituentTranslation)
+router.patch('/:id/translations/:lang', analyticalConstituentController.patchAnalyticalConstituentTranslation)
+router.delete('/:id/translations/:lang', analyticalConstituentController.deleteAnalyticalConstituentTranslation)
 
 export default router

@@ -1,12 +1,7 @@
 import { Brackets, FindManyOptions, QueryFailedError } from 'typeorm'
 import { Request, RequestHandler } from 'express'
 
-import {
-  viewProduct,
-  viewProducts,
-  viewProductTranslation,
-  viewProductTranslations,
-} from '../views/product'
+import { viewProduct, viewProducts, viewProductTranslation, viewProductTranslations } from '../views/product'
 import { viewAnalyticalConstituentsClient } from '../views/analyticalConstituent'
 import { viewIngredients } from '../views/ingredient'
 import Product from '../models/product'
@@ -50,8 +45,7 @@ export const getAllProducts: RequestHandler = async (req, res) => {
 
   if (req.query.q) {
     const formatQuery = req.query.q.toString().split(' ')
-    const queryTranslations =
-      ProductTranslation.createQueryBuilder('pT').where("pT.languageId = 'EN'")
+    const queryTranslations = ProductTranslation.createQueryBuilder('pT').where("pT.languageId = 'EN'")
     formatQuery.forEach((x) => queryTranslations.andWhere('pT.description ilike :x', { x }))
 
     console.log('formatQuery', formatQuery)
@@ -351,12 +345,10 @@ export const deleteProductIngredient: RequestHandler = async (req, res) => {
 
 export const setProductsIngredientOrder: RequestHandler = async (req, res) => {
   await Promise.all(
-    req.body.map(
-      (item: { ingredientId: Ingredient['id']; productId: Product['id']; order: number }) => {
-        const { ingredientId, order, productId } = item
-        return ProductIngredient.update({ ingredientId, productId }, { order })
-      },
-    ),
+    req.body.map((item: { ingredientId: Ingredient['id']; productId: Product['id']; order: number }) => {
+      const { ingredientId, order, productId } = item
+      return ProductIngredient.update({ ingredientId, productId }, { order })
+    }),
   )
 
   res.sendStatus(200)

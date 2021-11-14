@@ -5,8 +5,7 @@ import IngredientTranslation from '../models/ingredientTranslation'
 export function viewIngredient(ingredient: Ingredient, language: Language['id'] = 'EN') {
   let ingredientTranslation = ingredient.translations.find((t) => t.languageId === language)
 
-  if (!ingredientTranslation)
-    ingredientTranslation = ingredient.translations.find((t) => t.languageId === 'EN')
+  if (!ingredientTranslation) ingredientTranslation = ingredient.translations.find((t) => t.languageId === 'EN')
 
   const ingredientClient = {
     id: ingredient.id,

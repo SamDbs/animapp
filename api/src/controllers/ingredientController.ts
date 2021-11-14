@@ -53,9 +53,7 @@ export const getAllIngredients: RequestHandler = async (req, res) => {
   }
   const [ingredients, count] = await Ingredient.createQueryBuilder('ingredient')
     .withDeleted()
-    .where(
-      deletedIngredients ? 'ingredient."deletedAt" IS NOT NULL' : 'ingredient."deletedAt" IS NULL',
-    )
+    .where(deletedIngredients ? 'ingredient."deletedAt" IS NOT NULL' : 'ingredient."deletedAt" IS NULL')
     .leftJoinAndSelect('ingredient.translations', 'it', "it.languageId = 'EN'")
     .orderBy('it.name', 'ASC')
     .offset(offset)
