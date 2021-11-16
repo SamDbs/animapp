@@ -69,9 +69,9 @@ export default class IngredientResolver {
       const ingredientIds = await IngredientTranslation.find({
         select: ['ingredientId'],
         where: [
-          { name: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
-          { review: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
-          { description: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
+          { name: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'FR' },
+          { review: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'FR' },
+          { description: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'FR' },
         ],
       })
       Object.assign(options.where, { id: In(ingredientIds.map((x) => x.ingredientId)) })
@@ -92,9 +92,9 @@ export default class IngredientResolver {
       const ingredientIds = await IngredientTranslation.find({
         select: ['ingredientId'],
         where: [
-          { name: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
-          { review: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
-          { description: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
+          { name: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'FR' },
+          { review: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'FR' },
+          { description: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'FR' },
         ],
       })
       Object.assign(options.where, { id: In(ingredientIds.map((x) => x.ingredientId)) })
@@ -106,7 +106,7 @@ export default class IngredientResolver {
   @FieldResolver(() => String, { nullable: true })
   async name(@Root() ingredient: Ingredient): Promise<IngredientTranslation['name'] | undefined> {
     const ingredientTranslation = await IngredientTranslation.findOne({
-      where: { ingredientId: ingredient.id, languageId: 'EN' },
+      where: { ingredientId: ingredient.id, languageId: 'FR' },
     })
     return ingredientTranslation?.name ?? '-'
   }
@@ -114,7 +114,7 @@ export default class IngredientResolver {
   @FieldResolver(() => String, { nullable: true })
   async review(@Root() ingredient: Ingredient): Promise<IngredientTranslation['review'] | undefined> {
     const ingredientTranslation = await IngredientTranslation.findOne({
-      where: { ingredientId: ingredient.id, languageId: 'EN' },
+      where: { ingredientId: ingredient.id, languageId: 'FR' },
     })
     return ingredientTranslation?.review ?? '-'
   }
@@ -122,7 +122,7 @@ export default class IngredientResolver {
   @FieldResolver(() => String, { nullable: true })
   async description(@Root() ingredient: Ingredient): Promise<IngredientTranslation['description'] | undefined> {
     const ingredientTranslation = await IngredientTranslation.findOne({
-      where: { ingredientId: ingredient.id, languageId: 'EN' },
+      where: { ingredientId: ingredient.id, languageId: 'FR' },
     })
     return ingredientTranslation?.description ?? '-'
   }

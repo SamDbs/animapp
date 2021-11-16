@@ -107,7 +107,7 @@ export default class ProductResolver {
         select: ['productId'],
         where: {
           description: new FindOperator('ilike', `%${args.searchTerms}%`),
-          languageId: 'EN',
+          languageId: 'FR',
         },
       })
       Object.assign(options.where, { id: In(productIds.map((x) => x.productId)) })
@@ -130,7 +130,7 @@ export default class ProductResolver {
         select: ['productId'],
         where: {
           description: new FindOperator('ilike', `%${args.searchTerms}%`),
-          languageId: 'EN',
+          languageId: 'FR',
         },
       })
       Object.assign(options.where, { id: In(productIds.map((x) => x.productId)) })
@@ -142,7 +142,7 @@ export default class ProductResolver {
   @FieldResolver(() => String, { nullable: true })
   async description(@Root() product: Product): Promise<ProductTranslation['description'] | undefined> {
     const productTranslation = await ProductTranslation.findOne({
-      where: { productId: product.id, languageId: 'EN' },
+      where: { productId: product.id, languageId: 'FR' },
     })
     return productTranslation?.description ?? '-'
   }

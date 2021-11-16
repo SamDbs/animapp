@@ -51,8 +51,8 @@ export default class FaqResolver {
       const faqIds = await FaqTranslation.find({
         select: ['faqId'],
         where: [
-          { question: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
-          { answer: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
+          { question: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'FR' },
+          { answer: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'FR' },
         ],
       })
       options.where = { id: In(faqIds.map((x) => x.faqId)) }
@@ -63,7 +63,7 @@ export default class FaqResolver {
   @FieldResolver(() => String, { nullable: true })
   async question(@Root() root: Faq): Promise<FaqTranslation['question']> {
     const faqTranslation = await FaqTranslation.findOne({
-      where: { faqId: root.id, languageId: 'EN' },
+      where: { faqId: root.id, languageId: 'FR' },
     })
     return faqTranslation?.question ?? '-'
   }
@@ -71,7 +71,7 @@ export default class FaqResolver {
   @FieldResolver(() => String, { nullable: true })
   async answer(@Root() root: Faq): Promise<FaqTranslation['answer']> {
     const faqTranslation = await FaqTranslation.findOne({
-      where: { faqId: root.id, languageId: 'EN' },
+      where: { faqId: root.id, languageId: 'FR' },
     })
     return faqTranslation?.answer ?? '-'
   }
@@ -88,8 +88,8 @@ export default class FaqResolver {
       const faqIds = await FaqTranslation.find({
         select: ['faqId'],
         where: [
-          { question: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
-          { answer: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
+          { question: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'FR' },
+          { answer: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'FR' },
         ],
       })
       options.where = { id: In(faqIds.map((x) => x.faqId)) }

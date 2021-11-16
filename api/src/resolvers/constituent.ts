@@ -48,8 +48,8 @@ export default class AnalyticalConstituentResolver {
       const analyticalConstituents = await ConstituentTranslation.find({
         select: ['analyticalConstituentId'],
         where: [
-          { languageId: 'EN', name: new FindOperator('ilike', `%${args.searchTerms}%`) },
-          { languageId: 'EN', description: new FindOperator('ilike', `%${args.searchTerms}%`) },
+          { languageId: 'FR', name: new FindOperator('ilike', `%${args.searchTerms}%`) },
+          { languageId: 'FR', description: new FindOperator('ilike', `%${args.searchTerms}%`) },
         ],
       })
       options.where = { id: In(analyticalConstituents.map((x) => x.analyticalConstituentId)) }
@@ -60,7 +60,7 @@ export default class AnalyticalConstituentResolver {
   @FieldResolver(() => String, { nullable: true })
   async name(@Root() root: AnalyticalConstituent): Promise<ConstituentTranslation['name']> {
     const faqTranslation = await ConstituentTranslation.findOne({
-      where: { analyticalConstituentId: root.id, languageId: 'EN' },
+      where: { analyticalConstituentId: root.id, languageId: 'FR' },
     })
     return faqTranslation?.name ?? '-'
   }
@@ -68,7 +68,7 @@ export default class AnalyticalConstituentResolver {
   @FieldResolver(() => String, { nullable: true })
   async description(@Root() root: AnalyticalConstituent): Promise<ConstituentTranslation['description']> {
     const faqTranslation = await ConstituentTranslation.findOne({
-      where: { analyticalConstituentId: root.id, languageId: 'EN' },
+      where: { analyticalConstituentId: root.id, languageId: 'FR' },
     })
     return faqTranslation?.description ?? '-'
   }
@@ -85,8 +85,8 @@ export default class AnalyticalConstituentResolver {
       const analyticalConstituents = await ConstituentTranslation.find({
         select: ['analyticalConstituentId'],
         where: [
-          { name: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
-          { description: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'EN' },
+          { name: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'FR' },
+          { description: new FindOperator('ilike', `%${args.searchTerms}%`), languageId: 'FR' },
         ],
       })
       options.where = { id: In(analyticalConstituents.map((x) => x.analyticalConstituentId)) }
