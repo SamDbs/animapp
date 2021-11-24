@@ -1,3 +1,4 @@
+import Constants from 'expo-constants'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import {
   Modal,
@@ -66,7 +67,9 @@ export default function Analysis({ navigation }: Props): JSX.Element {
 
   const search = useCallback(async () => {
     // const request = await fetch(`http://10.0.2.2:8080/search/ingredients?q=${searchBox}`)
-    const request = await fetch(`${process.env.API_URL}/search/ingredients?q=${searchBox}`)
+    const request = await fetch(
+      `${Constants.manifest?.extra?.API_URL}/search/ingredients?q=${searchBox}`,
+    )
     const res = await request.json()
     setData(res)
     setIsSearched(true)

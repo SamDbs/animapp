@@ -1,5 +1,6 @@
 import { ActivityIndicator, StyleSheet, TextInput, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import Constants from 'expo-constants'
+import { useEffect, useState } from 'react'
 
 import { AntDesign, SafeAreaPage, Text, useThemeColor } from '../../../components/Themed'
 import { Button } from '../../../components/Button'
@@ -28,7 +29,7 @@ export default function Contact(): JSX.Element {
 
   const sendContact = async () => {
     setLoading(true)
-    const request = await fetch(`${process.env.API_URL}/contacts`, {
+    const request = await fetch(`${Constants.manifest?.extra?.API_URL}/contacts`, {
       // const request = await fetch(`http://10.0.2.2:8080/contacts`, {
       method: 'post',
       body: JSON.stringify({ name, email, message }),

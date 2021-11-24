@@ -1,7 +1,8 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { Camera } from 'expo-camera'
 import { BarCodeEvent, BarCodeScanner } from 'expo-barcode-scanner'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
 import { Text } from '../../components/Themed'
@@ -42,6 +43,7 @@ export default function ScanProduct({ navigation }: Props): JSX.Element {
   const { data, error } = useSWR(code ? `/scan/${code}` : null)
 
   function onBarCodeScanned(barcode: BarCodeEvent) {
+    console.log('scanned', barcode)
     setCode(barcode.data)
   }
 
@@ -73,9 +75,7 @@ export default function ScanProduct({ navigation }: Props): JSX.Element {
 
   return (
     <View style={style.screen}>
-      {camera && !code && (
-        <BarCodeScanner onBarCodeScanned={onBarCodeScanned} style={style.viewFinder} />
-      )}
+      {camera && !code && <Camera onBarCodeScanned={onBarCodeScanned} style={style.viewFinder} />}
       {!!code && <ActivityIndicator size={40} color="#ccc" />}
     </View>
   )

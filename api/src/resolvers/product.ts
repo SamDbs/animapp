@@ -13,6 +13,7 @@ import {
   Resolver,
   Root,
 } from 'type-graphql'
+import { uniqBy } from 'lodash/fp'
 import { GraphQLResolveInfo } from 'graphql'
 import { FindManyOptions, FindOperator, In, IsNull, Not } from 'typeorm'
 
@@ -103,14 +104,38 @@ export default class ProductResolver {
     if (args.limit && args.offset) options.skip = args.offset
     if (args.filters?.published !== undefined) Object.assign(options.where, { published: args.filters.published })
     if (args.searchTerms) {
-      const productIds = await ProductTranslation.find({
-        select: ['productId'],
-        where: {
-          description: new FindOperator('ilike', `%${args.searchTerms}%`),
-          languageId: 'FR',
-        },
-      })
-      Object.assign(options.where, { id: In(productIds.map((x) => x.productId)) })
+      const [product, brand, products, productTranslations] = await Promise.all([
+        Product.find({
+          select: getSelectedFieldsFromForModel(info, Product),
+          where: { name: args.searchTerms },
+        }),
+        Brand.createQueryBuilder('b')
+          .select(['b.id', 'p.id'])
+          .where('b.name ilike :q', { q: `%${args.searchTerms}%` })
+          .innerJoin('b.products', 'p')
+          .getOne(),
+        Product.createQueryBuilder('p')
+          .select('p.id')
+          .where('p.name ilike :q', { q: `%${args.searchTerms}%` })
+          .getMany(),
+        ProductTranslation.find({
+          select: ['productId'],
+          where: {
+            description: new FindOperator('ilike', `%${args.searchTerms}%`),
+            languageId: 'FR',
+          },
+        }),
+      ])
+
+      const brandProductIds = brand?.products.map((p) => p.id) ?? []
+      const productIds = products.map((p) => p.id)
+
+      const [p1, p2, p3] = await Promise.all([
+        Product.find({ ...options, where: { id: In(brandProductIds) } }),
+        Product.find({ ...options, where: { id: In(productIds) } }),
+        Product.find({ ...options, where: { id: In(productTranslations.map((x) => x.productId)) } }),
+      ])
+      return uniqBy('id', [...product, ...p1, ...p2, ...p3])
     }
 
     return Product.find(options)
