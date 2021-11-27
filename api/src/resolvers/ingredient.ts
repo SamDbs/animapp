@@ -111,10 +111,10 @@ export default class IngredientResolver {
         where: { ingredientId: ingredient.id, languageId: 'FR' },
       }))
 
-    if (ingredientTranslation?.name) return ingredientTranslation?.name
+    if (ingredientTranslation?.name) return ingredientTranslation.name
 
     const ingredientTranslationEn =
-      ingredient.translations.find((t) => t.languageId === 'EN') ??
+      ingredient?.translations?.find((t) => t.languageId === 'EN') ??
       (await IngredientTranslation.findOne({
         where: { ingredientId: ingredient.id, languageId: 'EN' },
       }))
@@ -146,10 +146,10 @@ export default class IngredientResolver {
         where: { ingredientId: ingredient.id, languageId: 'FR' },
       }))
 
-    if (ingredientTranslation?.description) return ingredientTranslation?.description
+    if (ingredientTranslation?.description) return ingredientTranslation.description
 
     const ingredientTranslationEn =
-      ingredient.translations.find((t) => t.languageId === 'EN') ??
+      ingredient?.translations?.find((t) => t.languageId === 'EN') ??
       (await IngredientTranslation.findOne({
         where: { ingredientId: ingredient.id, languageId: 'EN' },
       }))

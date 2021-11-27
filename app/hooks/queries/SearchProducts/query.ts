@@ -1,6 +1,6 @@
 import { gql } from '@apollo/client'
 
-const ANALYZE_INGREDIENTS = gql`
+const SEARCH_PRODUCTS = gql`
   query SearchProducts($q: String!) {
     products(searchTerms: $q) {
       id
@@ -15,4 +15,4 @@ const ANALYZE_INGREDIENTS = gql`
   }
 `
 
-export default ANALYZE_INGREDIENTS
+export default SEARCH_PRODUCTS

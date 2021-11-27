@@ -75,11 +75,11 @@ function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="MainTabNavigator">
       <Stack.Screen name="MainTabNavigator" component={MainTabNavigator} />
-      {/* <Stack.Screen
+      <Stack.Screen
         name="Product"
         component={Product}
         options={{ headerShown: true, headerBackTitle: '' }}
-      /> */}
+      />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
     </Stack.Navigator>
   )
