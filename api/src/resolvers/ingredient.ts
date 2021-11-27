@@ -105,26 +105,55 @@ export default class IngredientResolver {
 
   @FieldResolver(() => String, { nullable: true })
   async name(@Root() ingredient: Ingredient): Promise<IngredientTranslation['name'] | undefined> {
-    const ingredientTranslation = await IngredientTranslation.findOne({
-      where: { ingredientId: ingredient.id, languageId: 'FR' },
-    })
-    return ingredientTranslation?.name ?? '-'
+    const ingredientTranslation =
+      ingredient?.translations?.find((t) => t.languageId === 'FR') ??
+      (await IngredientTranslation.findOne({
+        where: { ingredientId: ingredient.id, languageId: 'FR' },
+      }))
+
+    if (ingredientTranslation?.name) return ingredientTranslation?.name
+
+    const ingredientTranslationEn =
+      ingredient.translations.find((t) => t.languageId === 'EN') ??
+      (await IngredientTranslation.findOne({
+        where: { ingredientId: ingredient.id, languageId: 'EN' },
+      }))
+    return ingredientTranslationEn?.name ?? '-'
   }
 
   @FieldResolver(() => String, { nullable: true })
   async review(@Root() ingredient: Ingredient): Promise<IngredientTranslation['review'] | undefined> {
-    const ingredientTranslation = await IngredientTranslation.findOne({
-      where: { ingredientId: ingredient.id, languageId: 'FR' },
-    })
-    return ingredientTranslation?.review ?? '-'
+    const ingredientTranslation =
+      ingredient?.translations?.find((t) => t.languageId === 'FR') ??
+      (await IngredientTranslation.findOne({
+        where: { ingredientId: ingredient.id, languageId: 'FR' },
+      }))
+    if (ingredientTranslation?.review) return ingredientTranslation.review
+
+    const ingredientTranslationEn =
+      ingredient?.translations?.find((t) => t.languageId === 'EN') ??
+      (await IngredientTranslation.findOne({
+        where: { ingredientId: ingredient.id, languageId: 'EN' },
+      }))
+    return ingredientTranslationEn?.review ?? '-'
   }
 
   @FieldResolver(() => String, { nullable: true })
   async description(@Root() ingredient: Ingredient): Promise<IngredientTranslation['description'] | undefined> {
-    const ingredientTranslation = await IngredientTranslation.findOne({
-      where: { ingredientId: ingredient.id, languageId: 'FR' },
-    })
-    return ingredientTranslation?.description ?? '-'
+    const ingredientTranslation =
+      ingredient?.translations?.find((t) => t.languageId === 'FR') ??
+      (await IngredientTranslation.findOne({
+        where: { ingredientId: ingredient.id, languageId: 'FR' },
+      }))
+
+    if (ingredientTranslation?.description) return ingredientTranslation?.description
+
+    const ingredientTranslationEn =
+      ingredient.translations.find((t) => t.languageId === 'EN') ??
+      (await IngredientTranslation.findOne({
+        where: { ingredientId: ingredient.id, languageId: 'EN' },
+      }))
+    return ingredientTranslationEn?.description ?? '-'
   }
 
   @FieldResolver(() => [IngredientTranslation])

@@ -30,7 +30,6 @@ export default class SearchResolver {
         }
       }),
     )
-    console.log('search result', searchResult)
     return searchResult
   }
 }
