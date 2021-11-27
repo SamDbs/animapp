@@ -28,7 +28,7 @@ function SearchInput(props: {
         value={props.input}
         returnKeyType="search"
         clearButtonMode="always"
-        placeholder="Type the name of a product or a brand"
+        placeholder="Rechercher un produit ou une marque"
         placeholderTextColor={placeholderColor}
       />
     </View>

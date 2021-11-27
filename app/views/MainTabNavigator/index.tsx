@@ -58,7 +58,7 @@ export default function MainTabNavigator(): JSX.Element {
           tabBarIcon: createTabBarIcon('time'),
           title: 'History',
         }}
-      />
+      /> */}
       <BottomTab.Screen
         name="About"
         component={HelpStack}
@@ -66,7 +66,7 @@ export default function MainTabNavigator(): JSX.Element {
           tabBarIcon: createTabBarIcon('help'),
           title: 'About',
         }}
-      /> */}
+      />
     </BottomTab.Navigator>
   )
 }
