@@ -43,7 +43,7 @@ export default function MainTabNavigator(): JSX.Element {
           title: 'Analysis',
         }}
       />
-      {/*<BottomTab.Screen
+      <BottomTab.Screen
         name="Search"
         component={Search}
         options={{
@@ -51,7 +51,7 @@ export default function MainTabNavigator(): JSX.Element {
           title: 'Search',
         }}
       />
-      <BottomTab.Screen
+      {/*<BottomTab.Screen
         name="History"
         component={History}
         options={{

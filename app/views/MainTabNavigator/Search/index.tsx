@@ -1,13 +1,14 @@
 import { ActivityIndicator, StyleSheet, TextInput, View } from 'react-native'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { ScrollView } from 'react-native-gesture-handler'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
 import { PageHeader, SafeAreaPage, Text, useThemeColor } from '../../components/Themed'
 import { RootStackParamList } from '../../../types'
 
 import ProductListItem from './components/ProductListItem'
+import useSearchProducts from '../../../hooks/queries/SearchProducts'
 
 type Props = BottomTabScreenProps<RootStackParamList, 'Product'>
 
@@ -40,11 +41,15 @@ function Center(props: { children: JSX.Element }): JSX.Element {
 
 export default function SearchProducts({ navigation: { navigate } }: Props): JSX.Element {
   const [input, setInput] = useState('')
+  const [fetch, { data, loading, error }] = useSearchProducts()
 
   const shouldFetch = input.length > 3
-  const { data, error } = useSWR(shouldFetch ? `/search?q=${input}` : null)
-  const loading = shouldFetch && !data && !error
-  const empty = shouldFetch && data && !data.products.length
+
+  useEffect(() => {
+    if (shouldFetch) fetch({ variables: { q: input } })
+  }, [input, shouldFetch])
+
+  const empty = shouldFetch && data && !data?.products.length
 
   return (
     <SafeAreaPage>
@@ -62,17 +67,16 @@ export default function SearchProducts({ navigation: { navigate } }: Props): JSX
           </Center>
         )}
 
-        {data &&
-          data.products.map((result: any, i: number) => (
-            <ProductListItem
-              product={result}
-              key={result.id}
-              onPress={() => {
-                if (navigate) navigate('Product', { productId: result.id })
-              }}
-              isFirst={i === 0}
-            />
-          ))}
+        {data?.products.map((result, i) => (
+          <ProductListItem
+            product={result}
+            key={result.id}
+            onPress={() => {
+              if (navigate) navigate('Product', { productId: result.id })
+            }}
+            isFirst={i === 0}
+          />
+        ))}
       </ScrollView>
     </SafeAreaPage>
   )

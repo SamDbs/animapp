@@ -3,12 +3,13 @@ import { Image, StyleSheet, View } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 
 import { AntDesign, Text } from '../../../components/Themed'
+import { Product } from '../../../../hooks/queries/SearchProducts'
 
 const CARD_SIZE = 80
 
 type Props = {
   isFirst: boolean
-  product: { id: number; name: string; brand: string; image: string }
+  product: Product
   onPress?: (() => void) | undefined
 }
 
@@ -25,7 +26,7 @@ export default function ProductListItem(props: Props): JSX.Element {
         <View style={{ padding: 10, flexShrink: 1 }}>
           <Text>{props.product.name}</Text>
           <Text secondary style={{ fontSize: 12 }}>
-            {props.product.brand}
+            {props.product.brand.name}
           </Text>
         </View>
       </View>

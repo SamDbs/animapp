@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { ScrollView, TextInput, TouchableWithoutFeedback } from 'react-native-gesture-handler'
+import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import React, { useCallback, useState } from 'react'
 import * as Clipboard from 'expo-clipboard'
 
