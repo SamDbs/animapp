@@ -5,6 +5,7 @@ import {
   Authorized,
   Field,
   FieldResolver,
+  ID,
   Info,
   InputType,
   Int,
@@ -50,6 +51,18 @@ class CreateProductArgs implements Partial<Product> {
 }
 
 @ArgsType()
+class GetProductArgs {
+  @Field(() => ID, { nullable: true })
+  id?: string
+
+  @Field(() => String, { nullable: true })
+  barCode?: string
+
+  @Field({ nullable: true })
+  filters?: ProductsFilters
+}
+
+@ArgsType()
 class GetProductsArgs {
   @Field(() => Int, { nullable: true })
   limit?: number
@@ -85,8 +98,18 @@ class UpdateProductArgs {
 @Resolver(() => Product)
 export default class ProductResolver {
   @Query(() => Product)
-  product(@Arg('id') id: string, @Info() info: GraphQLResolveInfo): Promise<Product> {
-    return Product.findOneOrFail(id, {
+  product(@Args() args: GetProductArgs, @Info() info: GraphQLResolveInfo): Promise<Product> {
+    const { barCode, filters, id } = args
+
+    if (!id && !barCode) throw new Error('A product can only be found using id or barCode')
+
+    const where: FindManyOptions<Product>['where'] = {}
+    if (id) where.id = id
+    if (barCode) where.barCode = barCode
+    if (filters?.published !== undefined) Object.assign(where, { published: filters.published })
+
+    return Product.findOneOrFail({
+      where,
       select: getSelectedFieldsFromForModel(info, Product),
     })
   }

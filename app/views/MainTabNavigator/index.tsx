@@ -27,14 +27,14 @@ export default function MainTabNavigator(): JSX.Element {
     <BottomTab.Navigator
       initialRouteName="Scan"
       screenOptions={{ tabBarActiveTintColor: Colors[colorScheme].tint, headerShown: false }}>
-      {/* <BottomTab.Screen
+      <BottomTab.Screen
         name="Scan"
         component={Scan}
         options={{
           tabBarIcon: createTabBarIcon('scan'),
           title: 'Scan',
         }}
-      /> */}
+      />
       <BottomTab.Screen
         name="Analysis"
         component={Analysis}
