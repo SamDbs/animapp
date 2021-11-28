@@ -51,14 +51,14 @@ export default function MainTabNavigator(): JSX.Element {
           title: 'Search',
         }}
       />
-      {/*<BottomTab.Screen
+      <BottomTab.Screen
         name="History"
         component={History}
         options={{
           tabBarIcon: createTabBarIcon('time'),
           title: 'History',
         }}
-      /> */}
+      />
       <BottomTab.Screen
         name="About"
         component={HelpStack}

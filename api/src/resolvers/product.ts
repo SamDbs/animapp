@@ -166,10 +166,20 @@ export default class ProductResolver {
 
   @FieldResolver(() => String, { nullable: true })
   async description(@Root() product: Product): Promise<ProductTranslation['description'] | undefined> {
-    const productTranslation = await ProductTranslation.findOne({
-      where: { productId: product.id, languageId: 'FR' },
-    })
-    return productTranslation?.description ?? '-'
+    const productTranslation =
+      product?.translations?.find((t) => t.languageId === 'FR') ??
+      (await ProductTranslation.findOne({
+        where: { productId: product.id, languageId: 'FR' },
+      }))
+
+    if (productTranslation?.description) return productTranslation.description
+
+    const productTranslationEn =
+      product?.translations?.find((t) => t.languageId === 'EN') ??
+      (await ProductTranslation.findOne({
+        where: { productId: product.id, languageId: 'EN' },
+      }))
+    return productTranslationEn?.description ?? '-'
   }
 
   @FieldResolver()

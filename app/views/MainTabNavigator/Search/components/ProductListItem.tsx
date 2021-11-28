@@ -9,7 +9,7 @@ const CARD_SIZE = 80
 
 type Props = {
   isFirst: boolean
-  product: Product
+  product: { image: string; name: string; brand: { name: string } }
   onPress?: (() => void) | undefined
 }
 
