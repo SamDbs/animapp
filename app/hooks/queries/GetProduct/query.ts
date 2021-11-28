@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 const GET_PRODUCT = gql`
-  query GetProduct($id: String!) {
-    product(id: $id) {
+  query GetProduct($id: ID!) {
+    product(id: $id, filters: { published: true }) {
       id
       description
       image

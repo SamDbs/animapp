@@ -130,7 +130,7 @@ export default class ProductResolver {
       const [product, brand, products, productTranslations] = await Promise.all([
         Product.find({
           select: getSelectedFieldsFromForModel(info, Product),
-          where: { name: args.searchTerms },
+          where: { name: args.searchTerms, published: args.filters?.published },
         }),
         Brand.createQueryBuilder('b')
           .select(['b.id', 'p.id'])
@@ -154,9 +154,12 @@ export default class ProductResolver {
       const productIds = products.map((p) => p.id)
 
       const [p1, p2, p3] = await Promise.all([
-        Product.find({ ...options, where: { id: In(brandProductIds) } }),
-        Product.find({ ...options, where: { id: In(productIds) } }),
-        Product.find({ ...options, where: { id: In(productTranslations.map((x) => x.productId)) } }),
+        Product.find({ ...options, where: { published: args.filters?.published, id: In(brandProductIds) } }),
+        Product.find({ ...options, where: { published: args.filters?.published, id: In(productIds) } }),
+        Product.find({
+          ...options,
+          where: { published: args.filters?.published, id: In(productTranslations.map((x) => x.productId)) },
+        }),
       ])
       return uniqBy('id', [...product, ...p1, ...p2, ...p3])
     }

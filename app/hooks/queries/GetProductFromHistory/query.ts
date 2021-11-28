@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client'
 
 const query = gql`
-  query GetProductFromHistory($id: String!) {
+  query GetProductFromHistory($id: ID!) {
     product(id: $id) {
       id
       image
