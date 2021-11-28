@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client'
 
-import GET_FAQ from './query'
+import GET_FAQS from './query'
 
 export type Faqs = { faq: Faq }[]
 export type Faq = {
@@ -10,15 +10,15 @@ export type Faq = {
 }
 
 type QueryReturnType = {
-  faq: {
+  faqs: {
     id: string
     question: string
     answer: string
-  }
+  }[]
 }
 
 type QueryVariables = { id: string }
 
-export default function useGetFaq(id: string) {
-  return useQuery<QueryReturnType, QueryVariables>(GET_FAQ, { variables: { id } })
+export default function useGetFaqs() {
+  return useQuery<QueryReturnType, QueryVariables>(GET_FAQS)
 }
