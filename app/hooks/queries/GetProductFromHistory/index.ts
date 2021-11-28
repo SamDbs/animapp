@@ -5,10 +5,8 @@ import query from './query'
 type QueryReturnType = {
   product: {
     id: string
-    description: string
     image: string
     name: string
-    type: string
     brand: {
       id: string
       name: string
