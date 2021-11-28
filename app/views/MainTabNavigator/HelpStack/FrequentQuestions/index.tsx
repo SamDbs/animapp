@@ -1,25 +1,26 @@
+import { StackScreenProps } from '@react-navigation/stack'
+
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import React, { useState } from 'react'
-import useSWR from 'swr'
 
 import { SafeAreaPage } from '../../../components/Themed'
+import useGetFaqs from '../../../../hooks/queries/GetFaq'
+import FaqItem from './components/FaqItem'
+import { RootStackParamList } from '../../../../types'
 
-import FaqItem, { FaqItemType } from './components/FaqItem'
+type Props = StackScreenProps<RootStackParamList, 'Faq'>
 
-export default function FrequentQuestions(): JSX.Element {
-  const { data, error } = useSWR(`/faq`)
-  const isLoading = !data?.faqs && !error
-  const [openItem, setOpenItem] = useState<number | null>(null)
+export default function FrequentQuestions(props: Props): JSX.Element {
+  const { data, loading } = useGetFaqs()
+  const [openItem, setOpenItem] = useState<string | null>(null)
 
   const faqs = data?.faqs ?? []
-
   return (
     <SafeAreaPage noContext>
       <View style={style.marginTop} />
-      {isLoading && <ActivityIndicator size={40} color="#ccc" />}
-      {error && <ActivityIndicator size={40} color="#ccc" />}
+      {loading && <ActivityIndicator size={40} color="#ccc" />}
       {faqs &&
-        faqs.map((item: FaqItemType) => (
+        faqs.map((item) => (
           <FaqItem
             key={item.id}
             item={item}

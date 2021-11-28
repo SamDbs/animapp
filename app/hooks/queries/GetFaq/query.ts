@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
-const GET_FAQ = gql`
-  query GetFaq($id: String!) {
-    faq(id: $id) {
+const GET_FAQS = gql`
+  query GetFaqs {
+    faqs {
       id
       question
       answer
@@ -10,4 +10,4 @@ const GET_FAQ = gql`
   }
 `
 
-export default GET_FAQ
+export default GET_FAQS
