@@ -17,6 +17,13 @@ const GET_PRODUCT = gql`
           rating
         }
       }
+      constituents {
+        quantity
+        constituent {
+          name
+          description
+        }
+      }
     }
   }
 `

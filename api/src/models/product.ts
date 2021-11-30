@@ -60,7 +60,6 @@ export default class Product extends BaseEntity {
   @OneToMany(() => ProductAnalyticalConstituent, (productAnalyticalConstituent) => productAnalyticalConstituent.product)
   analyticalConstituents!: ProductAnalyticalConstituent[]
 
-  @Field(() => [ProductIngredient])
   @OneToMany(() => ProductIngredient, (productIngredient) => productIngredient.product)
   ingredients!: ProductIngredient[]
 
