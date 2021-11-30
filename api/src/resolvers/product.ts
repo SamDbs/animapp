@@ -127,38 +127,56 @@ export default class ProductResolver {
     if (args.limit && args.offset) options.skip = args.offset
     if (args.filters?.published !== undefined) Object.assign(options.where, { published: args.filters.published })
     if (args.searchTerms) {
-      const [product, brand, products, productTranslations] = await Promise.all([
-        Product.find({
-          select: getSelectedFieldsFromForModel(info, Product),
-          where: { name: args.searchTerms, published: args.filters?.published },
-        }),
-        Brand.createQueryBuilder('b')
-          .select(['b.id', 'p.id'])
-          .where('b.name ilike :q', { q: `%${args.searchTerms}%` })
-          .innerJoin('b.products', 'p')
-          .getOne(),
-        Product.createQueryBuilder('p')
-          .select('p.id')
-          .where('p.name ilike :q', { q: `%${args.searchTerms}%` })
-          .getMany(),
-        ProductTranslation.find({
-          select: ['productId'],
-          where: {
-            description: new FindOperator('ilike', `%${args.searchTerms}%`),
-            languageId: 'FR',
-          },
-        }),
+      const productWhere = Object.assign(options.where, { name: args.searchTerms, published: args.filters?.published })
+      const queryProduct = Product.find({
+        select: getSelectedFieldsFromForModel(info, Product),
+        where: productWhere,
+      })
+
+      const queryBrandProducts = Brand.createQueryBuilder('b')
+        .select(['b.id', 'p.id'])
+        .where('b.name ilike :q', { q: `%${args.searchTerms}%` })
+      if (args.filters?.published !== undefined) {
+        queryBrandProducts.andWhere('p.published = :published', {
+          published: args.filters.published,
+        })
+      }
+      queryBrandProducts.innerJoin('b.products', 'p')
+
+      const querySimilarProducts = Product.createQueryBuilder('p')
+        .select('p.id')
+        .where('p.name ilike :q', { q: `%${args.searchTerms}%` })
+
+      if (args.filters?.published !== undefined) {
+        querySimilarProducts.andWhere('p.published = :published', {
+          published: args.filters.published,
+        })
+      }
+
+      const querySimilarProductsTranslations = ProductTranslation.find({
+        select: ['productId'],
+        where: {
+          description: new FindOperator('ilike', `%${args.searchTerms}%`),
+          languageId: 'FR',
+        },
+      })
+      const [product, brand, similarProducts, productTranslations] = await Promise.all([
+        queryProduct,
+        queryBrandProducts.getOne(),
+        querySimilarProducts.getMany(),
+        querySimilarProductsTranslations,
       ])
 
       const brandProductIds = brand?.products.map((p) => p.id) ?? []
-      const productIds = products.map((p) => p.id)
+      const similarProductIds = similarProducts.map((p) => p.id)
+      const productTranslationProductIds = productTranslations.map((x) => x.productId)
 
       const [p1, p2, p3] = await Promise.all([
         Product.find({ ...options, where: { published: args.filters?.published, id: In(brandProductIds) } }),
-        Product.find({ ...options, where: { published: args.filters?.published, id: In(productIds) } }),
+        Product.find({ ...options, where: { published: args.filters?.published, id: In(similarProductIds) } }),
         Product.find({
           ...options,
-          where: { published: args.filters?.published, id: In(productTranslations.map((x) => x.productId)) },
+          where: { published: args.filters?.published, id: In(productTranslationProductIds) },
         }),
       ])
       return uniqBy('id', [...product, ...p1, ...p2, ...p3])
