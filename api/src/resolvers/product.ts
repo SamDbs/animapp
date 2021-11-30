@@ -22,7 +22,6 @@ import Product, { ProductType } from '../models/product'
 import getSelectedFieldsFromForModel from '../utils/grapql-model-fields'
 import ProductAnalyticalConstituent from '../models/productAnalyticalConstituent'
 import ProductIngredient from '../models/productIngredients'
-import ProductConstituent from '../resolvers/productConstituent'
 import Image from '../models/image'
 import ProductTranslation from '../models/productTranslation'
 import removeUndefineds from '../utils/remove-undefined-fields'
@@ -210,12 +209,12 @@ export default class ProductResolver {
     return productTranslationEn?.description ?? '-'
   }
 
-  @FieldResolver()
+  @FieldResolver(() => [ProductIngredient])
   ingredients(@Root() product: Product): Promise<ProductIngredient[]> {
     return ProductIngredient.find({ where: { productId: product.id } })
   }
 
-  @FieldResolver(() => [ProductConstituent])
+  @FieldResolver(() => [ProductAnalyticalConstituent])
   analyticalConstituents(@Root() product: Product): Promise<ProductAnalyticalConstituent[]> {
     return ProductAnalyticalConstituent.find({ where: { productId: product.id } })
   }
