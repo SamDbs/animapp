@@ -1,7 +1,7 @@
 import { createContext } from 'react'
 
 const ProductHistoryContext = createContext<{
-  historyProductsIds: number[]
+  historyProductsIds: string[]
   viewProduct: any
 }>({
   historyProductsIds: [],

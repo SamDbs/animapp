@@ -5,6 +5,7 @@ import {
   Authorized,
   Field,
   FieldResolver,
+  ID,
   Info,
   InputType,
   Int,
@@ -52,6 +53,18 @@ class CreateProductArgs implements Partial<Product> {
 }
 
 @ArgsType()
+class GetProductArgs {
+  @Field(() => ID, { nullable: true })
+  id?: string
+
+  @Field(() => String, { nullable: true })
+  barCode?: string
+
+  @Field({ nullable: true })
+  filters?: ProductsFilters
+}
+
+@ArgsType()
 class GetProductsArgs {
   @Field(() => Int, { nullable: true })
   limit?: number
@@ -87,8 +100,18 @@ class UpdateProductArgs {
 @Resolver(() => Product)
 export default class ProductResolver {
   @Query(() => Product)
-  product(@Arg('id') id: string, @Info() info: GraphQLResolveInfo): Promise<Product> {
-    return Product.findOneOrFail(id, {
+  product(@Args() args: GetProductArgs, @Info() info: GraphQLResolveInfo): Promise<Product> {
+    const { barCode, filters, id } = args
+
+    if (!id && !barCode) throw new Error('A product can only be found using id or barCode')
+
+    const where: FindManyOptions<Product>['where'] = {}
+    if (id) where.id = id
+    if (barCode) where.barCode = barCode
+    if (filters?.published !== undefined) Object.assign(where, { published: filters.published })
+
+    return Product.findOneOrFail({
+      where,
       select: getSelectedFieldsFromForModel(info, Product),
     })
   }
@@ -109,7 +132,7 @@ export default class ProductResolver {
       const [product, brand, products, productTranslations] = await Promise.all([
         Product.find({
           select: getSelectedFieldsFromForModel(info, Product),
-          where: { name: args.searchTerms },
+          where: { name: args.searchTerms, published: args.filters?.published },
         }),
         Brand.createQueryBuilder('b')
           .select(['b.id', 'p.id'])
@@ -133,9 +156,12 @@ export default class ProductResolver {
       const productIds = products.map((p) => p.id)
 
       const [p1, p2, p3] = await Promise.all([
-        Product.find({ ...options, where: { id: In(brandProductIds) } }),
-        Product.find({ ...options, where: { id: In(productIds) } }),
-        Product.find({ ...options, where: { id: In(productTranslations.map((x) => x.productId)) } }),
+        Product.find({ ...options, where: { published: args.filters?.published, id: In(brandProductIds) } }),
+        Product.find({ ...options, where: { published: args.filters?.published, id: In(productIds) } }),
+        Product.find({
+          ...options,
+          where: { published: args.filters?.published, id: In(productTranslations.map((x) => x.productId)) },
+        }),
       ])
       return uniqBy('id', [...product, ...p1, ...p2, ...p3])
     }
@@ -168,10 +194,20 @@ export default class ProductResolver {
 
   @FieldResolver(() => String, { nullable: true })
   async description(@Root() product: Product): Promise<ProductTranslation['description'] | undefined> {
-    const productTranslation = await ProductTranslation.findOne({
-      where: { productId: product.id, languageId: 'FR' },
-    })
-    return productTranslation?.description ?? '-'
+    const productTranslation =
+      product?.translations?.find((t) => t.languageId === 'FR') ??
+      (await ProductTranslation.findOne({
+        where: { productId: product.id, languageId: 'FR' },
+      }))
+
+    if (productTranslation?.description) return productTranslation.description
+
+    const productTranslationEn =
+      product?.translations?.find((t) => t.languageId === 'EN') ??
+      (await ProductTranslation.findOne({
+        where: { productId: product.id, languageId: 'EN' },
+      }))
+    return productTranslationEn?.description ?? '-'
   }
 
   @FieldResolver()

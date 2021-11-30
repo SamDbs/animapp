@@ -39,7 +39,7 @@ type Variables = {
 }
 
 const GET_PRODUCT = gql`
-  query GetProduct($id: String!) {
+  query GetProduct($id: ID!) {
     product(id: $id) {
       barCode
       brandId
