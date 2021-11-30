@@ -215,7 +215,7 @@ export default class ProductResolver {
   }
 
   @FieldResolver(() => [ProductAnalyticalConstituent])
-  analyticalConstituents(@Root() product: Product): Promise<ProductAnalyticalConstituent[]> {
+  constituents(@Root() product: Product): Promise<ProductAnalyticalConstituent[]> {
     return ProductAnalyticalConstituent.find({ where: { productId: product.id } })
   }
 
