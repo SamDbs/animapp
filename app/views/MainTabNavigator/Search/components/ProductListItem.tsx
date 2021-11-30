@@ -3,13 +3,12 @@ import { Image, StyleSheet, View } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 
 import { AntDesign, Text } from '../../../components/Themed'
-import { Product } from '../../../../hooks/queries/SearchProducts'
 
 const CARD_SIZE = 80
 
 type Props = {
   isFirst: boolean
-  product: Product
+  product: { image: string; name: string; brand: { name: string } }
   onPress?: (() => void) | undefined
 }
 
