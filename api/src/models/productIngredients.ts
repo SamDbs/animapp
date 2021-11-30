@@ -37,7 +37,6 @@ export default class ProductIngredient extends BaseEntity {
   @JoinColumn({ name: 'productId' })
   product!: Product
 
-  @Field(() => Ingredient)
   @ManyToOne(() => Ingredient, (ingredient) => ingredient.products)
   @JoinColumn({ name: 'ingredientId' })
   ingredient!: Ingredient
