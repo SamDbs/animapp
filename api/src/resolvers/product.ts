@@ -107,11 +107,11 @@ export default class ProductResolver {
     const where: FindManyOptions<Product>['where'] = {}
     if (id) where.id = id
     if (barCode) where.barCode = barCode
-    if (filters?.published !== undefined) Object.assign(where, { published: filters.published })
+    if (filters?.published !== undefined) where.published = filters.published
 
     return Product.findOneOrFail({
-      where,
       select: getSelectedFieldsFromForModel(info, Product),
+      where,
     })
   }
 
@@ -128,14 +128,16 @@ export default class ProductResolver {
     if (args.limit && args.offset) options.skip = args.offset
     if (args.filters?.published !== undefined) Object.assign(options.where, { published: args.filters.published })
     if (args.searchTerms) {
-      const productWhere = Object.assign(options.where, { name: args.searchTerms, published: args.filters?.published })
+      const productWhere = Object.assign(options.where, { name: args.searchTerms })
       const queryProduct = Product.find({
         select: getSelectedFieldsFromForModel(info, Product),
         where: productWhere,
+        withDeleted: true,
       })
 
       const queryBrandProducts = Brand.createQueryBuilder('b')
         .select(['b.id', 'p.id'])
+        .withDeleted()
         .where('b.name ilike :q', { q: `%${args.searchTerms}%` })
       if (args.filters?.published !== undefined) {
         queryBrandProducts.andWhere('p.published = :published', {
@@ -146,6 +148,7 @@ export default class ProductResolver {
 
       const querySimilarProducts = Product.createQueryBuilder('p')
         .select('p.id')
+        .withDeleted()
         .where('p.name ilike :q', { q: `%${args.searchTerms}%` })
 
       if (args.filters?.published !== undefined) {
@@ -160,6 +163,7 @@ export default class ProductResolver {
           description: new FindOperator('ilike', `%${args.searchTerms}%`),
           languageId: 'FR',
         },
+        withDeleted: true,
       })
       const [product, brand, similarProducts, productTranslations] = await Promise.all([
         queryProduct,
@@ -173,11 +177,20 @@ export default class ProductResolver {
       const productTranslationProductIds = productTranslations.map((x) => x.productId)
 
       const [p1, p2, p3] = await Promise.all([
-        Product.find({ ...options, where: { published: args.filters?.published, id: In(brandProductIds) } }),
-        Product.find({ ...options, where: { published: args.filters?.published, id: In(similarProductIds) } }),
+        Product.find({
+          ...options,
+          where: { published: args.filters?.published, id: In(brandProductIds) },
+          withDeleted: true,
+        }),
+        Product.find({
+          ...options,
+          where: { published: args.filters?.published, id: In(similarProductIds) },
+          withDeleted: true,
+        }),
         Product.find({
           ...options,
           where: { published: args.filters?.published, id: In(productTranslationProductIds) },
+          withDeleted: true,
         }),
       ])
       return uniqBy('id', [...product, ...p1, ...p2, ...p3])
@@ -187,23 +200,84 @@ export default class ProductResolver {
   }
 
   @Query(() => Int)
-  async productsCount(@Args() args: GetProductsArgs): Promise<number> {
+  async productsCount(@Args() args: GetProductsArgs, @Info() info: GraphQLResolveInfo): Promise<number> {
     const deletedAt = args.filters?.deleted === true ? Not(IsNull()) : IsNull()
     const options: FindManyOptions<Product> = {
+      select: ['id'],
       order: { id: 'ASC' },
       where: { deletedAt },
       withDeleted: true,
     }
+    if (args.limit) options.take = args.limit
+    if (args.limit && args.offset) options.skip = args.offset
     if (args.filters?.published !== undefined) Object.assign(options.where, { published: args.filters.published })
     if (args.searchTerms) {
-      const productIds = await ProductTranslation.find({
+      const productWhere = Object.assign(options.where, { name: args.searchTerms })
+      const queryProduct = Product.find({
+        select: ['id'],
+        where: productWhere,
+        withDeleted: true,
+      })
+
+      const queryBrandProducts = Brand.createQueryBuilder('b')
+        .select(['b.id', 'p.id'])
+        .withDeleted()
+        .where('b.name ilike :q', { q: `%${args.searchTerms}%` })
+      if (args.filters?.published !== undefined) {
+        queryBrandProducts.andWhere('p.published = :published', {
+          published: args.filters.published,
+        })
+      }
+      queryBrandProducts.innerJoin('b.products', 'p')
+
+      const querySimilarProducts = Product.createQueryBuilder('p')
+        .select('p.id')
+        .withDeleted()
+        .where('p.name ilike :q', { q: `%${args.searchTerms}%` })
+
+      if (args.filters?.published !== undefined) {
+        querySimilarProducts.andWhere('p.published = :published', {
+          published: args.filters.published,
+        })
+      }
+
+      const querySimilarProductsTranslations = ProductTranslation.find({
         select: ['productId'],
         where: {
           description: new FindOperator('ilike', `%${args.searchTerms}%`),
           languageId: 'FR',
         },
+        withDeleted: true,
       })
-      Object.assign(options.where, { id: In(productIds.map((x) => x.productId)) })
+      const [product, brand, similarProducts, productTranslations] = await Promise.all([
+        queryProduct,
+        queryBrandProducts.getOne(),
+        querySimilarProducts.getMany(),
+        querySimilarProductsTranslations,
+      ])
+
+      const brandProductIds = brand?.products.map((p) => p.id) ?? []
+      const similarProductIds = similarProducts.map((p) => p.id)
+      const productTranslationProductIds = productTranslations.map((x) => x.productId)
+
+      const [p1, p2, p3] = await Promise.all([
+        Product.find({
+          ...options,
+          where: { published: args.filters?.published, id: In(brandProductIds) },
+          withDeleted: true,
+        }),
+        Product.find({
+          ...options,
+          where: { published: args.filters?.published, id: In(similarProductIds) },
+          withDeleted: true,
+        }),
+        Product.find({
+          ...options,
+          where: { published: args.filters?.published, id: In(productTranslationProductIds) },
+          withDeleted: true,
+        }),
+      ])
+      return uniqBy('id', [...product, ...p1, ...p2, ...p3]).length
     }
 
     return Product.count(options)
@@ -234,7 +308,13 @@ export default class ProductResolver {
 
   @FieldResolver(() => [ProductAnalyticalConstituent])
   constituents(@Root() product: Product): Promise<ProductAnalyticalConstituent[]> {
-    return ProductAnalyticalConstituent.find({ where: { productId: product.id } })
+    console.log('okokok')
+    try {
+      return ProductAnalyticalConstituent.find({ where: { productId: product.id } })
+    } catch (e) {
+      console.log('e')
+      return Promise.resolve([])
+    }
   }
 
   @FieldResolver(() => Brand)

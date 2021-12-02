@@ -33,6 +33,8 @@ function ProductView(props: Props): JSX.Element {
     ({ ingredient }) => ingredient.id === modal.ingredientId,
   )
 
+  if (!product) return <Text>Loading product...</Text>
+
   return (
     <SafeAreaPage noContext>
       <ProductHeader product={product} />
