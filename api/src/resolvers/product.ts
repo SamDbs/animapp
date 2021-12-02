@@ -308,13 +308,7 @@ export default class ProductResolver {
 
   @FieldResolver(() => [ProductAnalyticalConstituent])
   constituents(@Root() product: Product): Promise<ProductAnalyticalConstituent[]> {
-    console.log('okokok')
-    try {
-      return ProductAnalyticalConstituent.find({ where: { productId: product.id } })
-    } catch (e) {
-      console.log('e')
-      return Promise.resolve([])
-    }
+    return ProductAnalyticalConstituent.find({ where: { productId: product.id } })
   }
 
   @FieldResolver(() => Brand)
