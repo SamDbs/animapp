@@ -25,9 +25,9 @@ export default class ProductIngredient extends BaseEntity {
   @PrimaryColumn()
   ingredientId!: number
 
-  @Field({ nullable: true })
-  @Column({ nullable: true })
-  quantity!: string
+  @Field(() => String, { nullable: true })
+  @Column({ type: 'varchar', nullable: true })
+  quantity!: string | null
 
   @Field({ defaultValue: 0 })
   @Column({ default: 0 })
@@ -37,7 +37,6 @@ export default class ProductIngredient extends BaseEntity {
   @JoinColumn({ name: 'productId' })
   product!: Product
 
-  @Field(() => Ingredient)
   @ManyToOne(() => Ingredient, (ingredient) => ingredient.products)
   @JoinColumn({ name: 'ingredientId' })
   ingredient!: Ingredient

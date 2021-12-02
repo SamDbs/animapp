@@ -1,4 +1,4 @@
-import { ObjectType } from 'type-graphql'
+import { Field, ID, ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   Column,
@@ -17,23 +17,25 @@ import AnalyticalConstituent from './analyticalConstituent'
 @Entity()
 @ObjectType()
 export default class ConstituentTranslation extends BaseEntity {
+  @Field(() => ID)
   @PrimaryColumn()
   analyticalConstituentId!: number
 
+  @Field(() => ID)
   @PrimaryColumn()
   languageId!: string
 
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   name!: string
 
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   description!: string
 
-  @ManyToOne(
-    () => AnalyticalConstituent,
-    (analyticalConstituent) => analyticalConstituent.translations,
-    { onDelete: 'CASCADE' },
-  )
+  @ManyToOne(() => AnalyticalConstituent, (analyticalConstituent) => analyticalConstituent.translations, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'analyticalConstituentId' })
   analyticalConstituent!: AnalyticalConstituent
 

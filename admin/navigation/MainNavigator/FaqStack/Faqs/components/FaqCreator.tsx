@@ -1,17 +1,33 @@
+import { gql, useMutation } from '@apollo/client'
 import Card from '@components/Card'
-import useFaqStore from '@hooks/stores/faq'
+import { useNavigation } from '@react-navigation/core'
 import React, { useState } from 'react'
 import { Button, Text } from 'react-native'
 
+import { GET_FAQS } from './FaqList'
+
+const CREATE_FAQ = gql`
+  mutation CreateFaq {
+    createFaq {
+      id
+    }
+  }
+`
+
 export default function FaqCreator({ style }: any) {
+  const navigation = useNavigation()
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const createFaq = useFaqStore((state) => state.createFaq)
+  const [createFaq] = useMutation<{ createFaq: { id: string } }>(CREATE_FAQ, {
+    refetchQueries: [GET_FAQS],
+  })
+
   const create = async () => {
     setLoading(true)
     setError('')
     try {
-      await createFaq()
+      const x = await createFaq()
+      navigation.navigate('FaqStack', { screen: 'Faq', params: { id: x.data?.createFaq.id } })
     } catch (e) {
       setError(e?.response?.data?.message ?? 'An unknown error occured.')
     } finally {

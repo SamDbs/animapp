@@ -31,7 +31,12 @@ export default {
               Faq: 'faq/:id',
             },
           },
-          Contacts: 'contacts',
+          ContactStack: {
+            screens: {
+              Contacts: 'contacts',
+              Contact: 'contacts/:id',
+            },
+          },
           ProductStack: {
             screens: {
               Products: 'products',

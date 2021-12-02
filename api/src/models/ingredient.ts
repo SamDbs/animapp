@@ -43,7 +43,7 @@ export default class Ingredient extends BaseEntity {
   @UpdateDateColumn()
   updatedAt!: Date
 
-  @Field()
+  @Field(() => Date, { nullable: true })
   @DeleteDateColumn()
-  deletedAt!: Date
+  deletedAt?: Date | null
 }

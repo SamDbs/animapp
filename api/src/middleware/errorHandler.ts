@@ -9,6 +9,7 @@ export class MissingParamError extends Error {}
 export class ConflictError extends Error {}
 
 export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
+  console.error(error)
   if (error instanceof EntityColumnNotFound) {
     res.status(500).json({ message: 'Bad request' })
     return
@@ -25,11 +26,7 @@ export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
     res.status(409).json({ message: error?.message ?? 'Conflict with entities' })
     return
   }
-  if (
-    error instanceof NotAuthorizedError ||
-    error instanceof JsonWebTokenError ||
-    error instanceof TokenExpiredError
-  ) {
+  if (error instanceof NotAuthorizedError || error instanceof JsonWebTokenError || error instanceof TokenExpiredError) {
     res.status(401).json({ message: 'Not Authorized' })
     return
   }

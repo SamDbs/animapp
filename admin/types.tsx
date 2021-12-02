@@ -15,7 +15,7 @@ export type AuthStackParamList = {
 
 export type MainTabParamList = {
   BrandStack: undefined
-  Contacts: undefined
+  ContactStack: undefined
   FaqStack: undefined
   IngredientStack: undefined
   LanguageStack: undefined
@@ -56,4 +56,9 @@ export type BrandStackParamList = {
 export type ConstituentStackParamList = {
   Constituents: undefined
   Constituent: { id: string }
+}
+
+export type ContactStackParamList = {
+  Contacts: undefined
+  Contact: { id: string }
 }

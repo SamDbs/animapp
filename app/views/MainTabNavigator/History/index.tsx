@@ -1,30 +1,29 @@
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { ScrollView } from 'react-native-gesture-handler'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { StyleSheet, View } from 'react-native'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import React, { useContext } from 'react'
-import useSWR from 'swr'
 
 import { MainTabParamList, RootStackParamList } from '../../../types'
 import ProductHistoryContext from '../../../hooks/ProductHistoryContext'
 import { Card, PageHeader, SafeAreaPage, Text } from '../../components/Themed'
 import ProductListItem from '../Search/components/ProductListItem'
+import useGetProductFromHistory from '../../../hooks/queries/GetProductFromHistory'
 
 type Props = BottomTabScreenProps<MainTabParamList, 'History'>
 
 function Product(props: {
   isFirst: boolean
-  productId: number
+  productId: string
   navigate?: StackNavigationProp<RootStackParamList, 'Product'>['navigate']
 }) {
-  const { data: product, error } = useSWR(`/products/${props.productId}`)
+  const { data, loading } = useGetProductFromHistory(props.productId)
 
-  if (error) return null
-  if (!product) return <Text>Loading</Text>
+  if (loading || !data?.product) return <ActivityIndicator size={40} color="#ccc" />
 
   return (
     <ProductListItem
-      product={product}
+      product={data.product}
       onPress={() => {
         if (props.navigate) props.navigate('Product', { productId: props.productId })
       }}

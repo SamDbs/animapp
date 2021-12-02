@@ -8,7 +8,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true)
 }
 
-export type FaqItemType = { id: number; question: string; answer: string }
+type FaqItemType = { id: string; question: string; answer: string }
 
 type Props = { item: FaqItemType; isOpen: boolean; toggle: any }
 

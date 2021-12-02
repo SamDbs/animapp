@@ -17,13 +17,13 @@ export default function HelpHome({ navigation: { navigate } }: Props): JSX.Eleme
             style.card,
             { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#999' },
           ]}>
-          <Text>Frequent questions</Text>
+          <Text>Questions fréquentes</Text>
         </View>
       </TouchableWithoutFeedback>
 
       <TouchableWithoutFeedback onPress={() => navigate('Contact')}>
         <View style={style.card}>
-          <Text>Contact us</Text>
+          <Text>Nous contacter</Text>
         </View>
       </TouchableWithoutFeedback>
     </SafeAreaPage>

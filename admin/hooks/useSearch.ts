@@ -1,9 +1,9 @@
-import { useRef } from 'react'
+import { useCallback, useRef } from 'react'
 
 export default function useSearch(fetchMoreFn: (searchTerms: string) => void, timeout = 300) {
   const timeoutRef = useRef<any>(null)
 
-  const search = (terms: string) => {
+  const search = useCallback((terms: string) => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current)
     }
@@ -11,6 +11,7 @@ export default function useSearch(fetchMoreFn: (searchTerms: string) => void, ti
     timeoutRef.current = setTimeout(() => {
       fetchMoreFn(terms)
     }, timeout)
-  }
+  }, [])
+
   return search
 }

@@ -6,55 +6,22 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import { ScrollView, TextInput, TouchableWithoutFeedback } from 'react-native-gesture-handler'
+import { ScrollView, TextInput } from 'react-native-gesture-handler'
 import React, { useCallback, useState } from 'react'
 import * as Clipboard from 'expo-clipboard'
 
 import { MainTabParamList } from '../../../types'
-import {
-  AntDesign,
-  Card,
-  PageHeader,
-  SafeAreaPage,
-  Text,
-  useThemeColor,
-} from '../../components/Themed'
+import { PageHeader, SafeAreaPage, Text, useThemeColor } from '../../components/Themed'
 import { Button } from '../../components/Button'
+import useAnalyzeIngredients from '../../../hooks/queries/AnalyzeIngredients'
+import IngredientCard from './components/IngredientCard'
 
 type Props = BottomTabScreenProps<MainTabParamList, 'History'>
 
-type IngredientCardProps = {
-  ingredient: { id: string; name: string; image: string }
-  onPress?: (ingredient: IngredientCardProps['ingredient']) => void
-}
-
-const CARD_SIZE = 80
-export function IngredientCard(props: IngredientCardProps): JSX.Element {
-  return (
-    <Card style={{ height: 80 }}>
-      <TouchableWithoutFeedback
-        style={style.result}
-        onPress={() => props?.onPress?.(props.ingredient)}>
-        <View style={{ padding: 10 }}>
-          <Text>{props.ingredient.name}</Text>
-        </View>
-        <View
-          style={{
-            height: CARD_SIZE,
-            width: CARD_SIZE,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <AntDesign name="smileo" size={24} />
-        </View>
-      </TouchableWithoutFeedback>
-    </Card>
-  )
-}
-
 export default function Analysis({ navigation }: Props): JSX.Element {
   const [searchBox, setSearchBox] = useState('')
-  const [data, setData] = useState<any>(null)
+  const [fetch, { loading, data, error }] = useAnalyzeIngredients()
+
   const [isSearched, setIsSearched] = useState(false)
   const [isModal, setIsModal] = useState(false)
   const [modalContent, setModalContent] = useState<any>(null)
@@ -65,10 +32,7 @@ export default function Analysis({ navigation }: Props): JSX.Element {
   const placeholderColor = useThemeColor({}, 'inputPlaceholder')
 
   const search = useCallback(async () => {
-    // const request = await fetch(`http://10.0.2.2:8080/search/ingredients?q=${searchBox}`)
-    const request = await fetch(`${process.env.API_URL}/search/ingredients?q=${searchBox}`)
-    const res = await request.json()
-    setData(res)
+    fetch({ variables: { q: searchBox } })
     setIsSearched(true)
   }, [searchBox])
 
@@ -84,11 +48,11 @@ export default function Analysis({ navigation }: Props): JSX.Element {
 
   const clear = useCallback(async () => {
     setSearchBox('')
-    setData(null)
     setIsSearched(false)
   }, [])
 
-  const ingredients = data && data?.map((x: any) => x.ingredientFound)?.filter(Boolean)
+  const ingredients =
+    data && data.analyzeIngredients?.map((x) => x.ingredientFound)?.filter(Boolean)
 
   return (
     <SafeAreaPage>
@@ -170,10 +134,6 @@ export default function Analysis({ navigation }: Props): JSX.Element {
 
 const style = StyleSheet.create({
   scrollView: { flexGrow: 1 },
-  result: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
   modal: {
     alignItems: 'stretch',
     backgroundColor: 'rgba(100,100,100,0.5)',

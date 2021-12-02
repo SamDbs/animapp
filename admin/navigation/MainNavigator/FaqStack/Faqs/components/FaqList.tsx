@@ -1,26 +1,44 @@
+import { gql, useQuery } from '@apollo/client'
 import Card from '@components/Card'
 import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
-import useFaqStore, { FaqStoreState, Faq } from '@hooks/stores/faq'
-import useSearchableList from '@hooks/useSearchableList'
+import useSearch from '@hooks/useSearch'
 import { useNavigation } from '@react-navigation/native'
-import React from 'react'
+import React, { useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
 
+const LIMIT = 5
+
+type Faq = { id: string; question: string; answer: string }
+
+export const GET_FAQS = gql`
+  query GetFAQs($offset: Int, $limit: Int, $searchTerms: String = "") {
+    faqs(limit: $limit, offset: $offset, searchTerms: $searchTerms) {
+      id
+      question
+      answer
+    }
+    faqsCount(searchTerms: $searchTerms)
+  }
+`
+
+const initialPagination = {
+  page: 0,
+  offset: 0,
+}
+
 export default function FaqList({ style }: { style: View['props']['style'] }) {
-  const {
-    changePage,
-    isLoading,
-    items: faqs,
-    noResult,
-    pagination,
-    searchDebounced,
-  } = useSearchableList<FaqStoreState, Faq>(
-    useFaqStore,
-    (state) => state.searchFaqs,
-    (ids) => (state) => ids.map((id) => state.faqs[id]),
-  )
+  const [pagination, setPagination] = useState(initialPagination)
+  const { data, loading, refetch } = useQuery<{ faqs: Faq[]; faqsCount: number }>(GET_FAQS, {
+    variables: { limit: LIMIT, offset: pagination.offset },
+  })
+
+  const search = useSearch((searchTerms) => {
+    setPagination(initialPagination)
+    refetch({ offset: 0, searchTerms })
+  })
+
   const { navigate } = useNavigation()
 
   return (
@@ -42,7 +60,7 @@ export default function FaqList({ style }: { style: View['props']['style'] }) {
               height: 30,
               paddingHorizontal: 8,
             }}
-            onChangeText={searchDebounced}
+            onChangeText={search}
           />
         </View>
       </View>
@@ -60,7 +78,7 @@ export default function FaqList({ style }: { style: View['props']['style'] }) {
             <DataTable.Title>Answer</DataTable.Title>
             <DataTable.Title numeric>Actions</DataTable.Title>
           </DataTable.Header>
-          {faqs.filter(Boolean).map((faq, i: number) => {
+          {data?.faqs.map((faq) => {
             return (
               <DataTable.Row key={faq.id}>
                 <DataTable.Cell>{faq.question}</DataTable.Cell>
@@ -80,11 +98,18 @@ export default function FaqList({ style }: { style: View['props']['style'] }) {
               </DataTable.Row>
             )
           })}
-          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
-          {!isLoading && noResult && <NoResult />}
+          {loading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!loading && data?.faqs.length === 0 && <NoResult />}
         </DataTable>
       </View>
-      <Pagination onChangePage={changePage} pagination={pagination} />
+      <Pagination
+        onChangePage={(i) => setPagination({ page: i, offset: LIMIT * i })}
+        pagination={{
+          count: data?.faqsCount ?? 0,
+          limit: LIMIT,
+          page: pagination.page,
+        }}
+      />
     </Card>
   )
 }

@@ -8,22 +8,23 @@ import { buildSchema } from 'type-graphql'
 config()
 
 import 'express-async-errors'
-import search from './routes/search'
 import products from './routes/products'
-import brands from './routes/brands'
 import ingredients from './routes/ingredients'
-import contacts from './routes/contacts'
-import faq from './routes/faq'
-import languages from './routes/languages'
-import analyticalConstituents from './routes/analyticalConstituents'
 import authentication from './routes/authentication'
 import admin from './routes/admin'
 import { errorHandler } from './middleware/errorHandler'
-import { authAdmin, isConnected } from './middleware/admin'
+import { authChecker, isConnected } from './middleware/admin'
 import IngredientResolver from './resolvers/ingredient'
 import ProductResolver from './resolvers/product'
 import ProductIngredientResolver from './resolvers/productIngredient'
 import ContactResolver from './resolvers/contact'
+import LanguageResolver from './resolvers/language'
+import FaqResolver from './resolvers/faq'
+import BrandResolver from './resolvers/brand'
+import TranslationResolver from './resolvers/translation'
+import AnalyticalConstituentResolver from './resolvers/constituent'
+import ProductConstituentResolver from './resolvers/productConstituent'
+import SearchResolver from './resolvers/search'
 
 const PORT = (process.env.PORT as unknown as number) || 8080
 const HOST = '0.0.0.0'
@@ -54,7 +55,21 @@ async function main() {
   }
 
   const schema = await buildSchema({
-    resolvers: [ContactResolver, IngredientResolver, ProductIngredientResolver, ProductResolver],
+    authChecker,
+    authMode: 'error',
+    resolvers: [
+      AnalyticalConstituentResolver,
+      BrandResolver,
+      ContactResolver,
+      FaqResolver,
+      IngredientResolver,
+      LanguageResolver,
+      ProductConstituentResolver,
+      ProductIngredientResolver,
+      ProductResolver,
+      SearchResolver,
+      TranslationResolver,
+    ],
   })
 
   const app = express()
@@ -73,18 +88,17 @@ async function main() {
     res.send('Hello World!')
   })
 
-  app.use('/search', search)
   app.use('/products', products)
-  app.use('/brands', brands)
   app.use('/ingredients', ingredients)
-  app.use('/contacts', contacts)
-  app.use('/faq', faq)
-  app.use('/languages', languages)
-  app.use('/analytical-constituents', analyticalConstituents)
   app.use('/auth', authentication)
   app.use('/admin', admin)
 
-  app.use('/graphql', authAdmin, graphqlHTTP({ schema }))
+  type Res = { locals: { admin: object } }
+
+  app.use(
+    '/graphql',
+    graphqlHTTP((req, res) => ({ schema, context: { admin: (res as unknown as Res).locals?.admin } })),
+  )
 
   app.use(errorHandler)
   app.use((req, res) => {

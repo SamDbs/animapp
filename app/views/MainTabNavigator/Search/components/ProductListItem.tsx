@@ -8,7 +8,7 @@ const CARD_SIZE = 80
 
 type Props = {
   isFirst: boolean
-  product: { id: number; name: string; brand: string; image: string }
+  product: { image: string; name: string; brand: { name: string } }
   onPress?: (() => void) | undefined
 }
 
@@ -25,7 +25,7 @@ export default function ProductListItem(props: Props): JSX.Element {
         <View style={{ padding: 10, flexShrink: 1 }}>
           <Text>{props.product.name}</Text>
           <Text secondary style={{ fontSize: 12 }}>
-            {props.product.brand}
+            {props.product.brand.name}
           </Text>
         </View>
       </View>

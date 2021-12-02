@@ -5,7 +5,7 @@ import { View } from 'react-native'
 import { MainTabParamList } from '../../types'
 import BrandStack from './BrandStack'
 import ConstituentStack from './ConstituentStack'
-import Contacts from './Contacts'
+import ContactStack from './ContactStack'
 import DevStack from './DevStack'
 import FaqStack from './FaqStack'
 import IngredientStack from './IngredientStack'
@@ -24,7 +24,7 @@ export default function MainNavigator() {
         tabBar={() => null}
         screenOptions={{ headerShown: false }}>
         <BottomTab.Screen name="IngredientStack" component={IngredientStack} />
-        <BottomTab.Screen name="Contacts" component={Contacts} />
+        <BottomTab.Screen name="ContactStack" component={ContactStack} />
         <BottomTab.Screen name="LanguageStack" component={LanguageStack} />
         <BottomTab.Screen name="FaqStack" component={FaqStack} />
         <BottomTab.Screen name="ProductStack" component={ProductStack} />

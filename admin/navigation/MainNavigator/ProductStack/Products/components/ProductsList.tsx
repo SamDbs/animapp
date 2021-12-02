@@ -1,36 +1,71 @@
+import { gql, useQuery } from '@apollo/client'
 import Card from '@components/Card'
 import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
-import useProductsStore, { ProductStore, Product } from '@hooks/stores/product'
-import useSearchableList from '@hooks/useSearchableList'
+import useSearch from '@hooks/useSearch'
 import { useNavigation } from '@react-navigation/native'
 import React, { useCallback, useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
 
+const LIMIT = 5
+
+export const GET_PRODUCTS = gql`
+  query GetProducts(
+    $offset: Int
+    $limit: Int
+    $searchTerms: String = ""
+    $filters: ProductsFilters = {}
+  ) {
+    products(limit: $limit, offset: $offset, searchTerms: $searchTerms, filters: $filters) {
+      id
+      name
+      description
+      published
+      brand {
+        id
+        name
+      }
+    }
+    productsCount(searchTerms: $searchTerms, filters: $filters)
+  }
+`
+
+const initialPagination = {
+  page: 0,
+  offset: 0,
+}
+
+type QueryReturnType = {
+  products: { id: string; name: string; published: boolean; brand: { name: string } }[]
+  productsCount: number
+}
+
+type QueryVariables = {
+  limit: number
+  offset: number
+  filters?: ProductFilters
+  searchTerms?: string
+}
+type ProductFilters = { published?: boolean }
+
 export default function ProductList({ style }: { style?: View['props']['style'] }) {
-  const {
-    changePage,
-    isLoading,
-    items: products,
-    noResult,
-    pagination,
-    searchDebounced,
-    setFilters,
-  } = useSearchableList<ProductStore, Product>(
-    useProductsStore,
-    (state) => state.searchProducts,
-    (ids) => (state) => ids.map((id) => state.products[id]),
-  )
+  const [searchTerms, setSearchTerms] = useState<string>('')
+  const [filters, setFilters] = useState<ProductFilters>({})
+  const [pagination, setPagination] = useState(initialPagination)
+  const { data, loading } = useQuery<QueryReturnType, QueryVariables>(GET_PRODUCTS, {
+    fetchPolicy: 'cache-and-network',
+    variables: { limit: LIMIT, offset: pagination.offset, filters, searchTerms },
+  })
 
-  const [filterPublished, setFilterPublished] = useState<'all' | 'published' | 'draft'>()
+  const search = useSearch((searchTerms) => {
+    setSearchTerms(searchTerms)
+    setPagination({ ...initialPagination, offset: 0 })
+  })
 
-  const changeFilterPublished = useCallback((cb: any) => {
-    const newValue = cb(setFilterPublished)
-    if (newValue === 'draft' || newValue === 'published')
-      setFilters({ published: newValue === 'published' ? 1 : 0 })
-    else setFilters({})
-    setFilterPublished(newValue)
+  const changeFilters = useCallback((filters) => {
+    setPagination(initialPagination)
+    setFilters(filters)
   }, [])
 
   const { navigate } = useNavigation()
@@ -49,15 +84,13 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
           <Pressable
             style={{
               alignItems: 'center',
-              backgroundColor: filterPublished === 'all' ? '#eee' : 'transparent',
+              backgroundColor: filters.published === undefined ? '#eee' : 'transparent',
               borderColor: '#ccc',
               borderWidth: 1,
               cursor: 'pointer',
               justifyContent: 'center',
             }}
-            onPress={() =>
-              changeFilterPublished((current: any) => (current !== 'all' ? 'all' : undefined))
-            }>
+            onPress={() => changeFilters({ published: undefined })}>
             <View
               style={{
                 margin: 8,
@@ -70,17 +103,13 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
           <Pressable
             style={{
               alignItems: 'center',
-              backgroundColor: filterPublished === 'published' ? '#eee' : 'transparent',
+              backgroundColor: filters.published === true ? '#eee' : 'transparent',
               borderColor: '#ccc',
               borderWidth: 1,
               cursor: 'pointer',
               justifyContent: 'center',
             }}
-            onPress={() =>
-              changeFilterPublished((current: any) =>
-                current !== 'published' ? 'published' : undefined,
-              )
-            }>
+            onPress={() => changeFilters({ published: true })}>
             <View
               style={{
                 margin: 8,
@@ -93,15 +122,13 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
           <Pressable
             style={{
               alignItems: 'center',
-              backgroundColor: filterPublished === 'draft' ? '#eee' : 'transparent',
+              backgroundColor: filters.published === false ? '#eee' : 'transparent',
               borderColor: '#ccc',
               borderWidth: 1,
               cursor: 'pointer',
               justifyContent: 'center',
             }}
-            onPress={() =>
-              changeFilterPublished((current: any) => (current !== 'draft' ? 'draft' : undefined))
-            }>
+            onPress={() => changeFilters({ published: false })}>
             <View
               style={{
                 margin: 8,
@@ -122,7 +149,7 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
               height: 30,
               paddingHorizontal: 8,
             }}
-            onChangeText={searchDebounced}
+            onChangeText={search}
           />
         </View>
       </View>
@@ -141,7 +168,7 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
             <DataTable.Title>Brand</DataTable.Title>
             <DataTable.Title numeric>Actions</DataTable.Title>
           </DataTable.Header>
-          {products.filter(Boolean).map((product: any, i: number) => {
+          {data?.products.map((product) => {
             return (
               <DataTable.Row key={product.id}>
                 <DataTable.Cell style={{ flex: 0, flexBasis: 50 }}>
@@ -155,7 +182,7 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
                   />
                 </DataTable.Cell>
                 <DataTable.Cell>{product.name}</DataTable.Cell>
-                <DataTable.Cell>{product.brand}</DataTable.Cell>
+                <DataTable.Cell>{product.brand.name}</DataTable.Cell>
                 <DataTable.Cell numeric>
                   <IconButton
                     icon="pencil"
@@ -170,11 +197,18 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
               </DataTable.Row>
             )
           })}
-          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
-          {!isLoading && noResult && <NoResult />}
+          {loading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!loading && data?.productsCount === 0 && <NoResult />}
         </DataTable>
       </View>
-      <Pagination onChangePage={changePage} pagination={pagination} />
+      <Pagination
+        onChangePage={(i) => setPagination({ page: i, offset: LIMIT * i })}
+        pagination={{
+          count: data?.productsCount ?? 0,
+          limit: LIMIT,
+          page: pagination.page,
+        }}
+      />
     </Card>
   )
 }

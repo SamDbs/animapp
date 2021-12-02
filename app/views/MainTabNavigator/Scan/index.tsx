@@ -1,17 +1,17 @@
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { Camera } from 'expo-camera'
 import { BarCodeEvent, BarCodeScanner } from 'expo-barcode-scanner'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
-import React, { useEffect, useState } from 'react'
-import useSWR from 'swr'
+import { useEffect, useState } from 'react'
 
 import { Text } from '../../components/Themed'
 import { MainTabParamList } from '../../../types'
+import useGetProductByBarCode from '../../../hooks/queries/GetProductByBarCode'
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Scan'>
 
 export default function ScanProduct({ navigation }: Props): JSX.Element {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
-  const [code, setCode] = useState('')
   const [camera, setCamera] = useState(true)
 
   useEffect(() => {
@@ -22,7 +22,6 @@ export default function ScanProduct({ navigation }: Props): JSX.Element {
     checkCameraPermission()
 
     function emptyCodeOnFocus() {
-      setCode('')
       setCamera(true)
     }
 
@@ -39,21 +38,14 @@ export default function ScanProduct({ navigation }: Props): JSX.Element {
     }
   }, [navigation])
 
-  const { data, error } = useSWR(code ? `/scan/${code}` : null)
+  const [fetch, { loading }] = useGetProductByBarCode()
 
-  function onBarCodeScanned(barcode: BarCodeEvent) {
-    setCode(barcode.data)
+  async function onBarCodeScanned(barcode: BarCodeEvent) {
+    const result = await fetch({ variables: { barCode: barcode.data } })
+    const productId = result.data?.product.id
+    if (productId) navigation.navigate('Product' as any, { productId: productId })
+    else alert('Product not found.')
   }
-
-  useEffect(() => {
-    if (code && data && !error) {
-      setCode('')
-      navigation.navigate('Product' as any, { productId: data.productId })
-    } else if (error) {
-      alert('Bar code not working.')
-      setCode('')
-    }
-  }, [code, data, error, navigation])
 
   if (hasPermission === null) {
     return (
@@ -73,10 +65,8 @@ export default function ScanProduct({ navigation }: Props): JSX.Element {
 
   return (
     <View style={style.screen}>
-      {camera && !code && (
-        <BarCodeScanner onBarCodeScanned={onBarCodeScanned} style={style.viewFinder} />
-      )}
-      {!!code && <ActivityIndicator size={40} color="#ccc" />}
+      {camera && <Camera onBarCodeScanned={onBarCodeScanned} style={style.viewFinder} />}
+      {loading && <ActivityIndicator size={40} color="#ccc" />}
     </View>
   )
 }

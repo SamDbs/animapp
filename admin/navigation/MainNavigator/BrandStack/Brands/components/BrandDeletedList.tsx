@@ -1,28 +1,56 @@
+import { gql, useMutation, useQuery } from '@apollo/client'
 import Card from '@components/Card'
 import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
-import { FontAwesome5 } from '@expo/vector-icons'
-import useBrandStore, { BrandStore, Brand } from '@hooks/stores/brand'
-import useSearchableList from '@hooks/useSearchableList'
-import React from 'react'
-import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
+import useSearch from '@hooks/useSearch'
+import React, { useState } from 'react'
+import { Text, TextInput, View, ActivityIndicator } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
 
-export default function BrandList({ style }: { style?: View['props']['style'] }) {
-  const {
-    changePage,
-    isLoading,
-    items: brands,
-    noResult,
-    pagination,
-    searchDebounced,
-  } = useSearchableList<BrandStore, Brand>(
-    useBrandStore,
-    (state) => state.searchDeletedBrands,
-    (ids) => (state) => ids.map((id) => state.brands[id]),
-  )
+import { GET_BRANDS } from './BrandList'
 
-  const restoreBrand = useBrandStore((state) => state.restoreBrand)
+const LIMIT = 5
+
+type Brand = { id: string; name: string }
+
+export const GET_DELETE_BRANDS = gql`
+  query GetDeletedBrands($offset: Int, $limit: Int, $searchTerms: String = "") {
+    brands(limit: $limit, offset: $offset, searchTerms: $searchTerms, filters: { deleted: true }) {
+      id
+      name
+    }
+    brandsCount(searchTerms: $searchTerms, filters: { deleted: true })
+  }
+`
+const initialPagination = {
+  page: 0,
+  offset: 0,
+}
+
+const RESTORE_BRAND = gql`
+  mutation RestoreBrand($id: String!) {
+    restoreBrand(id: $id) {
+      id
+    }
+  }
+`
+
+export default function BrandDeletedList({ style }: { style?: View['props']['style'] }) {
+  const [restoreBrand] = useMutation(RESTORE_BRAND, {
+    refetchQueries: [GET_BRANDS, GET_DELETE_BRANDS],
+  })
+  const [pagination, setPagination] = useState(initialPagination)
+  const { data, loading, refetch } = useQuery<{
+    brands: Brand[]
+    brandsCount: number
+  }>(GET_DELETE_BRANDS, {
+    variables: { limit: LIMIT, offset: pagination.offset },
+  })
+
+  const search = useSearch((searchTerms) => {
+    setPagination(initialPagination)
+    refetch({ offset: 0, searchTerms })
+  })
 
   return (
     <Card style={style}>
@@ -43,7 +71,7 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
               height: 30,
               paddingHorizontal: 8,
             }}
-            onChangeText={searchDebounced}
+            onChangeText={search}
           />
         </View>
       </View>
@@ -61,7 +89,7 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
             <DataTable.Title numeric>Actions</DataTable.Title>
           </DataTable.Header>
 
-          {brands.filter(Boolean).map((brand: any, i: number) => {
+          {data?.brands.filter(Boolean).map((brand: any, i: number) => {
             return (
               <DataTable.Row key={brand.id}>
                 <DataTable.Cell>{brand.name}</DataTable.Cell>
@@ -71,8 +99,7 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
                     style={{ margin: 0 }}
                     onPress={async () => {
                       try {
-                        await restoreBrand(brand.id)
-                        location.reload()
+                        await restoreBrand({ variables: { id: brand.id } })
                       } catch (error: any) {
                         alert(error.response.data.message)
                       }
@@ -82,11 +109,18 @@ export default function BrandList({ style }: { style?: View['props']['style'] })
               </DataTable.Row>
             )
           })}
-          {isLoading && <ActivityIndicator style={{ margin: 8 }} />}
-          {!isLoading && noResult && <NoResult />}
+          {loading && <ActivityIndicator style={{ margin: 8 }} />}
+          {!loading && data?.brands.length === 0 && <NoResult />}
         </DataTable>
       </View>
-      <Pagination onChangePage={changePage} pagination={pagination} />
+      <Pagination
+        onChangePage={(i) => setPagination({ page: i, offset: LIMIT * i })}
+        pagination={{
+          count: data?.brandsCount ?? 0,
+          limit: LIMIT,
+          page: pagination.page,
+        }}
+      />
     </Card>
   )
 }

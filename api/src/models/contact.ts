@@ -36,7 +36,7 @@ export default class Contact extends BaseEntity {
   @UpdateDateColumn()
   updatedAt!: Date
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   @DeleteDateColumn()
-  deletedAt!: Date
+  deletedAt!: Date | null
 }

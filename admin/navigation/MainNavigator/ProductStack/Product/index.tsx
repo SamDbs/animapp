@@ -1,64 +1,110 @@
+import { gql, useMutation, useQuery } from '@apollo/client'
 import Card from '@components/Card'
 import FieldSelectWithLabel from '@components/FieldSelectWithlabel'
-import FieldTranslatable from '@components/FieldTranslatable'
+import FieldTranslatableQL, { EntityKind } from '@components/FieldTransatableQL'
 import FieldWithLabel from '@components/FieldWithLabel'
-import ManyToMany from '@components/ManyToMany'
-import OneToMany from '@components/OneToMany'
 import { PageHeader } from '@components/Themed'
 import UploadSingleImage from '@components/UploadSingleImage'
-import useBrandStore, { Brand, BrandStore } from '@hooks/stores/brand'
-import useConstituentsStore from '@hooks/stores/constituent'
-import useIngredientStore from '@hooks/stores/ingredient'
-import useProductsStore, {
-  Product as ProductEntity,
-  ProductStore,
-  ProductType,
-} from '@hooks/stores/product'
-import useProductTranslationStore, {
-  ProductTranslation,
-  ProductTranslationStore,
-} from '@hooks/stores/productTranslation'
+import useProductsStore, { ProductType } from '@hooks/stores/product'
 import { StackScreenProps } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { ActivityIndicator, Image, ScrollView, Switch, Text, View } from 'react-native'
 
 import { ProductStackParamList } from '../../../../types'
+import ProductBrand from '../Products/components/ProductBrand'
+import ProductBrandSelector from '../Products/components/ProductBrandSelector'
+import ProductConstituents from './components/ProductConstituents'
+import ProductIngredients from './components/ProductIngredients'
 
-export default function Product(props: StackScreenProps<ProductStackParamList, 'Product'>) {
-  const [id, setId] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [product, registerIds, unregisterIds, getProductById, updateProduct] = useProductsStore(
-    (state) => [
-      state.products[props.route.params.id],
-      state.registerIds,
-      state.unregisterIds,
-      state.getProductById,
-      state.updateProduct,
-    ],
+type Product = {
+  barCode: string
+  brandId: string
+  id: string
+  image: string
+  name: string
+  published: boolean
+  translations: {
+    description: string
+    languageId: string
+  }[]
+  type: string
+}
+type Variables = {
+  id?: string
+  name?: string
+  barCode?: string
+  type?: ProductType
+  published?: boolean
+  brandId?: string
+}
+
+const GET_PRODUCT = gql`
+  query GetProduct($id: ID!) {
+    product(id: $id) {
+      barCode
+      brandId
+      id
+      image
+      name
+      published
+      translations {
+        description
+        languageId
+      }
+      type
+    }
+  }
+`
+
+const UPDATE_PRODUCT = gql`
+  mutation UpdateProduct(
+    $id: String!
+    $name: String
+    $barCode: String
+    $type: String
+    $published: Boolean
+    $brandId: String
+  ) {
+    updateProduct(
+      id: $id
+      barCode: $barCode
+      name: $name
+      type: $type
+      published: $published
+      brandId: $brandId
+    ) {
+      id
+      published
+      brandId
+    }
+  }
+`
+
+const fieldsToTranslate = ['description']
+
+export default function ProductComponent(
+  props: StackScreenProps<ProductStackParamList, 'Product'>,
+) {
+  const { data, loading } = useQuery<{ product: Product }>(GET_PRODUCT, {
+    variables: { id: props.route.params.id },
+  })
+  const [updateProduct] = useMutation<{ updateProduct: { id: string } }, Variables>(
+    UPDATE_PRODUCT,
+    {
+      variables: { id: props.route.params.id },
+    },
   )
 
-  useEffect(() => {
-    if (!product) return
-    registerIds([id])
-    return () => unregisterIds([id])
-  }, [id])
+  const [editBrand, setEditBrand] = useState(false)
 
-  useEffect(() => {
-    async function fn() {
-      setIsLoading(true)
-      const { id } = await getProductById(props.route.params.id)
-      setId(id)
-      setIsLoading(false)
-    }
-    fn()
-  }, [])
+  const product = data?.product
 
   return (
     <ScrollView style={{ padding: 16 }}>
       <PageHeader>Product</PageHeader>
       <Card>
         <Text style={{ fontSize: 18 }}>Product</Text>
-        {isLoading && !product && <ActivityIndicator />}
+        {loading && <ActivityIndicator />}
         {product && (
           <>
             <View
@@ -89,27 +135,23 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
               />
             </View>
             <View>
-              <OneToMany<Brand, BrandStore, ProductEntity, ProductStore>
-                getOwnerByOwnedIdSelect={(state) => state.getBrandByProductId}
-                ownedId={product.id}
-                ownerEntityLinkCreator={(brand) => `/brands/${brand.id}`}
-                ownerSelectorCreator={(id) => (state) => state.brands[id]}
-                ownersSelectorCreator={(ids) => (state) => ids.map((id) => state.brands[id])}
-                registerOwnerIdsSelector={(state) => state.registerIds}
-                searchOwnersSelector={(state) => state.searchBrands}
-                unregisterOwnerIdsSelector={(state) => state.unregisterIds}
-                updateOwnerInOwnedSelector={(state) => state.updateProductBrand}
-                useOwnedStore={useProductsStore}
-                useOwnerStore={useBrandStore}
-              />
+              <ProductBrand id={product.brandId} onRemove={() => setEditBrand(true)} />
+              {editBrand && (
+                <ProductBrandSelector
+                  onSelect={(brandId) => {
+                    updateProduct({ variables: { brandId } })
+                    setEditBrand(false)
+                  }}
+                />
+              )}
               <FieldWithLabel
                 label="Name"
                 value={product.name}
-                onChangeValue={(val) => updateProduct(product.id, { name: val })}
+                onChangeValue={(val) => updateProduct({ variables: { name: val } })}
               />
               <FieldSelectWithLabel
                 label="Type"
-                onChangeValue={(val) => updateProduct(product.id, { type: val })}
+                onChangeValue={(val) => updateProduct({ variables: { type: val } })}
                 options={Object.keys(ProductType) as ProductType[]}
                 translationKey="ProductType"
                 value={product.type}
@@ -117,7 +159,7 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
               <FieldWithLabel
                 label="Bar code"
                 value={product.barCode}
-                onChangeValue={(val) => updateProduct(product.id, { barCode: val })}
+                onChangeValue={(val) => updateProduct({ variables: { barCode: val } })}
               />
               <View
                 style={{
@@ -129,72 +171,24 @@ export default function Product(props: StackScreenProps<ProductStackParamList, '
                 <Switch
                   style={{ marginLeft: 16 }}
                   value={product.published}
-                  onValueChange={(value) => updateProduct(product.id, { published: value })}
+                  onValueChange={(value) => updateProduct({ variables: { published: value } })}
                 />
               </View>
-              <FieldTranslatable<ProductEntity, ProductTranslation, ProductTranslationStore>
-                fields={{ description: 'Description' }}
-                baseEntityId={product.id}
-                useStore={useProductTranslationStore}
-                translationGetterSelector={(state) => state.getProductTranslations}
-                translationUpdaterSelector={(state) => state.updateProductTranslation}
-                translationsSelectorCreator={(ids) => (state) =>
-                  ids.map((id) => state.productTranslations[id])}
+              <FieldTranslatableQL
+                entityId={product.id}
+                fields={fieldsToTranslate}
+                kind={EntityKind.product}
+                translations={data.product.translations.map(({ languageId, description }) => ({
+                  languageId,
+                  strings: { description },
+                }))}
               />
             </View>
           </>
         )}
       </Card>
-      <Card style={{ marginVertical: 16 }}>
-        <Text style={{ fontSize: 18 }}>Attached ingredients</Text>
-        {isLoading && !product && <ActivityIndicator />}
-        {product && (
-          <ManyToMany
-            useOwnedStore={useIngredientStore}
-            ownerEntityId={product.id}
-            ownedItemsGetterSelector={(state) => state.getIngredientsByProductId}
-            ownedItemsUpdaterSelector={(state) => state.updateIngredientsByProductId}
-            relationParams
-            ownedItemsDeletorSelector={(state) => state.deleteIngredientFromProductId}
-            ownedItemsSelectorCreator={(ids) => (state) =>
-              ids
-                .map((id) => state.ingredients[id])
-                .sort((a, b) => {
-                  return (state?.productIngredients[`${product.id}-${a.id}`]?.order ?? 0) >
-                    (state?.productIngredients[`${product.id}-${b.id}`]?.order ?? 0)
-                    ? 1
-                    : -1
-                })}
-            registerOwnedIdsSelector={(state) => state.registerIds}
-            unregisterOwnedIdsSelector={(state) => state.unregisterIds}
-            searchItemsSelector={(state) => state.searchIngredients}
-            ownedEntityLinkCreator={(item) => `/ingredients/${item.id}`}
-            ownedItemsRelationGetterSelector={(state) => state.productIngredients}
-            withOrder
-            setOrderSelector={(state) => state.setIngredientsOrder}
-          />
-        )}
-      </Card>
-      <Card style={{ marginVertical: 16 }}>
-        <Text style={{ fontSize: 18 }}>Attached Analytical Constituent</Text>
-        {isLoading && !product && <ActivityIndicator />}
-        {product && (
-          <ManyToMany
-            useOwnedStore={useConstituentsStore}
-            ownerEntityId={product.id}
-            ownedItemsGetterSelector={(state) => state.getConstituentsByProductId}
-            ownedItemsUpdaterSelector={(state) => state.updateConstituentsByProductId}
-            relationParams
-            ownedItemsDeletorSelector={(state) => state.deleteConstituentFromProductId}
-            ownedItemsSelectorCreator={(ids) => (state) => ids.map((id) => state.constituents[id])}
-            registerOwnedIdsSelector={(state) => state.registerIds}
-            unregisterOwnedIdsSelector={(state) => state.unregisterIds}
-            searchItemsSelector={(state) => state.searchConstituents}
-            ownedEntityLinkCreator={(item) => `/constituents/${item.id}`}
-            ownedItemsRelationGetterSelector={(state) => state.productConstituents}
-          />
-        )}
-      </Card>
+      {data?.product && <ProductIngredients productId={data.product.id} />}
+      {data?.product && <ProductConstituents productId={data.product.id} />}
     </ScrollView>
   )
 }

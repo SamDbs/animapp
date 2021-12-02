@@ -1,4 +1,4 @@
-import { ObjectType } from 'type-graphql'
+import { Field, ID, ObjectType } from 'type-graphql'
 import {
   BaseEntity,
   Column,
@@ -17,16 +17,20 @@ import Language from './language'
 @Entity()
 @ObjectType()
 export default class FaqTranslation extends BaseEntity {
+  @Field(() => ID)
   @PrimaryColumn()
   faqId!: number
 
+  @Field(() => ID)
   @PrimaryColumn()
   languageId!: string
 
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   question!: string
 
-  @Column()
+  @Field({ nullable: true })
+  @Column({ nullable: true })
   answer!: string
 
   @ManyToOne(() => Faq, (faq) => faq.translations, { onDelete: 'CASCADE' })
@@ -37,12 +41,15 @@ export default class FaqTranslation extends BaseEntity {
   @JoinColumn({ name: 'languageId' })
   language!: Language
 
+  @Field()
   @CreateDateColumn()
   createdAt!: Date
 
+  @Field()
   @UpdateDateColumn()
   updatedAt!: Date
 
+  @Field()
   @DeleteDateColumn()
   deletedAt!: Date
 }

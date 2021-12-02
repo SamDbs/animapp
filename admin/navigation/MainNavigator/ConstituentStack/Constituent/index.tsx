@@ -1,49 +1,46 @@
+import { gql, useQuery } from '@apollo/client'
 import Card from '@components/Card'
-import FieldTranslatable from '@components/FieldTranslatable'
-import useConstituentsStore, { Constituent as ConstituentEntity } from '@hooks/stores/constituent'
-import useConstituentTranslationStore, {
-  ConstituentTranslation,
-  ConstituentTranslationStore,
-} from '@hooks/stores/constituentTranslation'
+import FieldTranslatableQL, { EntityKind } from '@components/FieldTransatableQL'
 import { StackScreenProps } from '@react-navigation/stack'
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
 
 import { ConstituentStackParamList } from '../../../../types'
+import { GET_CONSTITUENTS } from '../Constituents/components/ConstituentList'
 
-export default function Constituent(
+type Constituent = {
+  id: number
+  translations: { name: string; description: string; languageId: string }[]
+}
+
+const GET_CONSTITUENT = gql`
+  query GetConstituent($id: String!) {
+    analyticalConstituent(id: $id) {
+      id
+      translations {
+        languageId
+        name
+        description
+      }
+    }
+  }
+`
+
+const fieldsToTranslate = ['name', 'description']
+const refreshQueries = [GET_CONSTITUENT, GET_CONSTITUENTS]
+
+export default function ConstituentComponent(
   props: StackScreenProps<ConstituentStackParamList, 'Constituent'>,
 ) {
-  const [id, setId] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const constituent = useConstituentsStore((state) => state.constituents[props.route.params.id])
-  const [registerIds, unregisterIds, getConstituentById] = useConstituentsStore((state) => [
-    state.registerIds,
-    state.unregisterIds,
-    state.getConstituentById,
-  ])
-
-  useEffect(() => {
-    if (!constituent) return
-    registerIds([id])
-    return () => unregisterIds([id])
-  }, [id])
-
-  useEffect(() => {
-    async function fn() {
-      setIsLoading(true)
-      const { id } = await getConstituentById(props.route.params.id)
-      setId(id)
-      setIsLoading(false)
-    }
-    fn()
-  }, [])
+  const { data, loading } = useQuery<{ analyticalConstituent: Constituent }>(GET_CONSTITUENT, {
+    variables: { id: props.route.params.id },
+  })
 
   return (
     <ScrollView style={{ padding: 16 }}>
       <Card>
-        {isLoading && !constituent && <ActivityIndicator />}
-        {constituent && (
+        {loading && <ActivityIndicator />}
+        {data?.analyticalConstituent && (
           <>
             <View
               style={{
@@ -65,21 +62,20 @@ export default function Constituent(
                 }}
               />
             </View>
-            <View>
-              <FieldTranslatable<
-                ConstituentEntity,
-                ConstituentTranslation,
-                ConstituentTranslationStore
-              >
-                fields={{ name: 'Name', description: 'Description' }}
-                baseEntityId={constituent.id}
-                useStore={useConstituentTranslationStore}
-                translationGetterSelector={(state) => state.getConstituentTranslations}
-                translationUpdaterSelector={(state) => state.updateConstituentTranslation}
-                translationsSelectorCreator={(ids) => (state) =>
-                  ids.map((id) => state.constituentTranslations[id])}
+            {data.analyticalConstituent.translations && (
+              <FieldTranslatableQL
+                entityId={props.route.params.id}
+                fields={fieldsToTranslate}
+                kind={EntityKind.constituent}
+                refreshQueries={refreshQueries}
+                translations={data?.analyticalConstituent.translations.map(
+                  ({ languageId, name, description }) => ({
+                    languageId,
+                    strings: { name, description },
+                  }),
+                )}
               />
-            </View>
+            )}
           </>
         )}
       </Card>

@@ -1,9 +1,13 @@
 import { RequestHandler } from 'express'
 import { verify } from 'jsonwebtoken'
+import NodeCache from 'node-cache'
+import { AuthChecker } from 'type-graphql'
 
 import Admin from '../models/admin'
 
 import { NotAuthorizedError } from './errorHandler'
+
+const authAdminCache = new NodeCache({ stdTTL: 600, checkperiod: 600 })
 
 const introspectionQueries = [
   '{\n        __schema {\n          queryType {\n            kind\n          }\n        }\n      }',
@@ -17,7 +21,6 @@ export const authAdmin: RequestHandler = async (req, res, next) => {
     const isIntrospectionQuery = introspectionQueries.includes(query)
 
     if (isIntrospectionQuery) {
-      console.log('ok')
       next()
       return
     }
@@ -33,8 +36,20 @@ export const isConnected: RequestHandler = async (req, res, next) => {
   const authorize = req.header('Authorization')
   if (authorize) {
     const adminId = verify(authorize, process.env.AUTH_SECRET_KEY as string) as string
-    const admin = await Admin.findOneOrFail(adminId)
+    let admin = authAdminCache.get(adminId)
+    if (typeof admin === 'undefined') {
+      admin = await Admin.findOneOrFail(adminId)
+      authAdminCache.set(adminId, admin ?? null)
+    }
     res.locals.admin = admin
   }
   next()
+}
+
+type ContextType = { admin: any }
+
+export const authChecker: AuthChecker<ContextType> = ({ args, context, info, root }, roles) => {
+  if (!context.admin) return false
+
+  return true
 }
