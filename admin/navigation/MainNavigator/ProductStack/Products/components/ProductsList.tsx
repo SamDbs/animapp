@@ -4,7 +4,7 @@ import NoResult from '@components/NoResult'
 import Pagination from '@components/Pagination'
 import useSearch from '@hooks/useSearch'
 import { useNavigation } from '@react-navigation/native'
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Text, TextInput, View, ActivityIndicator, Pressable } from 'react-native'
 import { DataTable, IconButton } from 'react-native-paper'
 
@@ -50,17 +50,23 @@ type QueryVariables = {
 type ProductFilters = { published?: boolean }
 
 export default function ProductList({ style }: { style?: View['props']['style'] }) {
+  const [searchTerms, setSearchTerms] = useState<string>('')
   const [filters, setFilters] = useState<ProductFilters>({})
   const [pagination, setPagination] = useState(initialPagination)
-  const { data, loading, refetch } = useQuery<QueryReturnType, QueryVariables>(GET_PRODUCTS, {
+  const { data, loading } = useQuery<QueryReturnType, QueryVariables>(GET_PRODUCTS, {
     fetchPolicy: 'cache-and-network',
-    variables: { limit: LIMIT, offset: pagination.offset, filters },
+    variables: { limit: LIMIT, offset: pagination.offset, filters, searchTerms },
   })
 
   const search = useSearch((searchTerms) => {
-    setPagination(initialPagination)
-    refetch({ offset: 0, searchTerms })
+    setSearchTerms(searchTerms)
+    setPagination({ ...initialPagination, offset: 0 })
   })
+
+  const changeFilters = useCallback((filters) => {
+    setPagination(initialPagination)
+    setFilters(filters)
+  }, [])
 
   const { navigate } = useNavigation()
 
@@ -84,7 +90,7 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
               cursor: 'pointer',
               justifyContent: 'center',
             }}
-            onPress={() => setFilters({ published: undefined })}>
+            onPress={() => changeFilters({ published: undefined })}>
             <View
               style={{
                 margin: 8,
@@ -103,7 +109,7 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
               cursor: 'pointer',
               justifyContent: 'center',
             }}
-            onPress={() => setFilters({ published: true })}>
+            onPress={() => changeFilters({ published: true })}>
             <View
               style={{
                 margin: 8,
@@ -122,7 +128,7 @@ export default function ProductList({ style }: { style?: View['props']['style'] 
               cursor: 'pointer',
               justifyContent: 'center',
             }}
-            onPress={() => setFilters({ published: false })}>
+            onPress={() => changeFilters({ published: false })}>
             <View
               style={{
                 margin: 8,

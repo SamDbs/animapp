@@ -11,6 +11,9 @@ export type Ingredient = {
   rating: number | null
 }
 
+export type Constituents = { constituent: Constituent }[]
+export type Constituent = { name: string; description: string }
+
 type QueryReturnType = {
   product: {
     id: string
@@ -19,6 +22,7 @@ type QueryReturnType = {
     name: string
     type: string
     ingredients: Ingredients
+    constituents: Constituents
   }
 }
 

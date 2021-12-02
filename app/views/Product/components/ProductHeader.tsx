@@ -4,7 +4,9 @@ import { Text } from '../../components/Themed'
 
 const IMG_MARGIN = 20
 
-export default function ProductHeader({ product }: { product: any }) {
+type Props = { product: { image: string; name: string; type: string; description: string } }
+
+export default function ProductHeader({ product }: Props) {
   const dimensions = useWindowDimensions()
   const { width } = dimensions
   return (
