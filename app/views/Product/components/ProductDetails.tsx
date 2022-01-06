@@ -110,11 +110,9 @@ function AnalyticalConstituents({
 export default function ProductDetails({
   constituents,
   ingredients,
-  productId,
 }: {
   constituents: Constituents
   ingredients: Ingredients
-  productId: string
 }) {
   const colorSheme = useColorScheme()
   const { accent, tint } = Colors[colorSheme]

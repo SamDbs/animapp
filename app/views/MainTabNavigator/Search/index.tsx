@@ -1,7 +1,7 @@
 import { ActivityIndicator, StyleSheet, TextInput, View } from 'react-native'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { ScrollView } from 'react-native-gesture-handler'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { PageHeader, SafeAreaPage, Text, useThemeColor } from '../../components/Themed'
 import { RootStackParamList } from '../../../types'

@@ -1,8 +1,8 @@
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { ScrollView } from 'react-native-gesture-handler'
 import { StackNavigationProp } from '@react-navigation/stack'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 
 import { MainTabParamList, RootStackParamList } from '../../../types'
 import ProductHistoryContext from '../../../hooks/ProductHistoryContext'

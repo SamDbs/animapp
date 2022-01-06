@@ -1,4 +1,3 @@
-import React from 'react'
 import { LayoutAnimation, Platform, StyleSheet, UIManager, View } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 

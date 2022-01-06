@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import * as Clipboard from 'expo-clipboard'
 
 import { MainTabParamList } from '../../../types'

@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
 import { Pressable, View } from 'react-native'
+import { useState } from 'react'
 
 import { Text } from './Themed'
 

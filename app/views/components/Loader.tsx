@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react'
 import { Animated, Easing, View } from 'react-native'
+import { useEffect, useRef } from 'react'
 
 function Circle(props: {
   color: string

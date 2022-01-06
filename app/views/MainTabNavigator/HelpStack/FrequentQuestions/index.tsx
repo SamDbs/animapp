@@ -1,7 +1,6 @@
-import { StackScreenProps } from '@react-navigation/stack'
-
 import { ActivityIndicator, StyleSheet, View } from 'react-native'
-import React, { useState } from 'react'
+import { StackScreenProps } from '@react-navigation/stack'
+import { useState } from 'react'
 
 import { SafeAreaPage } from '../../../components/Themed'
 import useGetFaqs from '../../../../hooks/queries/GetFaq'

@@ -5,7 +5,6 @@ import {
   Text as DefaultText,
   View as DefaultView,
 } from 'react-native'
-import React from 'react'
 import Svg, { Path } from 'react-native-svg'
 
 import Colors from '../../constants/Colors'

@@ -1,15 +1,15 @@
 import { StackScreenProps } from '@react-navigation/stack'
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { RootStackParamList } from '../../types'
-import ProductHistoryContext from '../../hooks/ProductHistoryContext'
-
 import { SafeAreaPage, Text } from '../components/Themed'
+import ProductHistoryContext from '../../hooks/ProductHistoryContext'
+import useGetProduct from '../../hooks/queries/GetProduct'
+
+import IngredientModalContext from './components/context'
 import ModalIngredient from './components/ModalIngredient'
 import ProductDetails from './components/ProductDetails'
 import ProductHeader from './components/ProductHeader'
-import useGetProduct from '../../hooks/queries/GetProduct'
-import IngredientModalContext from './components/context'
 
 type Props = StackScreenProps<RootStackParamList, 'Product'>
 
@@ -35,8 +35,6 @@ function ProductView(props: Props): JSX.Element {
 
   if (!product) return <Text>Loading product...</Text>
 
-  console.log('product', JSON.stringify(product, null, 2))
-
   const hasDetails = product.ingredients || product.constituents
 
   return (
@@ -44,11 +42,7 @@ function ProductView(props: Props): JSX.Element {
       <ProductHeader product={product} />
 
       {hasDetails && (
-        <ProductDetails
-          constituents={product.constituents}
-          ingredients={product.ingredients}
-          productId={props.route.params.productId}
-        />
+        <ProductDetails constituents={product.constituents} ingredients={product.ingredients} />
       )}
 
       {modal.ingredientId && foundIngredient && (
