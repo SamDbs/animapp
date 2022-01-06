@@ -9,6 +9,7 @@ const GET_PRODUCT = gql`
       name
       type
       ingredients {
+        quantity
         ingredient {
           id
           name
@@ -20,6 +21,7 @@ const GET_PRODUCT = gql`
       constituents {
         quantity
         constituent {
+          id
           name
           description
         }

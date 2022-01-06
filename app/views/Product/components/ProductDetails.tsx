@@ -4,24 +4,47 @@ import { TouchableOpacity, View } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler'
 
 import { ContentView, Text } from '../../components/Themed'
-import { Ingredients } from '../../../hooks/queries/GetProduct'
+import {
+  Constituent,
+  Constituents,
+  Ingredient,
+  Ingredients,
+} from '../../../hooks/queries/GetProduct'
 import Colors from '../../../constants/Colors'
 import useColorScheme from '../../../hooks/useColorScheme'
 import IngredientModalContext from './context'
 
 const DetailsTabNavigator = createMaterialTopTabNavigator()
 
-function IngredientView({ ingredient }: { ingredient: any }) {
+function IngredientView({ quantity, ingredient }: { quantity: string; ingredient: Ingredient }) {
   const modal = useContext(IngredientModalContext)
 
   return (
     <TouchableOpacity onPress={() => modal.open(ingredient.id)}>
-      <View key={ingredient.id} style={{ padding: 10, flex: 1 }}>
-        <View>
+      <View style={{ padding: 10, flex: 1 }}>
+        <Row>
           <Text>{ingredient.name}</Text>
-        </View>
+          <Text>{quantity ?? '-'}</Text>
+        </Row>
       </View>
     </TouchableOpacity>
+  )
+}
+
+function ConstituentView({
+  constituent,
+  quantity,
+}: {
+  constituent: Constituent
+  quantity: string
+}) {
+  return (
+    <View style={{ padding: 10, flex: 1 }}>
+      <Row>
+        <Text>{constituent.name}</Text>
+        <Text>{quantity ?? '-'}</Text>
+      </Row>
+    </View>
   )
 }
 
@@ -31,13 +54,16 @@ function IngredientsView({
   },
 }: {
   route: { params: { ingredients: Ingredients } }
-  navigation: any
 }) {
   return (
     <ContentView style={{ flex: 1 }}>
       <ScrollView style={{ flex: 1 }}>
         {ingredients?.map((ingredient) => (
-          <IngredientView key={ingredient.ingredient.id} ingredient={ingredient.ingredient} />
+          <IngredientView
+            key={ingredient.ingredient.id}
+            ingredient={ingredient.ingredient}
+            quantity={ingredient.quantity}
+          />
         ))}
       </ScrollView>
     </ContentView>
@@ -61,46 +87,32 @@ function Row(props: JSX.Element['props']) {
 
 function AnalyticalConstituents({
   route: {
-    params: { ACs, productId },
+    params: { constituents },
   },
 }: {
-  route: {
-    params: {
-      ACs: { analyticalConstituents: any[]; relations: any[] }
-      productId: number
-    }
-  }
+  route: { params: { constituents: Constituents } }
 }) {
-  if (ACs.analyticalConstituents.length === 0)
-    return <ContentView style={{ paddingHorizontal: 10, flex: 1 }} />
-
   return (
-    <ContentView style={{ paddingHorizontal: 10, flex: 1 }}>
-      <Row>
-        <Text style={{ fontWeight: 'bold' }}>Element</Text>
-        <Text style={{ fontWeight: 'bold' }}>Nutrition value</Text>
-      </Row>
-      {ACs.analyticalConstituents.map((AC, i) => {
-        const foundRelation = ACs.relations.find(
-          (rel) => rel.constituentId === AC.id && rel.productId == productId,
-        )
-        return (
-          <Row key={AC.id} last={i === ACs.analyticalConstituents.length - 1}>
-            <Text>{AC.name}</Text>
-            <Text>{foundRelation && foundRelation.quantity ? foundRelation.quantity : '-'}</Text>
-          </Row>
-        )
-      })}
+    <ContentView style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }}>
+        {constituents?.map((constituent) => (
+          <ConstituentView
+            key={constituent.constituent.id}
+            constituent={constituent.constituent}
+            quantity={constituent.quantity}
+          />
+        ))}
+      </ScrollView>
     </ContentView>
   )
 }
 
 export default function ProductDetails({
-  ACs,
+  constituents,
   ingredients,
   productId,
 }: {
-  ACs: { analyticalConstituents: any[]; relations: any[] }
+  constituents: Constituents
   ingredients: Ingredients
   productId: string
 }) {
@@ -122,13 +134,12 @@ export default function ProductDetails({
           name="Ingredients"
           initialParams={{ ingredients }}
         />
-        {/*
+
         <DetailsTabNavigator.Screen
           component={AnalyticalConstituents}
           name="Constituents"
-          initialParams={{ ACs, productId }}
+          initialParams={{ constituents }}
         />
-        */}
       </DetailsTabNavigator.Navigator>
     </View>
   )

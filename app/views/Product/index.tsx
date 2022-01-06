@@ -35,16 +35,19 @@ function ProductView(props: Props): JSX.Element {
 
   if (!product) return <Text>Loading product...</Text>
 
+  console.log('product', JSON.stringify(product, null, 2))
+
+  const hasDetails = product.ingredients || product.constituents
+
   return (
     <SafeAreaPage noContext>
       <ProductHeader product={product} />
 
-      {product?.ingredients && (
+      {hasDetails && (
         <ProductDetails
+          constituents={product.constituents}
+          ingredients={product.ingredients}
           productId={props.route.params.productId}
-          // ACs={ACs}
-          ACs={{ analyticalConstituents: [], relations: [] }}
-          ingredients={product?.ingredients}
         />
       )}
 

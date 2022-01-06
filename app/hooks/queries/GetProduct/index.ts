@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client'
 
 import GET_PRODUCT from './query'
 
-export type Ingredients = { ingredient: Ingredient }[]
+export type Ingredients = { quantity: string; ingredient: Ingredient }[]
 export type Ingredient = {
   id: string
   name: string
@@ -11,8 +11,8 @@ export type Ingredient = {
   rating: number | null
 }
 
-export type Constituents = { constituent: Constituent }[]
-export type Constituent = { name: string; description: string }
+export type Constituents = { quantity: string; constituent: Constituent }[]
+export type Constituent = { id: string; name: string; description: string }
 
 type QueryReturnType = {
   product: {
