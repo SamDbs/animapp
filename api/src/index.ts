@@ -93,11 +93,17 @@ async function main() {
   app.use('/auth', authentication)
   app.use('/admin', admin)
 
-  type Res = { locals: { admin: object } }
+  type Res = { locals: { admin: object; restUrl: string } }
 
   app.use(
     '/graphql',
-    graphqlHTTP((req, res) => ({ schema, context: { admin: (res as unknown as Res).locals?.admin } })),
+    graphqlHTTP((req, res) => ({
+      schema,
+      context: {
+        admin: (res as unknown as Res).locals?.admin,
+        restUrl: (res as unknown as Res).locals?.restUrl,
+      },
+    })),
   )
 
   app.use(errorHandler)

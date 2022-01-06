@@ -43,6 +43,7 @@ export const isConnected: RequestHandler = async (req, res, next) => {
     }
     res.locals.admin = admin
   }
+  res.locals.restUrl = req.protocol + '://' + req.get('host')
   next()
 }
 

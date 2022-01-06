@@ -3,6 +3,7 @@ import {
   Args,
   ArgsType,
   Authorized,
+  Ctx,
   Field,
   FieldResolver,
   ID,
@@ -320,10 +321,12 @@ export default class ProductResolver {
   }
 
   @FieldResolver(() => String, { nullable: true })
-  async image(@Root() product: Product): Promise<string | undefined> {
-    const image = await Image.findOne({ select: ['url'], where: { productId: product.id } })
+  async image(@Root() product: Product, @Ctx() ctx: any): Promise<string | undefined> {
+    const img = await Image.findOne({ select: ['id'], where: { productId: product.id } })
 
-    return image?.url ?? 'https://via.placeholder.com/400'
+    if (!img) return undefined
+
+    return `${ctx.restUrl}/products/${product.id}/image`
   }
 
   @FieldResolver(() => [ProductTranslation])
