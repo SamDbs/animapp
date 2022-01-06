@@ -4,15 +4,15 @@ import { useCallback, useEffect, useState } from 'react'
 const STORAGE_KEY = '@productsHistory'
 
 export default function useProductHistoryContextValue(): {
-  historyProductsIds: number[]
-  viewProduct: (id: number) => Promise<void>
+  historyProductsIds: string[]
+  viewProduct: (id: string) => Promise<void>
 } {
-  const [historyProductsIds, setHistoryProductsIds] = useState<number[]>([])
+  const [historyProductsIds, setHistoryProductsIds] = useState<string[]>([])
 
   const viewProduct = useCallback(
     async (id) => {
       const storageHistory = await AsyncStorage.getItem(STORAGE_KEY)
-      const currentIds: number[] = storageHistory ? JSON.parse(storageHistory) : []
+      const currentIds: string[] = storageHistory ? JSON.parse(storageHistory) : []
       const otherIds = currentIds.filter((i) => i !== id)
       const newIdsArray = [id, ...otherIds]
       setHistoryProductsIds(newIdsArray)
