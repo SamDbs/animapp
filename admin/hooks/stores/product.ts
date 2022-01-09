@@ -36,7 +36,7 @@ const useProductsStore = create<ProductStore>(
         }))
       },
     }),
-    'product',
+    { name: 'product' },
   ),
 )
 

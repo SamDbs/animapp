@@ -26,7 +26,7 @@ const useAuthStore = create(
         return set({ jwt: '' })
       },
     })),
-    'auth',
+    { name: 'auth' },
   ),
 )
 

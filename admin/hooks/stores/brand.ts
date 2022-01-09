@@ -158,7 +158,7 @@ const useBrandStore = create<BrandStore>(
         return { pagination: data.pagination, ids }
       },
     }),
-    'brand',
+    { name: 'brand' },
   ),
 )
 export default useBrandStore
