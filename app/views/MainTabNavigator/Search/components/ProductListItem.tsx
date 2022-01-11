@@ -1,7 +1,7 @@
 import { Image, StyleSheet, View } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 
-import { AntDesign, Text } from '../../../components/Themed'
+import { Text } from '../../../components/Themed'
 
 const CARD_SIZE = 80
 
@@ -27,15 +27,6 @@ export default function ProductListItem(props: Props): JSX.Element {
             {props.product.brand.name}
           </Text>
         </View>
-      </View>
-      <View
-        style={{
-          height: CARD_SIZE,
-          width: CARD_SIZE,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <AntDesign name="smileo" size={24} />
       </View>
     </TouchableWithoutFeedback>
   )

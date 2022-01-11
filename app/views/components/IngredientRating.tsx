@@ -1,9 +1,9 @@
-import { AntDesign } from './Themed'
+import Svg from '../../assets/images/paw-print.svg'
 
 type Props = {
   rating: number
 }
 
 export default function IngredientRating(props: Props) {
-  return <AntDesign name="smileo" size={24} />
+  return <Svg width={24} height={24} color={'white'} />
 }
