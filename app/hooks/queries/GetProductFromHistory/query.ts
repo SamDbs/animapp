@@ -6,6 +6,7 @@ const query = gql`
       id
       image
       name
+      published
       brand {
         id
         name
