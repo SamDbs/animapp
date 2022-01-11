@@ -5,6 +5,7 @@ const STORAGE_KEY = '@productsHistory'
 
 export default function useProductHistoryContextValue(): {
   historyProductsIds: string[]
+  removeProduct:(id:string) => Promise<void>
   viewProduct: (id: string) => Promise<void>
 } {
   const [historyProductsIds, setHistoryProductsIds] = useState<string[]>([])
@@ -15,6 +16,17 @@ export default function useProductHistoryContextValue(): {
       const currentIds: string[] = storageHistory ? JSON.parse(storageHistory) : []
       const otherIds = currentIds.filter((i) => i !== id)
       const newIdsArray = [id, ...otherIds]
+      setHistoryProductsIds(newIdsArray)
+      await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newIdsArray))
+    },
+    [historyProductsIds.join('-')],
+  )
+
+  const removeProduct = useCallback(
+    async (id) => {
+      const storageHistory = await AsyncStorage.getItem(STORAGE_KEY)
+      const currentIds: string[] = storageHistory ? JSON.parse(storageHistory) : []
+      const newIdsArray = currentIds.filter((i) => i !== id)
       setHistoryProductsIds(newIdsArray)
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newIdsArray))
     },
@@ -33,9 +45,11 @@ export default function useProductHistoryContextValue(): {
     getHistoryProducts()
   }, [])
 
+
+
   useEffect(() => {
     refresh()
-  }, [refresh])
+  }, [])
 
-  return { historyProductsIds, viewProduct }
+  return { historyProductsIds, viewProduct, removeProduct }
 }
