@@ -28,13 +28,6 @@ export default function ProductListItem(props: Props): JSX.Element {
           </Text>
         </View>
       </View>
-      <View
-        style={{
-          height: CARD_SIZE,
-          width: CARD_SIZE,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}></View>
     </TouchableWithoutFeedback>
   )
 }
