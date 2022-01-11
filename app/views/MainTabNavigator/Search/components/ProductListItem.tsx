@@ -1,7 +1,7 @@
 import { Image, StyleSheet, View } from 'react-native'
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler'
 
-import { AntDesign, Text } from '../../../components/Themed'
+import { Text } from '../../../components/Themed'
 
 const CARD_SIZE = 80
 
