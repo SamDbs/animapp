@@ -34,9 +34,7 @@ export default function ProductListItem(props: Props): JSX.Element {
           width: CARD_SIZE,
           justifyContent: 'center',
           alignItems: 'center',
-        }}>
-        <AntDesign name="smileo" size={24} />
-      </View>
+        }}></View>
     </TouchableWithoutFeedback>
   )
 }
