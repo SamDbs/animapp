@@ -2,8 +2,8 @@ import 'dotenv/config'
 
 export default {
   expo: {
-    name: 'app',
-    slug: 'app',
+    name: 'animapp',
+    slug: 'animapp',
     version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/images/icon.png',
@@ -21,8 +21,10 @@ export default {
     ios: {
       supportsTablet: true,
       userInterfaceStyle: 'automatic',
+      bundleIdentifier: 'io.animapp.ios-mvp',
     },
     android: {
+      package: 'io.animapp.android_mvp',
       adaptiveIcon: {
         foregroundImage: './assets/images/adaptive-icon.png',
         backgroundColor: '#CCCCCC',
